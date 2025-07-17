@@ -1,7 +1,6 @@
 # Important note
 
-This project is currently not active maintained!
-See discussion https://github.com/apidoc/apidoc/issues/1436
+This project is a FORK
 
 # apiDoc
 
@@ -47,7 +46,7 @@ $ apidoc -i src/ -o doc/
 This repository contains and `example` folder from which you can generate a very complete documentation on an example api endpoint. It also contains best practice hints (in the `footer.md` file).
 
 ```bash
-$ git clone https://github.com/apidoc/apidoc && cd apidoc
+$ git clone https://github.com/tyba-co/apidoc && cd apidoc
 $ npm install --prod
 $ ./bin/apidoc -i example -o /tmp/doc
 $ $BROWSER /tmp/doc

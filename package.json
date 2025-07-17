@@ -10,10 +10,10 @@
   "homepage": "https://apidocjs.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/apidoc/apidoc.git"
+    "url": "https://github.com/tyba-co/apidoc/apidoc.git"
   },
   "bugs": {
-    "url": "https://github.com/apidoc/apidoc/issues"
+    "url": "https://github.com/tyba-co/apidoc/apidoc/issues"
   },
   "scripts": {
     "build-example": "./bin/apidoc -v -i example/ -o /tmp/apidoc-output",

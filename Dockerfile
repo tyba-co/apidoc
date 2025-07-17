@@ -3,9 +3,8 @@ FROM node:16-alpine
 
 LABEL org.label-schema.name="apidoc" \
     org.label-schema.description="apidoc Docker image" \
-    org.label-schema.url="http://apidocjs.com/" \
-    org.label-schema.vcs-url="https://github.com/apidoc/apidoc" \
-    org.label-schema.maintainer="rottmann@inveris.de" \
+    org.label-schema.vcs-url="https://github.com/tyba-co/apidoc" \
+    org.label-schema.maintainer="@tyba-co" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.docker.cmd="docker run --rm -v $(pwd):/home/node/apidoc apidoc/apidoc -o outputdir -i inputdir"
 
