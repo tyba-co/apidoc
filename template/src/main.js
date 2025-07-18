@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
   initSampleRequest();
   Prism.highlightAll();
-  
+
   // Handle sidebar navigation active state
-  $(document).on('click', '.sidenav a', function() {
+  $(document).on('click', '.sidenav a', function () {
     // Remove active class from all links and add to clicked one
     $('.sidenav').find('a').removeClass('active');
     $(this).addClass('active');
-    
+
     // For proper parent li styling
     $('.sidenav > li').removeClass('active');
     $(this).parent('li').addClass('active');
@@ -382,18 +382,18 @@ function init () {
 
   // Bootstrap 5 Scrollspy
   if (!apiProject.template.aloneDisplay) {
-    const scrollSpy = new bootstrap.ScrollSpy(document.body, {
-      target: '#scrollingNav'
+    bootstrap.ScrollSpy.getOrCreateInstance(document.body, {
+      target: '#scrollingNav',
     });
   }
-  
+
   // Initialize offcanvas for mobile navigation
   const offcanvasElement = document.getElementById('sidebar');
   if (offcanvasElement) {
     const offcanvas = new bootstrap.Offcanvas(offcanvasElement, {
-      backdrop: true
+      backdrop: true,
     });
-    
+
     // Close offcanvas on link click on mobile
     const sidebarLinks = document.querySelectorAll('#sidebar .nav a');
     sidebarLinks.forEach(link => {
@@ -447,7 +447,7 @@ function init () {
   function initDynamic () {
     // Bootstrap popover
     document.querySelectorAll('button[data-bs-toggle="popover"]').forEach(popoverTriggerEl => {
-      new bootstrap.Popover(popoverTriggerEl);
+      bootstrap.Popover.getOrCreateInstance(popoverTriggerEl);
       popoverTriggerEl.addEventListener('click', (e) => {
         e.preventDefault();
       });
