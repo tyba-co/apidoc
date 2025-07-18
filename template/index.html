@@ -413,26 +413,29 @@
 
 <script id="template-article-sample-request" type="text/x-handlebars-template">
   {{#if article.sampleRequest}}
-    <div class="card card-body">
-      <h3>{{__ "Send a Sample Request"}}</h3>
-      <form class="form-horizontal">
-        <fieldset>
-          <div class="mb-3 row">
-            <label class="col-md-3 col-form-label" for="{{../id}}-sample-request-url">URL</label>
-            <div class="input-group">
-              <span class="input-group-text">{{__ "url"}}</span>
-              <input id="{{../id}}-sample-request-url" type="url" class="form-control sample-request-url" value="{{article.sampleRequest.0.url}}" />
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0">{{__ "Send a Sample Request"}}</h3>
+      </div>
+      <div class="card-body">
+        <form class="form-horizontal">
+          <fieldset>
+            <div class="mb-3">
+              <label class="form-label" for="{{../id}}-sample-request-url">URL</label>
+              <div class="input-group">
+                <span class="input-group-text">{{__ "url"}}</span>
+                <input id="{{../id}}-sample-request-url" type="url" class="form-control sample-request-url" value="{{article.sampleRequest.0.url}}" />
+              </div>
             </div>
-          </div>
 
       {{#if article.header}}
         {{#if article.header.fields}}
-          <h3>{{__ "Headers"}}</h3>
+          <h4 class="mt-4">{{__ "Headers"}}</h4>
           {{#each article.header.fields}}
             <div class="{{../id}}-sample-request-header-fields">
               {{#each this}}
               <div class="mb-3">
-                <label class="col-md-3 form-label" for="sample-request-header-field-{{field}}">{{field}}</label>
+                <label class="form-label" for="sample-request-header-field-{{field}}">{{field}}</label>
                 <div class="input-group">
                   <span class="input-group-text">{{{type}}}</span>
                   <input type="text" id="sample-request-header-field-{{field}}"
@@ -452,21 +455,24 @@
 
       {{#if article.parameter}}
         {{#if article.parameter.fields}}
-          <h3>{{__ "Parameters"}}</h3>
-          {{#each article.parameter.fields}}
+          <h4 class="mt-4">{{__ "Parameters"}}</h4>
+          <div class="row mb-3">
             <div class="col-md-3">
-              <select   name="{{../id}}-sample-header-content-type" class="{{../id}}-sample-request-param-select sample-header-content-type sample-header-content-type-switch">
+              <label class="form-label">Format</label>
+              <select name="{{../id}}-sample-header-content-type" class="form-select {{../id}}-sample-request-param-select sample-header-content-type sample-header-content-type-switch">
                 <option value="auto" selected>ajax-auto</option>
-                <option value="json" >json</option>
-                <option value="form-data" >form-data</option>
+                <option value="json">json</option>
+                <option value="form-data">form-data</option>
               </select>
             </div>
+          </div>
 
+          {{#each article.parameter.fields}}
             <div class="{{../id}}-sample-request-param-body {{../id}}-sample-header-content-type-body hide">
-              <div class="form-group">
+              <div class="mb-3">
                 <div class="input-group">
                   <div class="input-group-text">json</div>
-                  <textarea id="sample-request-body-json" class="form-control sample-request-body" data-sample-request-body-group="sample-request-param-{{@./index}}" rows="6" style="OVERFLOW: visible" {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
+                  <textarea id="sample-request-body-json" class="form-control sample-request-body" data-sample-request-body-group="sample-request-param-{{@./index}}" rows="6" {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
                 </div>
               </div>
             </div>
@@ -474,7 +480,7 @@
               {{#each this}}
               <div class="mb-3">
                 {{#ifNotObject type}}
-                <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}</label>
+                <label class="form-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
                 <div class="input-group">
                   <div class="input-group-text">{{{type}}}</div>
                   {{#if allowedValues}}
@@ -510,13 +516,13 @@
       {{/if}}
 
       {{#if article.query}}
-        <h3>{{__ "Query Parameters"}}</h3>
+        <h4 class="mt-4">{{__ "Query Parameters"}}</h4>
         <div class="{{../id}}-sample-request-param-fields {{../id}}-sample-header-content-type-fields">
           {{#each article.query}}
             <div class="mb-3">
               {{#ifNotObject type}}
-              <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} ({{__ "optional"}}){{/if}}</label>
-              <div class="input-group col-md-6">
+              <label class="form-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
+              <div class="input-group">
                 <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
                 <div class="input-group-text sample-request-select">
@@ -572,11 +578,12 @@
           </div>
         </div>
 
-        <div hidden class="col-md-9" id="sample-request-body-form-input-{{this.id}}">
+        <div hidden class="col-md-12" id="sample-request-body-form-input-{{this.id}}">
+          <h4 class="mt-4">{{__ "Body Parameters"}}</h4>
           {{#each article.body}}
-            <div class="form-group">
+            <div class="mb-3">
               {{#ifNotObject type}}
-              <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}</label>
+              <label class="form-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
               <div class="input-group">
                 <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
@@ -610,23 +617,28 @@
         </div>
       {{/if}}
 
-          <div class="mb-3">
-            <div class="controls float-end">
-              <button class="btn btn-primary bg-primary sample-request-send" data-type="{{article.type}}">{{__ "Send"}}</button>
-              <button class="btn btn-danger bg-red sample-request-clear" data-type="{{article.type}}">{{__ "Reset"}}</button>
+          <div class="mb-4 mt-4">
+            <div class="controls">
+              <button class="btn btn-primary sample-request-send" data-type="{{article.type}}">{{__ "Send"}}</button>
+              <button class="btn btn-outline-secondary ms-2 sample-request-clear" data-type="{{article.type}}">{{__ "Reset"}}</button>
             </div>
           </div>
-          <div class="mb-3 sample-request-response" hidden>
-            <h3>
+          <div class="sample-request-response" hidden>
+            <h4 class="mb-3">
               {{__ "Response"}}
               <button class="btn btn-outline-secondary btn-sm float-end sample-request-clear">X</button>
-            </h3>
-            <pre 
-              data-type="json"
-              data-prismjs-copy="{{__ "Copy"}}"
-              data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
-              data-prismjs-copy-success="{{__ "copied!"}}"
-            ><code class="language-json sample-request-response-json"></code></pre>
+            </h4>
+            <div class="card">
+              <div class="card-body p-0">
+                <pre 
+                  class="m-0 p-3"
+                  data-type="json"
+                  data-prismjs-copy="{{__ "Copy"}}"
+                  data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+                  data-prismjs-copy-success="{{__ "copied!"}}"
+                ><code class="language-json sample-request-response-json"></code></pre>
+              </div>
+            </div>
           </div>
         </fieldset>
       </form>
