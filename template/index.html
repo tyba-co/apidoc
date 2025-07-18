@@ -14,68 +14,78 @@
   <link href="assets/apple-touch-icon.png?__API_CACHE_BUSTING_QUERY_PARAM__" rel="apple-touch-icon" sizes="180x180">
   <link href="assets/favicon-32x32.png?__API_CACHE_BUSTING_QUERY_PARAM__" rel="icon" type="image/png" sizes="32x32">
   <link href="assets/favicon-16x16.png?__API_CACHE_BUSTING_QUERY_PARAM__" rel="icon" type="image/png" sizes="16x16">
+  <script src="assets/bootstrap.bundle.min.js?__API_CACHE_BUSTING_QUERY_PARAM__"></script>
 </head>
 
 <body class="container-fluid">
 
 <!-- SIDENAV -->
 <script id="template-sidenav" type="text/x-handlebars-template">
-<nav id="scrollingNav" class="col-sm-3 col-lg-2 sidebar-offcanvas">
-  <div class="nav-toggle visible-xs">
-    <button type="button" class="btn btn-link" data-toggle="offcanvas">
-        <span class="sr-only">{{__ "Toggle navigation"}}</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+<div class="d-md-none">
+  <div class="nav-toggle">
+    <button type="button" class="btn btn-link" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <span class="visually-hidden">{{__ "Toggle navigation"}}</span>
+        <span class="navbar-toggler-icon"></span>
     </button>
   </div>
+</div>
+
+<div class="offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+  <div class="offcanvas-header d-md-none">
+    <h5 class="offcanvas-title" id="sidebarLabel">Documentation</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <nav id="scrollingNav" class="col-sm-3 col-lg-2 sidebar-offcanvas">
   <div class="sidenav-search">
     <input class="form-control search" data-action='filter-search' type="text" placeholder="{{__ "Filter..."}}">
     <span class="search-reset">x</span>
   </div>
-  <ul class="sidenav nav nav-list list">
+  <ul class="sidenav nav flex-column list">
   {{#each nav}}
     {{#if title}}
       {{#if isHeader}}
         {{#if isFixed}}
-          <li class="nav-fixed nav-header navbar-btn nav-list-item" data-group="{{group}}"><a href="#api-{{group}}" data-name="show-api-{{group}}" class="show-api api-{{group}}-init">{{underscoreToSpace title}}</a></li>
+          <li class="nav-fixed nav-header nav-list-item" data-group="{{group}}"><a href="#api-{{group}}" data-name="show-api-{{group}}" class="show-api api-{{group}}-init">{{underscoreToSpace title}}</a></li>
         {{else}}
           <li class="nav-header nav-list-item" data-group="{{group}}"><a href="#api-{{group}}" data-group="show-api-{{group}}" class="show-group api-{{group}}-init">{{underscoreToSpace title}}</a></li>
         {{/if}}
       {{else}}
-        <li class="{{#if hidden}}hide {{/if}}" data-group="{{group}}" data-name="{{name}}" data-version="{{version}}">
-          <a href="#api-{{group}}-{{name}}" title="{{url}}" data-group="show-api-{{group}}" data-name="show-api-{{group}}-{{name}}" class="nav-list-item show-api api-{{group}}-{{name}}-init">{{title}}<div class="nav-list-url-item hide">{{url}}</div></a>
+        <li class="{{#if hidden}}d-none {{/if}}" data-group="{{group}}" data-name="{{name}}" data-version="{{version}}">
+          <a href="#api-{{group}}-{{name}}" title="{{url}}" data-group="show-api-{{group}}" data-name="show-api-{{group}}-{{name}}" class="nav-list-item show-api api-{{group}}-{{name}}-init">{{title}}<div class="nav-list-url-item d-none">{{url}}</div></a>
         </li>
       {{/if}}
     {{/if}}
   {{/each}}
   </ul>
-</nav>
+    </nav>
+  </div>
+</div>
 </script>
 
 <!-- PROJECT -->
 <script id="template-project" type="text/x-handlebars-template">
-  <div class="pull-left">
+  <div class="float-start">
     <h1>{{name}}</h1>
     {{#if description}}<h2>{{{nl2br description}}}</h2>{{/if}}
   </div>
-  <div class="pull-right">
+  <div class="float-end">
     {{#if template.withCompare}}
     <div class="btn-group">
-      <button id="version" class="btn btn-lg btn-default dropdown-toggle" data-toggle="dropdown">
+      <button id="version" class="btn btn-lg btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         <strong>{{version}}</strong>&nbsp;<span class="caret"></span>
       </button>
-      <ul id="versions" class="dropdown-menu open-left">
-        <li><a id="compareAllWithPredecessor" href="#">{{__ "Compare all with predecessor"}}</a></li>
-        <li class="divider"></li>
-        <li class="disabled"><a href="#">{{__ "show up to version:"}}</a></li>
+      <ul id="versions" class="dropdown-menu dropdown-menu-end">
+        <li><a id="compareAllWithPredecessor" href="#" class="dropdown-item">{{__ "Compare all with predecessor"}}</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a href="#" class="dropdown-item disabled">{{__ "show up to version:"}}</a></li>
       {{#each versions}}
-        <li class="version"><a href="#">{{this}}</a></li>
+        <li class="version"><a href="#" class="dropdown-item">{{this}}</a></li>
       {{/each}}
       </ul>
     </div>
     {{else}}
-    <div id="version" class="well well-sm">
+    <div id="version" class="card card-body p-2">
       <strong>{{version}}</strong>
     </div>
     {{/if}}
@@ -123,16 +133,16 @@
 
 <script id="template-article" type="text/x-handlebars-template">
   <article id="api-{{article.group}}-{{article.name}}-{{article.version}}" {{#if hidden}}class="hide"{{/if}} data-group="{{article.group}}" data-name="{{article.name}}" data-version="{{article.version}}">
-    <div class="pull-left">
+    <div class="float-start">
       <h1><span class="color-primary">{{underscoreToSpace article.groupTitle}}</span>{{#if article.title}} <span class="text-muted">|</span> {{article.title}}{{/if}}</h1>
     </div>
     {{#if template.withCompare}}
-    <div class="pull-right">
+    <div class="float-end">
       <div class="btn-group">
-        <button class="version btn btn-default dropdown-toggle" data-toggle="dropdown">
-          <strong>{{article.version}}</strong>&nbsp;<span class="caret"></span>
+        <button class="version btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+          <strong>{{article.version}}</strong>
         </button>
-        <ul class="versions dropdown-menu open-left">
+        <ul class="versions dropdown-menu dropdown-menu-start">
           <li class="disabled"><a href="#">{{__ "compare changes to:"}}</a></li>
         {{#each versions}}
           <li class="version"><a href="#">{{this}}</a></li>
@@ -168,7 +178,7 @@
         {{#each article.permission}}
           {{name}}
           {{#if title}}
-          <button type="button" class="btn btn-info btn-xs" data-title="{{title}}" data-content="{{nl2br description}}" data-html="true" data-toggle="popover" data-placement="right" data-trigger="hover">
+          <button type="button" class="btn btn-info btn-sm" data-title="{{title}}" data-content="{{nl2br description}}" data-html="true" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="hover">
               <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
           </button>
           {{/if}}
@@ -180,15 +190,15 @@
     {{#ifCond article.examples.length '>' 0}}
       <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
         {{#each article.examples}}
-          <li{{#ifCond @index '==' 0}} class="active"{{/ifCond}}>
-            <a href="#examples-{{../id}}-{{@index}}" role="tab" data-toggle="tab">{{title}}</a>
+          <li class="nav-item{{#ifCond @index '==' 0}} active{{/ifCond}}">
+            <a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">{{title}}</a>
           </li>
         {{/each}}
       </ul>
 
       <div class="tab-content">
       {{#each article.examples}}
-        <div class="tab-pane{{#ifCond @index '==' 0}} active{{/ifCond}}" id="examples-{{../id}}-{{@index}}">
+        <div class="tab-pane fade{{#ifCond @index '==' 0}} show active{{/ifCond}}" id="examples-{{../id}}-{{@index}}">
           <pre 
             data-type="{{type}}"
             data-prismjs-copy="{{__ "Copy"}}"
@@ -358,7 +368,7 @@
       <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
       {{#each params.examples}}
         <li{{#ifCond @index '==' 0}} class="active"{{/ifCond}}>
-          <a href="#{{../section}}-examples-{{../id}}-{{@index}}" role="tab" data-toggle="tab">{{title}}</a>
+          <a href="#{{../section}}-examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">{{title}}</a>
         </li>
       {{/each}}
       </ul>
@@ -381,14 +391,14 @@
 
 <script id="template-article-sample-request" type="text/x-handlebars-template">
   {{#if article.sampleRequest}}
-    <div class="well">
+    <div class="card card-body">
       <h3>{{__ "Send a Sample Request"}}</h3>
       <form class="form-horizontal">
         <fieldset>
-          <div class="form-group">
-            <label class="col-md-3 control-label" for="{{../id}}-sample-request-url">URL</label>
+          <div class="mb-3 row">
+            <label class="col-md-3 col-form-label" for="{{../id}}-sample-request-url">URL</label>
             <div class="input-group">
-              <span class="input-group-addon">{{__ "url"}}</span>
+              <span class="input-group-text">{{__ "url"}}</span>
               <input id="{{../id}}-sample-request-url" type="url" class="form-control sample-request-url" value="{{article.sampleRequest.0.url}}" />
             </div>
           </div>
@@ -399,10 +409,10 @@
           {{#each article.header.fields}}
             <div class="{{../id}}-sample-request-header-fields">
               {{#each this}}
-              <div class="form-group">
-                <label class="col-md-3 control-label" for="sample-request-header-field-{{field}}">{{field}}</label>
+              <div class="mb-3">
+                <label class="col-md-3 form-label" for="sample-request-header-field-{{field}}">{{field}}</label>
                 <div class="input-group">
-                  <span class="input-group-addon">{{{type}}}</span>
+                  <span class="input-group-text">{{{type}}}</span>
                   <input type="text" id="sample-request-header-field-{{field}}"
                     class="form-control sample-request-input"
                     value="{{#if defaultValue}}{{ defaultValue }}{{/if}}"
@@ -433,20 +443,20 @@
             <div class="{{../id}}-sample-request-param-body {{../id}}-sample-header-content-type-body hide">
               <div class="form-group">
                 <div class="input-group">
-                  <div class="input-group-addon">json</div>
+                  <div class="input-group-text">json</div>
                   <textarea id="sample-request-body-json" class="form-control sample-request-body" data-sample-request-body-group="sample-request-param-{{@./index}}" rows="6" style="OVERFLOW: visible" {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
                 </div>
               </div>
             </div>
             <div class="{{../id}}-sample-request-param-fields {{../id}}-sample-header-content-type-fields">
               {{#each this}}
-              <div class="form-group">
+              <div class="mb-3">
                 {{#ifNotObject type}}
-                <label class="col-md-3 control-label" for="sample-request-param-field-{{field}}">{{field}}</label>
+                <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}</label>
                 <div class="input-group">
-                  <div class="input-group-addon">{{{type}}}</div>
+                  <div class="input-group-text">{{{type}}}</div>
                   {{#if allowedValues}}
-                  <div class="input-group-addon sample-request-select">
+                  <div class="input-group-text sample-request-select">
                     <select class="form-control" data-name="{{dot2bracket this}}" data-family="query" data-group="{{@../index}}" {{#if optional}}data-optional="true"{{/if}}>
                       <option value="" class="empty">&lt;{{__ "No value"}}&gt;</option>
                       {{#each allowedValues}}
@@ -481,13 +491,13 @@
         <h3>{{__ "Query Parameters"}}</h3>
         <div class="{{../id}}-sample-request-param-fields {{../id}}-sample-header-content-type-fields">
           {{#each article.query}}
-            <div class="form-group">
+            <div class="mb-3">
               {{#ifNotObject type}}
-              <label class="col-md-3 control-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} ({{__ "optional"}}){{/if}}</label>
+              <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}{{#if optional}} ({{__ "optional"}}){{/if}}</label>
               <div class="input-group col-md-6">
-                <div class="input-group-addon">{{{type}}}</div>
+                <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
-                <div class="input-group-addon sample-request-select">
+                <div class="input-group-text sample-request-select">
                   <select class="form-control" data-name="{{dot2bracket this}}" data-family="query" data-group="{{@../index}}" {{#if optional}}data-optional="true"{{/if}}>
                     <option value="" class="empty">&lt;{{__ "No value"}}&gt;</option>
                     {{#each allowedValues}}
@@ -528,9 +538,9 @@
         </div>
 
         <div class="col-md-9" id="sample-request-body-json-input-{{this.id}}">
-          <div class="form-group">
+          <div class="mb-3">
             <div class="input-group">
-              <div class="input-group-addon">json</div>
+              <div class="input-group-text">json</div>
               <textarea class="form-control sample-request-input" rows="6"
                 data-family="body-json"
                 data-name={{"body"}}
@@ -544,11 +554,11 @@
           {{#each article.body}}
             <div class="form-group">
               {{#ifNotObject type}}
-              <label class="col-md-3 control-label" for="sample-request-param-field-{{field}}">{{field}}</label>
+              <label class="col-md-3 form-label" for="sample-request-param-field-{{field}}">{{field}}</label>
               <div class="input-group">
-                <div class="input-group-addon">{{{type}}}</div>
+                <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
-                <div class="input-group-addon sample-request-select">
+                <div class="input-group-text sample-request-select">
                   <select class="form-control" data-name="{{dot2bracket this}}" data-family="body" data-group="{{@../index}}" {{#if optional}}data-optional="true"{{/if}}>
                     <option value="" class="empty">&lt;{{__ "No value"}}&gt;</option>
                     {{#each allowedValues}}
@@ -578,16 +588,16 @@
         </div>
       {{/if}}
 
-          <div class="form-group">
-            <div class="controls pull-right">
+          <div class="mb-3">
+            <div class="controls float-end">
               <button class="btn btn-primary bg-primary sample-request-send" data-type="{{article.type}}">{{__ "Send"}}</button>
               <button class="btn btn-danger bg-red sample-request-clear" data-type="{{article.type}}">{{__ "Reset"}}</button>
             </div>
           </div>
-          <div class="form-group sample-request-response" hidden>
+          <div class="mb-3 sample-request-response" hidden>
             <h3>
               {{__ "Response"}}
-              <button class="btn btn-default btn-xs pull-right sample-request-clear">X</button>
+              <button class="btn btn-outline-secondary btn-sm float-end sample-request-clear">X</button>
             </h3>
             <pre 
               data-type="json"
@@ -604,19 +614,19 @@
 
 <script id="template-compare-article" type="text/x-handlebars-template">
   <article id="api-{{article.group}}-{{article.name}}-{{article.version}}" {{#if hidden}}class="hide"{{/if}} data-group="{{article.group}}" data-name="{{article.name}}" data-version="{{article.version}}" data-compare-version="{{compare.version}}">
-    <div class="pull-left">
+    <div class="float-start">
       <h1>{{underscoreToSpace article.groupTitle}} | {{{showDiff article.title compare.title}}}</h1>
     </div>
 
-    <div class="pull-right">
+    <div class="float-end">
       <div class="btn-group">
         <button class="btn btn-success" disabled>
           <strong>{{article.version}}</strong> {{__ "compared to"}}
         </button>
-        <button class="version btn btn-danger dropdown-toggle" data-toggle="dropdown">
-          <strong>{{compare.version}}</strong>&nbsp;<span class="caret"></span>
+        <button class="version btn btn-danger dropdown-toggle" data-bs-toggle="dropdown">
+          <strong>{{compare.version}}</strong>
         </button>
-        <ul class="versions dropdown-menu open-left">
+        <ul class="versions dropdown-menu dropdown-menu-start">
           <li class="disabled"><a href="#">{{__ "compare changes to:"}}</a></li>
           <li class="divider"></li>
         {{#each versions}}
@@ -650,7 +660,7 @@
     {{#each_compare_title article.examples compare.examples}}
       {{#if typeSame}}
         <li{{#ifCond index '==' 0}} class="active"{{/ifCond}}>
-          <a href="#compare-examples-{{../article.id}}-{{index}}" role="tab" data-toggle="tab">{{{showDiff source.title compare.title}}}</a>
+          <a href="#compare-examples-{{../article.id}}-{{index}}" role="tab" data-bs-toggle="tab">{{{showDiff source.title compare.title}}}</a>
         </li>
       {{/if}}
 
@@ -839,7 +849,7 @@
     {{#each_compare_title source.examples compare.examples}}
       {{#if typeSame}}
         <li{{#ifCond index '==' 0}} class="active"{{/ifCond}}>
-          <a href="#{{../section}}-compare-examples-{{../article.id}}-{{index}}" role="tab" data-toggle="tab">{{{showDiff source.title compare.title}}}</a>
+          <a href="#{{../section}}-compare-examples-{{../article.id}}-{{index}}" role="tab" data-bs-toggle="tab">{{{showDiff source.title compare.title}}}</a>
         </li>
       {{/if}}
 
@@ -1015,17 +1025,13 @@
 </script>
 
 <div class="container-fluid">
-  <div class="row row-offcanvas row-offcanvas-left">
-    <div id="sidenav" class="col-sm-3 col-lg-2"></div>
-    <div id="content" class="col-sm-9 col-lg-10">
+  <div class="row">
+    <div id="sidenav" class="col-md-3 col-lg-2 d-md-block"></div>
+
+    <div id="content" class="col-md-9 col-lg-10">
       <div id="project"></div>
-      <div id="header"></div>
       <div id="sections"></div>
       <div id="footer"></div>
-      <div id="generator"></div>
-    </div>
-  </div>
-</div>
 
 <div id="loader">
   <div class="spinner">

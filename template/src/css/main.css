@@ -6,6 +6,7 @@
  * Define colors
  */
 :root {
+  /* Custom theme colors */
   --primary: #0088cc;
   --white: #fff;
   --light-gray: #ccc;
@@ -17,6 +18,11 @@
   --meth-post: #4070ec;
   --meth-delete: #ed0039;
   --red: #dc3545;
+  
+  /* Bootstrap 5 variables */
+  --bs-primary: var(--primary);
+  --bs-danger: var(--red);
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .color-primary {
@@ -270,7 +276,7 @@ td.code {
 */
 
 /*
- * Off Canvas
+ * Off Canvas - Bootstrap 5
  * --------------------------------------------------
  */
 @media screen and (max-width: 767px) {
@@ -278,25 +284,14 @@ td.code {
     margin-top: 58px;
   }
 
-  .row-offcanvas {
-    position: relative;
-    -webkit-transition: all .25s ease-out;
-    -o-transition: all .25s ease-out;
-    transition: all .25s ease-out;
-    left: 0;
+  /* Bootstrap 5 offcanvas adjustments */
+  .sidebar-offcanvas {
+    max-width: 280px;
+    background-color: var(--dark-gray);
   }
-
-  .row-offcanvas,
-  .row-offcanvas * {
-    transition: all 0.5s ease-out;
-  }
-
-  .row-offcanvas .sidebar-offcanvas {
-    position: absolute;
-    top: 0;
-    left: -200px !important; /* 6 columns */
-    width: 100%; /* 6 columns */
-    max-width: 200px;
+  
+  .offcanvas-start {
+    width: 280px;
   }
 
   .nav-toggle {
@@ -304,37 +299,24 @@ td.code {
     left: 0;
     background: var(--dark-gray);
     width: 100%;
+    z-index: 1045;
   }
   
   .nav-toggle .btn {
     margin: 10px 14px;
+    display: inline-flex;
+    align-items: center;
   }
-  .nav-toggle .icon-bar {
-    display: block;
-    width: 22px;
-    height: 2px;
-    border-radius: 1px;
-    background-color: var(--white);
-  }
-  .nav-toggle .icon-bar + .icon-bar {
-    margin-top: 4px;
-  }
-
-  .row-offcanvas.active .sidebar-offcanvas {
-    left: 0 !important; /* 6 columns */
-  }
-  .row-offcanvas.active, .row-offcanvas.active .nav-toggle {
-    left: 200px;
-  }
-  /* Styling the three lines to make it an X */
-  .row-offcanvas.active .nav-toggle .btn > .icon-bar {
-    transform: rotate(45deg) translate(-4px, -4px);
-  }
-  .row-offcanvas.active .nav-toggle .btn .icon-bar:nth-child(2) {
-    display: none;
-  }
-  .row-offcanvas.active .nav-toggle .btn .icon-bar:nth-child(3) {
-    transform: rotate(-45deg);
+  
+  .navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    background-image: var(--bs-navbar-toggler-icon-bg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
   }
 }
 

@@ -7,12 +7,9 @@ import $ from 'jquery';
 import { groupBy, extend, some } from 'lodash';
 import semver from 'semver';
 import Handlebars from 'handlebars';
-// bootstrap plugins
-import 'bootstrap/js/dropdown';
-import 'bootstrap/js/tooltip';
-import 'bootstrap/js/popover';
-import 'bootstrap/js/scrollspy';
-import 'bootstrap/js/tab';
+// Import Bootstrap's JavaScript bundle (includes Popper.js)
+// Bootstrap 5 no longer uses jQuery so we need to import the entire bundle
+import * as bootstrap from 'bootstrap';
 
 // Prism is the syntax highlighting lib
 import Prism from 'prismjs';
@@ -372,10 +369,29 @@ function init () {
   });
   $('#sections').append(content);
 
-  // Bootstrap Scrollspy
+  // Bootstrap 5 Scrollspy
   if (!apiProject.template.aloneDisplay) {
-    document.body.dataset.spy = 'scroll';
-    $('body').scrollspy({ target: '#scrollingNav' });
+    const scrollSpy = new bootstrap.ScrollSpy(document.body, {
+      target: '#scrollingNav'
+    });
+  }
+  
+  // Initialize offcanvas for mobile navigation
+  const offcanvasElement = document.getElementById('sidebar');
+  if (offcanvasElement) {
+    const offcanvas = new bootstrap.Offcanvas(offcanvasElement, {
+      backdrop: true
+    });
+    
+    // Close offcanvas on link click on mobile
+    const sidebarLinks = document.querySelectorAll('#sidebar .nav a');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          offcanvas.hide();
+        }
+      });
+    });
   }
 
   // when we click on an input that was previously highlighted because it was empty, remove the red border
@@ -419,8 +435,11 @@ function init () {
      */
   function initDynamic () {
     // Bootstrap popover
-    $('button[data-toggle="popover"]').popover().click(function (e) {
-      e.preventDefault();
+    document.querySelectorAll('button[data-bs-toggle="popover"]').forEach(popoverTriggerEl => {
+      new bootstrap.Popover(popoverTriggerEl);
+      popoverTriggerEl.addEventListener('click', (e) => {
+        e.preventDefault();
+      });
     });
 
     const version = $('#version strong').html();
@@ -435,12 +454,18 @@ function init () {
       });
     }
 
-    // tabs
+    // tabs - Bootstrap 5 style
     $('.nav-tabs-examples a').click(function (e) {
       e.preventDefault();
-      $(this).tab('show');
+      const tabTrigger = new bootstrap.Tab(this);
+      tabTrigger.show();
     });
-    $('.nav-tabs-examples').find('a:first').tab('show');
+    // Initialize first tab
+    const firstTab = $('.nav-tabs-examples a').first().get(0);
+    if (firstTab) {
+      const tab = new bootstrap.Tab(firstTab);
+      tab.show();
+    }
 
     // switch content-type for body inputs (json or form-data)
     $('.sample-request-content-type-switch').change(function () {
@@ -590,7 +615,7 @@ function init () {
   /**
    * Off-Canvas side toggle navigation
    */
-  document.querySelector('[data-toggle="offcanvas"]').addEventListener('click', function () {
+  document.querySelector('[data-bs-toggle="offcanvas"]').addEventListener('click', function () {
     const row = document.querySelector('.row-offcanvas');
     if (row) {
       row.classList.toggle('active');
