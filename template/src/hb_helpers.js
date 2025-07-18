@@ -95,6 +95,15 @@ export function register () {
   });
 
   /**
+   * Add two numbers together - used for incrementing counters
+   * @param number num
+   * @param number increment
+   */
+  Handlebars.registerHelper('add', function (num, increment) {
+    return num + increment;
+  });
+
+  /**
    * Remove double quotes.
    * @param string text
    */

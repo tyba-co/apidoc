@@ -33,6 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
   initSampleRequest();
   Prism.highlightAll();
+  
+  // Handle sidebar navigation active state
+  $(document).on('click', '.sidenav a', function() {
+    // Remove active class from all links and add to clicked one
+    $('.sidenav').find('a').removeClass('active');
+    $(this).addClass('active');
+    
+    // For proper parent li styling
+    $('.sidenav > li').removeClass('active');
+    $(this).parent('li').addClass('active');
+  });
 });
 
 function init () {

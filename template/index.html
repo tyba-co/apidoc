@@ -95,7 +95,13 @@
 
 <script id="template-header" type="text/x-handlebars-template">
   {{#if content}}
-    <div id="api-_header" class="show-api-article show-api-_-article">{{{content}}}</div>
+    <div id="api-_header" class="show-api-article show-api-_-article mb-4">
+      <div class="card">
+        <div class="card-body">
+          {{{content}}}
+        </div>
+      </div>
+    </div>
   {{/if}}
 </script>
 
@@ -191,7 +197,7 @@
       <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
         {{#each article.examples}}
           <li class="nav-item{{#ifCond @index '==' 0}} active{{/ifCond}}">
-            <a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">{{title}}</a>
+            <a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">Example {{add @index 1}}</a>
           </li>
         {{/each}}
       </ul>
@@ -199,12 +205,20 @@
       <div class="tab-content">
       {{#each article.examples}}
         <div class="tab-pane fade{{#ifCond @index '==' 0}} show active{{/ifCond}}" id="examples-{{../id}}-{{@index}}">
-          <pre 
-            data-type="{{type}}"
-            data-prismjs-copy="{{__ "Copy"}}"
-            data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
-            data-prismjs-copy-success="{{__ "copied!"}}"
-          ><code class="language-{{type}}">{{content}}</code></pre>
+          <div class="card mb-4">
+            <div class="card-header">
+              <strong>Example {{add @index 1}}</strong>
+            </div>
+            <div class="card-body p-0">
+              <pre 
+                class="mb-0"
+                data-type="{{type}}"
+                data-prismjs-copy="{{__ "Copy"}}"
+                data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+                data-prismjs-copy-success="{{__ "copied!"}}"
+              ><code class="language-{{type}}">{{content}}</code></pre>
+            </div>
+          </div>
         </div>
       {{/each}}
       </div>
@@ -367,21 +381,29 @@
     {{#ifCond params.examples.length '>' 0}}
       <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
       {{#each params.examples}}
-        <li{{#ifCond @index '==' 0}} class="active"{{/ifCond}}>
-          <a href="#{{../section}}-examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">{{title}}</a>
+        <li class="nav-item{{#ifCond @index '==' 0}} active{{/ifCond}}">
+          <a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#{{../section}}-examples-{{../id}}-{{@index}}" role="tab" data-bs-toggle="tab">Example {{add @index 1}}</a>
         </li>
       {{/each}}
       </ul>
 
       <div class="tab-content">
       {{#each params.examples}}
-        <div class="tab-pane{{#ifCond @index '==' 0}} active{{/ifCond}}" id="{{../section}}-examples-{{../id}}-{{@index}}">
-        <pre 
-          data-type="{{type}}"
-          data-prismjs-copy="{{__ "Copy"}}"
-          data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
-          data-prismjs-copy-success="{{__ "copied!"}}"
-        ><code class="language-{{type}}">{{reformat content type}}</code></pre>
+        <div class="tab-pane fade{{#ifCond @index '==' 0}} show active{{/ifCond}}" id="{{../section}}-examples-{{../id}}-{{@index}}">
+          <div class="card mb-4">
+            <div class="card-header">
+              <strong>Example {{add @index 1}}</strong>
+            </div>
+            <div class="card-body p-0">
+              <pre 
+                class="mb-0"
+                data-type="{{type}}"
+                data-prismjs-copy="{{__ "Copy"}}"
+                data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+                data-prismjs-copy-success="{{__ "copied!"}}"
+              ><code class="language-{{type}}">{{reformat content type}}</code></pre>
+            </div>
+          </div>
         </div>
       {{/each}}
       </div>

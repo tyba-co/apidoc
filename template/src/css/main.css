@@ -76,6 +76,7 @@ a:focus {
 #content {
   margin-top: 10px;
   padding-left: 10px;
+  margin-left: 250px;
 }
 
 p {
@@ -202,6 +203,30 @@ td.code {
 }
 
 /* ------------------------------------------------------------------------------------------
+ * Code examples
+ * ------------------------------------------------------------------------------------------ */
+pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+pre code {
+  color: #212529;
+  font-family: "Source Code Pro", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hljs {
+  background-color: #f8f9fa;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------------------------------
  * Sidenav
  * ------------------------------------------------------------------------------------------ */
 #scrollingNav {
@@ -209,6 +234,7 @@ td.code {
   top: 0;
   left: 0;
   bottom: 0;
+  width: 250px;
   z-index: 10;
   background-color: var(--dark-gray);
   box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
@@ -254,10 +280,14 @@ td.code {
 }
 
 
-.sidenav > li.active > a {
+.sidenav > li.active > a,
+.sidenav > li > a.active {
   position: relative;
   background-color: var(--primary);
   color: var(--white);
+  font-weight: 600;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 /**
@@ -548,6 +578,33 @@ ul.nav-tabs {
   margin: 0;
 }
 
+.nav-tabs {
+  border-bottom: 1px solid var(--light-gray);
+  margin-bottom: 15px;
+}
+
+.nav-tabs .nav-link {
+  margin-bottom: -1px;
+  color: var(--main-gray);
+  border: 1px solid transparent;
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--light-gray);
+  background-color: #f8f9fa;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary);
+  background-color: var(--white);
+  border-color: var(--light-gray) var(--light-gray) var(--white);
+  font-weight: 500;
+}
+
 p.deprecated span{
   color: var(--red);
   font-weight: bold;
@@ -603,3 +660,57 @@ p.deprecated span{
   }
 
 } /* /@media print */
+
+/* Code examples in responses */
+pre {
+  margin: 0;
+  border-radius: 0 0 0.375rem 0.375rem;
+}
+
+pre code {
+  display: block;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.tab-pane .card-header {
+  border-radius: 0.375rem 0.375rem 0 0;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+}
+
+/* Improve tabs appearance */
+.nav-tabs-examples {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.nav-tabs-examples .nav-link.active,
+.nav-tabs-examples .active a,
+.nav-tabs-examples .nav-link.active {
+  background-color: #f8f9fa;
+  color: #212529 !important;
+  border-color: #dee2e6;
+  border-bottom-color: #f8f9fa;
+  font-weight: 500;
+}
+
+.nav-tabs-examples a,
+.nav-tabs-examples .nav-link {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem 0.25rem 0 0;
+  display: block;
+  text-decoration: none;
+  color: #212529;
+  margin-right: 0.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-tabs-examples a:hover,
+.nav-tabs-examples .nav-link:hover {
+  background-color: #f1f1f1;
+  border-color: #ced4da;
+  text-decoration: none;
+}
