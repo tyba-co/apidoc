@@ -57,8 +57,12 @@ jobs:
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
 
-      - run: npm run build
-      - run: npm run test
+      - name: Run tests
+        run: npm run test
+      - name: Run linter
+        run: npm run eslint
+      - name: Build example
+        run: npm run build-example
 
   publish-gpr:
     needs: build-and-test
