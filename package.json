@@ -5,7 +5,9 @@
   "author": "Peter Rottmann <rottmann@inveris.de>",
   "license": "MIT",
   "preferGlobal": true,
-  "bin": "bin/apidoc",
+  "bin": {
+    "apidoc": "bin/apidoc"
+  },
   "main": "./lib/index.js",
   "homepage": "https://apidocjs.com",
   "repository": {
@@ -18,11 +20,13 @@
   "scripts": {
     "build-example": "./bin/apidoc -v -i example/ -o /tmp/apidoc-output",
     "build-devxample": "./bin/apidoc -v -i example/ -o /tmp/apidoc-output --debug",
-    "eslint": "./node_modules/.bin/eslint --ext js,mjs lib bin/apidoc template/src",
+    "eslint": "eslint --ext js,mjs lib bin/apidoc template/src",
     "pre-commit": "npm run eslint && npm run test",
-    "serve": "npm run build-example && (docker rm -f apidoc || true) && docker run --rm --name apidoc -p 8080:80 -v /tmp/apidoc-output:/usr/share/nginx/html:ro -d nginx","test": "mocha --colors --no-package --no-config 'test/**/*_test.*js'"
+    "serve": "npm run build-example && (docker rm -f apidoc || true) && docker run --rm --name apidoc -p 8080:80 -v /tmp/apidoc-output:/usr/share/nginx/html:ro -d nginx",
+    "test": "mocha --colors --no-package --no-config 'test/**/*_test.*js'"
   },
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
     "@tyba-co:registry": "https://npm.pkg.github.com"
   },
   "keywords": [
