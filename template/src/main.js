@@ -31,7 +31,6 @@ import { register } from './hb_helpers';
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
-  initSampleRequest();
   Prism.highlightAll();
 
   // Handle sidebar navigation active state
@@ -43,6 +42,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // For proper parent li styling
     $('.sidenav > li').removeClass('active');
     $(this).parent('li').addClass('active');
+  });
+
+  // switch content-type for parameter inputs (json or form-data)
+  console.log('Setting up sample-header-content-type-switch handler');
+  $(document).on('change', '.sample-header-content-type-switch', function () {
+    console.log('Sample header content type changed to:', $(this).val());
+    const selectedValue = $(this).val();
+    const $form = $(this).closest('form');
+    const formId = $form.find('input.sample-request-url').attr('id').split('-').slice(0, -3).join('-');
+    
+    console.log('Form ID:', formId);
+    if (selectedValue === 'json') {
+      $form.find('.' + formId + '-sample-header-content-type-fields').hide();
+      $form.find('.' + formId + '-sample-header-content-type-body').show();
+    } else {
+      $form.find('.' + formId + '-sample-header-content-type-body').hide();
+      $form.find('.' + formId + '-sample-header-content-type-fields').show();
+    }
+  });
+
+  // Initialize the correct state on page load
+  $('.sample-header-content-type-switch').each(function() {
+    const selectedValue = $(this).val();
+    const $form = $(this).closest('form');
+    const formId = $form.find('input.sample-request-url').attr('id').split('-').slice(0, -3).join('-');
+    
+    if (selectedValue === 'json') {
+      $form.find('.' + formId + '-sample-header-content-type-fields').hide();
+      $form.find('.' + formId + '-sample-header-content-type-body').show();
+    } else {
+      $form.find('.' + formId + '-sample-header-content-type-body').hide();
+      $form.find('.' + formId + '-sample-header-content-type-fields').show();
+    }
   });
 });
 
@@ -379,6 +411,10 @@ function init () {
     content += templateSections(fields);
   });
   $('#sections').append(content);
+
+  // Initialize sample requests after content is rendered
+  console.log('Initializing sample requests after content render');
+  initSampleRequest();
 
   // Bootstrap 5 Scrollspy
   if (!apiProject.template.aloneDisplay) {

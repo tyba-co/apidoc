@@ -17,25 +17,29 @@ import Prism from 'prismjs';
 import 'prismjs/components/prism-json';
 
 export function initSampleRequest () {
-  // Button send
-  $('.sample-request-send').off('click');
-  $('.sample-request-send').on('click', function (e) {
+  // Button send - using event delegation
+  $(document).off('click', '.sample-request-send');
+  $(document).on('click', '.sample-request-send', function (e) {
     e.preventDefault();
+    console.log('Send button clicked!'); // Debug log
     const root = $(this).parents('article');
     const group = root.data('group');
     const name = root.data('name');
     const version = root.data('version');
+    console.log('Sending request for:', { group, name, version, type: $(this).data('type') }); // Debug log
     sendSampleRequest(group, name, version, $(this).data('type'));
   });
 
-  // Button clear
-  $('.sample-request-clear').off('click');
-  $('.sample-request-clear').on('click', function (e) {
+  // Button clear - using event delegation
+  $(document).off('click', '.sample-request-clear');
+  $(document).on('click', '.sample-request-clear', function (e) {
     e.preventDefault();
+    console.log('Clear button clicked!'); // Debug log
     const root = $(this).parents('article');
     const group = root.data('group');
     const name = root.data('name');
     const version = root.data('version');
+    console.log('Clearing request for:', { group, name, version }); // Debug log
     clearSampleRequest(group, name, version);
   });
 }
@@ -71,15 +75,23 @@ function getHydratedUrl (root, queryParameters) {
  * }
  */
 function collectValues (root) {
+  console.log('Collecting values from root:', root);
   const parameters = {};
   ['header', 'query', 'body'].forEach(family => {
     // key: parameter name (e.g. 'id'), value: the content of the input
     const inputValues = {};
     // look for all parameters
     try {
-      root.find($(`[data-family="${family}"]:visible`)).each((index, el) => {
+      const elements = root.find(`[data-family="${family}"]:visible`);
+      console.log(`Found ${elements.length} visible elements for family: ${family}`);
+      
+      elements.each((index, el) => {
+        console.log('Processing element:', el, 'with dataset:', el.dataset);
         const name = el.dataset.name;
         let value = el.value;
+        
+        console.log(`Element name: ${name}, value: ${value}, type: ${el.type}`);
+        
         // special case for checkbox, we look at the checked property
         if (el.type === 'checkbox') {
           if (el.checked) {
@@ -97,19 +109,30 @@ function collectValues (root) {
         inputValues[name] = value;
       });
     } catch (e) {
+      console.error('Error in collectValues:', e);
       return;
     }
     parameters[family] = inputValues;
+    console.log(`Parameters for ${family}:`, inputValues);
   });
+  
   // find the json body
-  const bodyJson = root.find($('[data-family="body-json"]'));
+  const bodyJson = root.find('[data-family="body-json"]');
+  console.log('Found bodyJson elements:', bodyJson.length);
+  
   // load it if it's visible
-  if (bodyJson.is(':visible')) {
+  if (bodyJson.is(':visible') && bodyJson.length > 0) {
+    console.log('Using JSON body with value:', bodyJson.val());
     parameters.body = bodyJson.val();
+    if (!parameters.header) parameters.header = {};
     parameters.header['Content-Type'] = 'application/json';
   } else {
+    console.log('Using form-data mode');
+    if (!parameters.header) parameters.header = {};
     parameters.header['Content-Type'] = 'multipart/form-data';
   }
+  
+  console.log('Final parameters:', parameters);
   return parameters;
 }
 
@@ -155,10 +178,15 @@ function sendSampleRequest (group, name, version, method) {
   // Do the request!
   $.ajax(requestParams);
 
-  root.find('.sample-request-response').fadeTo(200, 1);
+  // Show response container and set loading state
+  console.log('Showing response container and setting loading state');
+  const responseContainer = root.find('.sample-request-response');
+  responseContainer.removeAttr('hidden').show();
+  responseContainer.fadeTo(200, 1);
   root.find('.sample-request-response-json').html('Loading...');
 
   function displaySuccess (data, status, jqXHR) {
+    console.log('Request successful:', { data, status, response: jqXHR.responseText });
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(jqXHR.responseText);
@@ -167,10 +195,12 @@ function sendSampleRequest (group, name, version, method) {
       jsonResponse = jqXHR.responseText;
     }
     root.find('.sample-request-response-json').text(jsonResponse);
+    console.log('Response displayed in UI');
     Prism.highlightAll();
   }
 
   function displayError (jqXHR, textStatus, error) {
+    console.log('Request failed:', { jqXHR, textStatus, error });
     let message = 'Error ' + jqXHR.status + ': ' + error;
     let jsonResponse;
     try {
@@ -182,21 +212,31 @@ function sendSampleRequest (group, name, version, method) {
 
     if (jsonResponse) { message += '\n' + jsonResponse; }
 
+    // Show response container for errors too
+    const responseContainer = root.find('.sample-request-response');
+    
     // flicker on previous error to make clear that there is a new response
-    if (root.find('.sample-request-response').is(':visible')) { root.find('.sample-request-response').fadeTo(1, 0.1); }
+    if (responseContainer.is(':visible')) { 
+      responseContainer.fadeTo(1, 0.1); 
+    } else {
+      responseContainer.removeAttr('hidden').show();
+    }
 
-    root.find('.sample-request-response').fadeTo(250, 1);
+    responseContainer.fadeTo(250, 1);
     root.find('.sample-request-response-json').text(message);
+    console.log('Error displayed in UI');
     Prism.highlightAll();
   }
 }
 
 function clearSampleRequest (group, name, version) {
+  console.log('Clearing sample request for:', { group, name, version });
   const root = $('article[data-group="' + group + '"][data-name="' + name + '"][data-version="' + version + '"]');
 
   // hide sample response
   root.find('.sample-request-response-json').html('');
-  root.find('.sample-request-response').hide();
+  const responseContainer = root.find('.sample-request-response');
+  responseContainer.hide().attr('hidden', 'hidden');
 
   // reset value of parameters
   root.find('.sample-request-input').each((idx, el) => {

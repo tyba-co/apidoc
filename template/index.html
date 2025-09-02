@@ -472,7 +472,12 @@
               <div class="mb-3">
                 <div class="input-group">
                   <div class="input-group-text">json</div>
-                  <textarea id="sample-request-body-json" class="form-control sample-request-body" data-sample-request-body-group="sample-request-param-{{@./index}}" rows="6" {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
+                  <textarea id="sample-request-body-json" class="form-control sample-request-body" 
+                    data-family="body-json"
+                    data-name="body"
+                    data-sample-request-body-group="sample-request-param-{{@./index}}" 
+                    rows="6" 
+                    {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
                 </div>
               </div>
             </div>
@@ -571,7 +576,7 @@
               <div class="input-group-text">json</div>
               <textarea class="form-control sample-request-input" rows="6"
                 data-family="body-json"
-                data-name={{"body"}}
+                data-name="body"
                 data-content-type="json"
                 {{#if optional}}data-optional="true"{{/if}}>{{body2json article.body}}</textarea>
             </div>

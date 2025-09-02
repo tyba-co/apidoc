@@ -42,9 +42,18 @@
   border: 1px solid var(--red);
 }
 
+/* Utility classes */
+.hide {
+  display: none !important;
+}
+
 /** for some reason the iOS safari style is applied on date inputs */
 input[type="date"] {
   line-height: 1.4 !important;
+}
+
+.hide {
+  display: none !important;
 }
 
 /* Sample request form styles */
@@ -81,6 +90,11 @@ input[type="date"] {
 .sample-request-response pre {
   background-color: #f8f9fa;
   border-radius: 0.25rem;
+}
+
+/* Utility classes */
+.hide {
+  display: none !important;
 }
 
 /* ------------------------------------------------------------------------------------------
