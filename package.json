@@ -22,6 +22,9 @@
     "pre-commit": "npm run eslint && npm run test",
     "serve": "npm run build-example && (docker rm -f apidoc || true) && docker run --rm --name apidoc -p 8080:80 -v /tmp/apidoc-output:/usr/share/nginx/html:ro -d nginx","test": "mocha --colors --no-package --no-config 'test/**/*_test.*js'"
   },
+  "publishConfig": {
+    "@tyba-co:registry": "https://npm.pkg.github.com"
+  },
   "keywords": [
     "api",
     "apidoc",
