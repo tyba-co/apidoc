@@ -51,23 +51,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const $select = $(this);
     const selectedValue = $select.val();
     const id = $select.data('id');
-    
+
     if (!id) {
       console.warn('No ID found for content-type switch');
       return;
     }
-    
+
     try {
       // Hide all content type specific elements
       $(`#sample-request-body-json-input-${id}, #sample-request-body-form-input-${id}`).hide();
-      
+
       // Show selected content type element
       if (selectedValue === 'body-json') {
         $(`#sample-request-body-json-input-${id}`).show();
       } else if (selectedValue === 'body-form-data') {
         $(`#sample-request-body-form-input-${id}`).show();
       }
-      
+
       console.log(`Switched to ${selectedValue} for API ${id}`);
     } catch (error) {
       console.error('Error switching content type:', error);
@@ -75,11 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize the correct state on page load
-  $('.sample-header-content-type-switch').each(function() {
+  $('.sample-header-content-type-switch').each(function () {
     const selectedValue = $(this).val();
     const $form = $(this).closest('form');
     const formId = $form.find('input.sample-request-url').attr('id').split('-').slice(0, -3).join('-');
-    
+
     if (selectedValue === 'json') {
       $form.find('.' + formId + '-sample-header-content-type-fields').hide();
       $form.find('.' + formId + '-sample-header-content-type-body').show();

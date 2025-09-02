@@ -42,22 +42,22 @@ const logger = {
 /**
  * Initialize sample request functionality
  */
-export function initSampleRequest() {
+export function initSampleRequest () {
   logger.debug('Initializing sample request handlers');
-  
+
   // Remove existing handlers to prevent duplicates
   $(document).off('click', SELECTORS.SEND_BUTTON);
   $(document).off('click', SELECTORS.CLEAR_BUTTON);
-  
+
   // Button send - using event delegation for dynamic content
   $(document).on('click', SELECTORS.SEND_BUTTON, function (e) {
     e.preventDefault();
-    
+
     try {
       const $button = $(this);
       const $root = $button.parents('article');
       const requestData = extractRequestData($root, $button);
-      
+
       logger.debug('Send button clicked', requestData);
       sendSampleRequest(requestData.group, requestData.name, requestData.version, requestData.type);
     } catch (error) {
@@ -68,12 +68,12 @@ export function initSampleRequest() {
   // Button clear - using event delegation for dynamic content
   $(document).on('click', SELECTORS.CLEAR_BUTTON, function (e) {
     e.preventDefault();
-    
+
     try {
       const $button = $(this);
       const $root = $button.parents('article');
       const requestData = extractRequestData($root);
-      
+
       logger.debug('Clear button clicked', requestData);
       clearSampleRequest(requestData.group, requestData.name, requestData.version);
     } catch (error) {
@@ -85,7 +85,7 @@ export function initSampleRequest() {
 /**
  * Extract request data from DOM elements
  */
-function extractRequestData($root, $button = null) {
+function extractRequestData ($root, $button = null) {
   return {
     group: $root.data('group'),
     name: $root.data('name'),
@@ -97,20 +97,20 @@ function extractRequestData($root, $button = null) {
 /**
  * Convert path params from {param} format to :param format
  */
-function convertPathParams(url) {
+function convertPathParams (url) {
   return url.replace(/{(.+?)}/g, ':$1');
 }
 
 /**
  * Transform URL with parameters (e.g., https://example.org/:path/:id → https://example.org/some-path/42)
  */
-function getHydratedUrl($root, queryParameters) {
+function getHydratedUrl ($root, queryParameters) {
   const dryUrl = $root.find(SELECTORS.SAMPLE_URL).val();
   const urlProcessor = new UrlProcessor();
-  
+
   // Convert {param} format to :param
   const convertedUrl = convertPathParams(dryUrl);
-  
+
   try {
     return urlProcessor.hydrate(convertedUrl, queryParameters);
   } catch (error) {
@@ -122,30 +122,30 @@ function getHydratedUrl($root, queryParameters) {
 /**
  * Collect parameter values from form elements
  */
-function collectValues($root) {
+function collectValues ($root) {
   logger.debug('Collecting values from form');
   const parameters = {};
   const families = ['header', 'query', 'body'];
-  
+
   families.forEach(family => {
     const inputValues = {};
-    
+
     try {
       const $elements = $root.find(`[data-family="${family}"]:visible`);
       logger.debug(`Found ${$elements.length} visible elements for family: ${family}`);
-      
+
       $elements.each((index, el) => {
         const $el = $(el);
         const name = el.dataset?.name;
         const isOptional = el.dataset?.optional === 'true';
-        
+
         if (!name) {
           logger.debug('Skipping element without name attribute');
           return true; // continue
         }
-        
+
         let value = el.value || '';
-        
+
         // Handle different input types
         if (el.type === 'checkbox') {
           if (el.checked) {
@@ -154,7 +154,7 @@ function collectValues($root) {
             return true; // Skip unchecked checkboxes
           }
         }
-        
+
         // Validate required fields
         if (!value && !isOptional && el.type !== 'checkbox') {
           $el.addClass(CSS_CLASSES.BORDER_DANGER);
@@ -164,23 +164,23 @@ function collectValues($root) {
           // Remove error styling if field now has value
           $el.removeClass(CSS_CLASSES.BORDER_DANGER);
         }
-        
+
         inputValues[name] = value;
       });
     } catch (error) {
       logger.error(`Error processing ${family} parameters`, error);
     }
-    
+
     parameters[family] = inputValues;
   });
-  
+
   // Handle JSON body special case
   const $bodyJson = $root.find('[data-family="body-json"]');
-  
+
   if ($bodyJson.length > 0 && $bodyJson.is(':visible')) {
     const jsonValue = $bodyJson.val();
     logger.debug('Using JSON body mode', { hasValue: !!jsonValue });
-    
+
     parameters.body = jsonValue || '';
     if (!parameters.header) parameters.header = {};
     parameters.header['Content-Type'] = 'application/json';
@@ -189,7 +189,7 @@ function collectValues($root) {
     if (!parameters.header) parameters.header = {};
     parameters.header['Content-Type'] = 'multipart/form-data';
   }
-  
+
   logger.debug('Final collected parameters', parameters);
   return parameters;
 }
@@ -197,7 +197,7 @@ function collectValues($root) {
 /**
  * Show response container with loading state
  */
-function showResponseContainer($root, loadingText = 'Loading...') {
+function showResponseContainer ($root, loadingText = 'Loading...') {
   const $responseContainer = $root.find(SELECTORS.RESPONSE_CONTAINER);
   $responseContainer.removeAttr('hidden').show().fadeTo(200, 1);
   $root.find(SELECTORS.RESPONSE_JSON).html(loadingText);
@@ -206,21 +206,21 @@ function showResponseContainer($root, loadingText = 'Loading...') {
 /**
  * Update response display with content
  */
-function updateResponseDisplay($root, content, isError = false) {
+function updateResponseDisplay ($root, content, isError = false) {
   const $responseContainer = $root.find(SELECTORS.RESPONSE_CONTAINER);
-  
+
   // Show flicker effect for new responses
   if ($responseContainer.is(':visible')) {
     $responseContainer.fadeTo(1, 0.1);
   } else {
     $responseContainer.removeAttr('hidden').show();
   }
-  
+
   $responseContainer.fadeTo(250, 1);
   $root.find(SELECTORS.RESPONSE_JSON).text(content);
-  
+
   logger.debug(`${isError ? 'Error' : 'Success'} response displayed`);
-  
+
   // Re-apply syntax highlighting
   Prism.highlightAll();
 }
@@ -228,18 +228,18 @@ function updateResponseDisplay($root, content, isError = false) {
 /**
  * Send sample request
  */
-function sendSampleRequest(group, name, version, method) {
+function sendSampleRequest (group, name, version, method) {
   logger.debug('Sending sample request', { group, name, version, method });
-  
+
   const $root = $(`article[data-group="${group}"][data-name="${name}"][data-version="${version}"]`);
   if (!$root.length) {
     logger.error('Could not find article element for request');
     return;
   }
-  
+
   const parameters = collectValues($root);
   const url = getHydratedUrl($root, parameters.query);
-  
+
   // Prepare request configuration
   const requestConfig = {
     url: url,
@@ -248,7 +248,7 @@ function sendSampleRequest(group, name, version, method) {
     success: (data, status, jqXHR) => displaySuccess($root, data, status, jqXHR),
     error: (jqXHR, textStatus, error) => displayError($root, jqXHR, textStatus, error),
   };
-  
+
   // Handle request body based on content type
   if (parameters.header && parameters.header['Content-Type'] === 'application/json') {
     // JSON body
@@ -266,14 +266,14 @@ function sendSampleRequest(group, name, version, method) {
     requestConfig.data = formData;
     requestConfig.processData = false;
     requestConfig.contentType = false; // Let browser set multipart boundary
-    
+
     // Remove Content-Type header to let browser handle it
     delete requestConfig.headers['Content-Type'];
   }
-  
+
   // Show loading state
   showResponseContainer($root, 'Loading...');
-  
+
   // Execute request
   $.ajax(requestConfig);
 }
@@ -281,9 +281,9 @@ function sendSampleRequest(group, name, version, method) {
 /**
  * Handle successful response
  */
-function displaySuccess($root, data, status, jqXHR) {
+function displaySuccess ($root, data, status, jqXHR) {
   logger.debug('Request successful', { status, responseLength: jqXHR.responseText?.length });
-  
+
   let formattedResponse;
   try {
     const parsedJson = JSON.parse(jqXHR.responseText);
@@ -292,18 +292,18 @@ function displaySuccess($root, data, status, jqXHR) {
     // Not JSON, display as-is
     formattedResponse = jqXHR.responseText || 'No response content';
   }
-  
+
   updateResponseDisplay($root, formattedResponse);
 }
 
 /**
  * Handle error response
  */
-function displayError($root, jqXHR, textStatus, error) {
+function displayError ($root, jqXHR, textStatus, error) {
   logger.error('Request failed', { status: jqXHR.status, textStatus, error });
-  
+
   let errorMessage = `Error ${jqXHR.status}: ${error}`;
-  
+
   // Try to parse error response
   if (jqXHR.responseText) {
     try {
@@ -321,9 +321,9 @@ function displayError($root, jqXHR, textStatus, error) {
 /**
  * Clear sample request form and response
  */
-function clearSampleRequest(group, name, version) {
+function clearSampleRequest (group, name, version) {
   logger.debug('Clearing sample request', { group, name, version });
-  
+
   const $root = $(`article[data-group="${group}"][data-name="${name}"][data-version="${version}"]`);
   if (!$root.length) {
     logger.error('Could not find article element for clearing');
@@ -338,14 +338,14 @@ function clearSampleRequest(group, name, version) {
   // Reset form inputs
   $root.find(SELECTORS.SAMPLE_INPUT).each((idx, el) => {
     const $el = $(el);
-    
+
     // Remove error styling
     $el.removeClass(CSS_CLASSES.BORDER_DANGER);
-    
+
     // Reset value - use placeholder if it's a default value, otherwise empty
     const placeholder = el.placeholder || '';
     const name = el.dataset?.name || '';
-    el.value = (placeholder && placeholder !== name) ? placeholder : '';
+    el.value = placeholder && placeholder !== name ? placeholder : '';
   });
 
   // Restore default URL
@@ -354,6 +354,6 @@ function clearSampleRequest(group, name, version) {
     const defaultValue = $urlElement.prop('defaultValue');
     $urlElement.val(defaultValue);
   }
-  
+
   logger.debug('Sample request cleared successfully');
 }
