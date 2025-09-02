@@ -8,7 +8,7 @@ on:
 jobs:
 
   install:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -35,7 +35,7 @@ jobs:
 
   build-and-test:
     needs: install
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
@@ -62,7 +62,7 @@ jobs:
 
   publish-gpr:
     needs: build-and-test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
@@ -88,4 +88,4 @@ jobs:
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
         
-      - run: npm publish
+      - run: npm publish --access public
