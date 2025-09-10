@@ -1,8 +1,8 @@
 {
   "name": "@tyba-co/apidoc",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "RESTful web API Documentation Generator",
-  "author": "Peter Rottmann <rottmann@inveris.de>",
+  "author": "Forked by Tyba - github.com/tyba-co/tyba.co",
   "license": "MIT",
   "preferGlobal": true,
   "bin": {
