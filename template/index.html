@@ -31,15 +31,13 @@
 </div>
 
 <div class="offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
-  <div class="offcanvas-header d-md-none">
-    <h5 class="offcanvas-title" id="sidebarLabel">Documentation</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
-  </div>
+
   <div class="offcanvas-body p-0">
     <nav id="scrollingNav" class="col-sm-3 col-lg-2 sidebar-offcanvas">
   <div class="sidenav-search">
     <input class="form-control search" data-action='filter-search' type="text" placeholder="{{__ "Filter..."}}">
     <span class="search-reset">x</span>
+    <button type="button" class="btn-close-mobile d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close">✕</button>
   </div>
   <ul class="sidenav nav flex-column list">
   {{#each nav}}
