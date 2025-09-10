@@ -6,7 +6,7 @@ module.exports = {
     node: true,
   },
   extends: [
-    '@eslint/js/configs/recommended',
+    'eslint:recommended',
     'standard',
   ],
   parserOptions: {
