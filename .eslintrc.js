@@ -3,10 +3,11 @@ module.exports = {
     browser: true,
     commonjs: true,
     es2021: true,
+    node: true,
   },
   extends: [
+    '@eslint/js/configs/recommended',
     'standard',
-    'eslint:recommended',
   ],
   parserOptions: {
     ecmaVersion: 12,
