@@ -169,6 +169,29 @@ function thankUser () { }
  */
 function createCity () { }
 
+
+/**
+ * @api {get} /city Gets a new city
+ * @apiVersion 0.3.0
+ * @apiName GetCity
+ * @apiGroup City
+ * @apiDescription Get a new city.
+ * @apiQuery {String=Aerial,Land,Underwater} view=Aerial Type of view.
+ * @apiQuery {Number} zoom Zoom.
+ */
+function getCity () { }
+
+
+/**
+ * @api {delete} /city Delete a city
+ * @apiVersion 0.3.0
+ * @apiName DeleteCity
+ * @apiGroup City
+ * @apiDescription Delete a city.
+ * @apiParam {Number} id City ID.
+ */
+function deleteCity () { }
+
 /**
  * @api {get} /category Get a category
  * @apiVersion 0.3.0
@@ -207,3 +230,181 @@ function getCategory () { }
  *   }
  */
 function deleteCategory () { }
+
+/**
+ * @api {patch} /category Update a category
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName UpdateCategory
+ * @apiGroup Category (official)
+ * @apiDescription Update a category. Sample request has been disabled here.
+ * @apiBody {String} [name] Name of the category.
+ * @apiBody {String} lastName Custom name with dot.
+ * @apiQuery {Number} id Category ID.
+ * @apiQuery {Number} [name] Category ID.
+ * @apiParamExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestCategory () { }
+
+
+
+/**
+ * @api {put} /food Update a food
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName UpdateFood
+ * @apiGroup Food (official)
+ * @apiDescription Update a Food. Sample request has been disabled here.
+ * @apiBody {String} [name] Name of the Food.
+ * @apiBody {String} lastName Custom name with dot.
+ * @apiQuery {Number} id Food ID.
+ * @apiQuery {Number} [name] Food ID.
+ * @apiParamExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestFood () { }
+
+
+/**
+ * @api {post} /food create a food
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName CreateFood
+ * @apiGroup Food (official)
+ * @apiDescription Create a Food. Sample request has been disabled here.
+ * @apiBody {String} [name] Name of the Food.
+ * @apiBody {String} lastName Custom name with dot.
+ * @apiQuery {Number} id Food ID.
+ * @apiQuery {Number} [name] Food ID.
+ * @apiParamExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestFoodCreate () { }
+
+
+/**
+ * @api {get} /food get foods
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName GetFoods
+ * @apiGroup Food (official)
+ * @apiDescription Gets Food. Sample request has been disabled here..
+ * @apiQuery {Number} id Food ID.
+ * @apiQuery {Number} [name] Food ID.
+ * @apiSuccessExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestFoodGet () { }
+
+/**
+ * @api {get} /food/{foodId} get foods by id
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName GetFoodsById
+ * @apiGroup Food (official)
+ * @apiDescription Gets Food by ID. Sample request has been disabled here..
+ * @apiParam {Number} foodId Food ID.
+ * @apiQuery {Number} [name] Food ID.
+ * @apiSuccessExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestFoodGetById () { }
+
+/**
+ * @api {delete} /food/{foodId} delete foods by id
+ * @apiVersion 0.3.0
+ * @apiSampleRequest off
+ * @apiName DeleteFoodsById
+ * @apiGroup Food (official)
+ * @apiDescription Deletes Food by ID. Sample request has been disabled here..
+ * @apiParam {Number} foodId Food ID.
+ * @apiQuery {Number} [name] Food ID.
+ * @apiSuccessExample {json} Some json code:
+ *   {
+ *     "user": "Sample User",
+ *      "payload": {
+ *        "test": [
+ *          "code": "
+ *            public class HelloWorldTest {
+ *              HelloWorld hw = new HelloWorld();
+ *              @Test
+ *              public void testOkay {
+ *              assertEquals(\"HelloWorld\", hw.getMsg());
+ *            }
+ *         }"
+ *        ]
+ *      }
+ *   }
+ */
+function TestDeleteGetById () { }
