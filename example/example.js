@@ -408,3 +408,259 @@ function TestFoodGetById () { }
  *   }
  */
 function TestDeleteGetById () { }
+
+/**
+ * @api {get} /products Get all products
+ * @apiVersion 0.3.0
+ * @apiName GetProducts
+ * @apiGroup Product
+ *
+ * @apiDescription Retrieve a list of all products available.
+ *
+ * @apiSuccess {Object[]} products List of products.
+ * @apiSuccess {Number} products.id Product unique ID.
+ * @apiSuccess {String} products.name Product name.
+ * @apiSuccess {Number} products.price Product price.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "products": [
+ *         {
+ *           "id": 1,
+ *           "name": "Widget A",
+ *           "price": 29.99
+ *         }
+ *       ]
+ *     }
+ */
+
+/**
+ * @api {post} /products Create new product
+ * @apiVersion 0.3.0
+ * @apiName CreateProduct
+ * @apiGroup Product
+ *
+ * @apiParam {String} name Product name.
+ * @apiParam {Number} price Product price.
+ * @apiParam {String} [description] Product description.
+ *
+ * @apiSuccess {Number} id Product unique ID.
+ * @apiSuccess {String} name Product name.
+ * @apiSuccess {Number} price Product price.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *       "id": 1,
+ *       "name": "Widget A",
+ *       "price": 29.99
+ *     }
+ */
+
+/**
+ * @api {get} /products/:id Get product by ID
+ * @apiVersion 0.3.0
+ * @apiName GetProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product unique ID.
+ *
+ * @apiSuccess {Number} id Product unique ID.
+ * @apiSuccess {String} name Product name.
+ * @apiSuccess {Number} price Product price.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "id": 1,
+ *       "name": "Widget A", 
+ *       "price": 29.99
+ *     }
+ */
+
+/**
+ * @api {put} /products/:id Update product
+ * @apiVersion 0.3.0
+ * @apiName UpdateProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product unique ID.
+ * @apiParam {String} [name] Product name.
+ * @apiParam {Number} [price] Product price.
+ * @apiParam {String} [description] Product description.
+ *
+ * @apiSuccess {Number} id Product unique ID.
+ * @apiSuccess {String} name Product name.
+ * @apiSuccess {Number} price Product price.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "id": 1,
+ *       "name": "Widget A Updated",
+ *       "price": 39.99
+ *     }
+ */
+
+/**
+ * @api {delete} /products/:id Delete product
+ * @apiVersion 0.3.0
+ * @apiName DeleteProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product unique ID.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 204 No Content
+ */
+
+/**
+ * @api {get} /orders Get all orders
+ * @apiVersion 0.3.0
+ * @apiName GetOrders
+ * @apiGroup Order
+ *
+ * @apiDescription Retrieve a list of all orders.
+ *
+ * @apiSuccess {Object[]} orders List of orders.
+ * @apiSuccess {Number} orders.id Order unique ID.
+ * @apiSuccess {Number} orders.userId User ID who made the order.
+ * @apiSuccess {String} orders.status Order status.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "orders": [
+ *         {
+ *           "id": 1,
+ *           "userId": 123,
+ *           "status": "pending"
+ *         }
+ *       ]
+ *     }
+ */
+
+/**
+ * @api {post} /orders Create new order
+ * @apiVersion 0.3.0
+ * @apiName CreateOrder
+ * @apiGroup Order
+ *
+ * @apiParam {Number} userId User ID making the order.
+ * @apiParam {Object[]} items List of order items.
+ * @apiParam {Number} items.productId Product ID.
+ * @apiParam {Number} items.quantity Item quantity.
+ *
+ * @apiSuccess {Number} id Order unique ID.
+ * @apiSuccess {Number} userId User ID.
+ * @apiSuccess {String} status Order status.
+ * @apiSuccess {Number} total Order total amount.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *       "id": 1,
+ *       "userId": 123,
+ *       "status": "pending",
+ *       "total": 59.98
+ *     }
+ */
+
+/**
+ * @api {get} /categories Get all categories
+ * @apiVersion 0.3.0
+ * @apiName GetCategories
+ * @apiGroup Category
+ *
+ * @apiDescription Retrieve a list of all product categories.
+ *
+ * @apiSuccess {Object[]} categories List of categories.
+ * @apiSuccess {Number} categories.id Category unique ID.
+ * @apiSuccess {String} categories.name Category name.
+ * @apiSuccess {String} categories.slug Category slug.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "categories": [
+ *         {
+ *           "id": 1,
+ *           "name": "Electronics",
+ *           "slug": "electronics"
+ *         }
+ *       ]
+ *     }
+ */
+
+/**
+ * @api {post} /categories Create new category
+ * @apiVersion 0.3.0
+ * @apiName CreateCategory
+ * @apiGroup Category
+ *
+ * @apiParam {String} name Category name.
+ * @apiParam {String} slug Category slug.
+ * @apiParam {String} [description] Category description.
+ *
+ * @apiSuccess {Number} id Category unique ID.
+ * @apiSuccess {String} name Category name.
+ * @apiSuccess {String} slug Category slug.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *       "id": 1,
+ *       "name": "Electronics",
+ *       "slug": "electronics"
+ *     }
+ */
+
+/**
+ * @api {get} /inventory Get inventory items
+ * @apiVersion 0.3.0
+ * @apiName GetInventory
+ * @apiGroup Inventory
+ *
+ * @apiDescription Retrieve current inventory status.
+ *
+ * @apiSuccess {Object[]} items List of inventory items.
+ * @apiSuccess {Number} items.productId Product ID.
+ * @apiSuccess {Number} items.quantity Available quantity.
+ * @apiSuccess {String} items.location Storage location.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "items": [
+ *         {
+ *           "productId": 1,
+ *           "quantity": 50,
+ *           "location": "Warehouse A"
+ *         }
+ *       ]
+ *     }
+ */
+
+/**
+ * @api {put} /inventory/:productId Update inventory
+ * @apiVersion 0.3.0
+ * @apiName UpdateInventory
+ * @apiGroup Inventory
+ *
+ * @apiParam {Number} productId Product unique ID.
+ * @apiParam {Number} quantity New quantity.
+ * @apiParam {String} [location] Storage location.
+ *
+ * @apiSuccess {Number} productId Product ID.
+ * @apiSuccess {Number} quantity Updated quantity.
+ * @apiSuccess {String} location Storage location.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "productId": 1,
+ *       "quantity": 45,
+ *       "location": "Warehouse A"
+ *     }
+ */

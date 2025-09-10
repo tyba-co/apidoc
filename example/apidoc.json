@@ -25,7 +25,7 @@
     "filename": "footer.md"
   },
   "template": {
-    "showRequiredLabels": false,
+    "showRequiredLabels": true,
     "withCompare": true,
     "withGenerator": true,
     "aloneDisplay": false
