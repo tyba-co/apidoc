@@ -69,11 +69,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      contents: read
+      contents: write
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          
+      - name: Switch to master branch
+        if: github.event_name == 'release'
+        run: |
+          git checkout master
+          git pull origin master
+          
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -91,5 +101,27 @@ jobs:
       - name: Install dependencies (if cache miss)
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: npm install
-        
+
+      - name: Extract version from release tag
+        if: github.event_name == 'release'
+        id: extract-version
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          # Remove 'v' prefix if present (e.g., v1.2.3 -> 1.2.3)
+          VERSION=${TAG_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        if: github.event_name == 'release'
+        run: |
+          npm version --no-git-tag-version ${{ steps.extract-version.outputs.version }}
+
+      - name: Commit version update
+        if: github.event_name == 'release'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: update version to ${{ steps.extract-version.outputs.version }}'
+          file_pattern: 'package.json package-lock.json'
+          branch: master
+
       - run: npm publish --access public
