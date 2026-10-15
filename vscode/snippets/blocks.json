@@ -1,0 +1,29 @@
+{
+  "apidoc endpoint": {
+    "prefix": "apidoc",
+    "body": [
+      "/**",
+      " * @api {${1|get,post,put,patch,delete|}} ${2:/things/:id} ${3:Get a thing}",
+      " * @apiVersion ${4:1.0.0}",
+      " * @apiName ${5:GetThing}",
+      " * @apiGroup ${6:Thing}",
+      " *",
+      " * @apiParam {${7|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${8:id} ${9:Thing id.}",
+      " *",
+      " * @apiSuccess {${10|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${11:name} ${12:Thing name.}",
+      " * @apiError (404 Not Found) ${13:ThingNotFound} ${14:No thing exists with this id.}",
+      " */$0"
+    ],
+    "description": "apidoc: complete endpoint block"
+  },
+  "apidoc define": {
+    "prefix": "apidocdefine",
+    "body": [
+      "/**",
+      " * @apiDefine ${1:DefineName} ${2:Title}",
+      " * ${3:Description}",
+      " */$0"
+    ],
+    "description": "apidoc: reusable @apiDefine block"
+  }
+}

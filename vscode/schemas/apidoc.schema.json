@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/tyba-co/apidoc/master/vscode/schemas/apidoc.schema.json",
+  "title": "apidoc.json",
+  "description": "apidoc project configuration (@tyba-co/apidoc).",
+  "type": "object",
+  "additionalProperties": true,
+  "definitions": {
+    "markdownInclude": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename"],
+      "properties": {
+        "title": { "type": "string", "description": "Navigation title of the section." },
+        "filename": { "type": "string", "description": "Markdown file, relative to the first input directory or to the config file." }
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "description": "Project name." },
+    "version": { "type": "string", "description": "Project version (semver)." },
+    "description": { "type": "string", "description": "Project description." },
+    "title": { "type": "string", "description": "Browser title of the generated site." },
+    "url": { "type": "string", "description": "Prefix shown before every endpoint path, e.g. https://api.example.com." },
+    "sampleUrl": {
+      "description": "Prefix for relative @apiSampleRequest URLs; true uses the origin the docs are served from.",
+      "oneOf": [{ "type": "string" }, { "const": true }]
+    },
+    "defaultVersion": { "type": "string", "description": "Version used for blocks without @apiVersion (default 0.0.0)." },
+    "order": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Group and endpoint names (@apiGroup / @apiName) in display order."
+    },
+    "header": { "$ref": "#/definitions/markdownInclude", "description": "Markdown file shown before the endpoints." },
+    "footer": { "$ref": "#/definitions/markdownInclude", "description": "Markdown file shown after the endpoints." },
+    "input": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source directories, used when the CLI -i option is not given."
+    },
+    "output": { "type": "string", "description": "Output directory, used when the CLI -o option is not given." },
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aloneDisplay": { "type": "boolean", "default": false, "description": "Show one endpoint at a time instead of the whole page." },
+        "showRequiredLabels": { "type": "boolean", "default": false, "description": "Label required fields." },
+        "withGenerator": { "type": "boolean", "default": true, "description": "Show the 'Generated with apidoc' line." },
+        "withCompare": { "type": "boolean", "default": true, "description": "Enable the version compare dropdowns." },
+        "forceLanguage": {
+          "type": "string",
+          "enum": ["ca", "cn", "cs", "de", "es", "en", "fr", "it", "nl", "pl", "pt", "pt_br", "ro", "ru", "tr", "vi", "zh", "zh_cn"],
+          "description": "Force the interface language instead of the browser language."
+        }
+      }
+    }
+  }
+}
