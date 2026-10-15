@@ -30,7 +30,7 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - `example/` — sample sources and `apidoc.json`; doubles as the CI smoke test via `build-example`.
 - `skills/apidoc/` — agent skill shipped in the npm package; `apidoc install-skill` (`lib/install_skill.js`, dispatched in `bin/apidoc` before commander) copies it to `.claude/skills/apidoc`. `.claude-plugin/marketplace.json` exposes the same skill as a Claude Code plugin.
 - `vscode/` — VS Code extension (snippets + `apidoc.json` schema), not published to npm; `cd vscode && npm run package` builds the `.vsix`.
-- `docs/` — user documentation in markdown (getting started, structure, tag reference, configuration, tooling). `scripts/build-pages.js` renders it with markdown-it and Prism, and `.github/workflows/pages.yml` publishes it with the example to GitHub Pages on every push to `master`. Neither ships in the npm package.
+- `docs/` — user documentation in markdown (getting started, configuration and CLI, structuring, tag reference, tooling). `scripts/build-pages.js` renders all of it as one page (like apidocjs.com): `### @apiXxx` headings get the anchor `#param-api-xxx`, markdown links between files are resolved to in-page anchors, and `scripts/pages.js` follows the scroll in the sidebar. `.github/workflows/pages.yml` publishes it with the example to GitHub Pages on every push to `master`. Neither ships in the npm package.
 - Field names: a quoted segment (`meta."trace.id"`, `"custom.property"`) is a literal key containing a dot. `template/src/field_path.mjs` is the one place that splits and unquotes field paths; the body example in `template/index.html` marks a dotted key in red when its parent is not declared as `Object`.
 
 ## Conventions

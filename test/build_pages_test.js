@@ -32,10 +32,9 @@ describe('documentation site', function () {
     fs.rmSync(outputDir, { recursive: true, force: true });
   });
 
-  it('writes every page with its assets', function () {
+  it('writes the single docs page with its assets', function () {
     // ARRANGE
-    const expectedFiles = pageFiles.map(file => file.replace(/\.md$/, '.html'))
-      .concat(['assets/bootstrap.min.css', 'assets/bootstrap.bundle.min.js', 'assets/prism.css', 'assets/docs.css']);
+    const expectedFiles = ['index.html', 'assets/bootstrap.min.css', 'assets/bootstrap.bundle.min.js', 'assets/prism.css', 'assets/docs.css', 'assets/docs.js'];
 
     // ACT
     const missingFiles = expectedFiles.filter(file => !fs.existsSync(path.join(outputDir, file)));
@@ -44,42 +43,33 @@ describe('documentation site', function () {
     assert.deepStrictEqual(missingFiles, []);
   });
 
-  it('documents every registered parser as a heading of the tag reference', function () {
+  it('documents every registered parser as a param-* section, like apidocjs.com', function () {
     // ARRANGE
-    const tagsHtml = fs.readFileSync(path.join(outputDir, 'tags.html'), 'utf8');
+    const html = fs.readFileSync(path.join(outputDir, 'index.html'), 'utf8');
+    const documentedTags = new Set([...html.matchAll(/<h3 id="param-([^"]+)">/g)].map(match => match[1].replace(/-/g, '')));
 
     // ACT
     const undocumentedTags = readRegisteredParserTags().concat('apiignore')
-      .filter(tag => !tagsHtml.includes(`<h3 id="${tag}">`));
+      .filter(tag => !documentedTags.has(tag));
 
     // ASSERT
     assert.deepStrictEqual(undocumentedTags, []);
   });
 
-  it('links only to pages and anchors that exist', function () {
+  it('links only to anchors that exist and leaves no markdown links behind', function () {
     // ARRANGE
-    const idsByPage = {};
-    const htmlByPage = {};
-    pageFiles.forEach(file => {
-      const page = file.replace(/\.md$/, '.html');
-      htmlByPage[page] = fs.readFileSync(path.join(outputDir, page), 'utf8');
-      idsByPage[page] = new Set([...htmlByPage[page].matchAll(/ id="([^"]+)"/g)].map(match => match[1]));
-    });
+    const html = fs.readFileSync(path.join(outputDir, 'index.html'), 'utf8');
+    const ids = new Set([...html.matchAll(/ id="([^"]+)"/g)].map(match => match[1]));
 
     // ACT
-    const brokenLinks = [];
-    Object.entries(htmlByPage).forEach(([page, html]) => {
-      [...html.matchAll(/<a [^>]*href="([^"]+)"/g)].map(match => match[1])
-        .filter(href => !/^(https?:|mailto:|\.\.\/)/.test(href))
-        .forEach(href => {
-          const [target, anchor] = href.split('#');
-          const targetPage = target || page;
-          if (!idsByPage[targetPage] || (anchor && !idsByPage[targetPage].has(anchor))) { brokenLinks.push(`${page} -> ${href}`); }
-        });
-    });
+    const hrefs = [...html.matchAll(/<a [^>]*href="([^"]+)"/g)].map(match => match[1]);
+    const brokenLinks = hrefs
+      .filter(href => !/^(https?:|mailto:|\.\.\/)/.test(href))
+      .filter(href => !ids.has(href.replace(/^#/, '')) || !href.startsWith('#'));
 
     // ASSERT
     assert.deepStrictEqual(brokenLinks, []);
+    assert.ok(!hrefs.some(href => href.includes('.md')));
   });
 
   pageFiles.forEach(file => {

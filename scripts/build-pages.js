@@ -1,5 +1,5 @@
 /**
- * Build the GitHub Pages site: a landing page, the docs (docs/*.md) and the generated example.
+ * Build the GitHub Pages site: a landing page, the docs (docs/*.md as one page) and the generated example.
  *
  * Usage: node scripts/build-pages.js [outputDir]   (default: tmp/site)
  */
@@ -15,7 +15,15 @@ loadLanguages(['bash', 'json', 'javascript', 'diff']);
 const repoRoot = path.join(__dirname, '..');
 const docsSourceDir = path.join(repoRoot, 'docs');
 const repositoryUrl = 'https://github.com/tyba-co/apidoc';
-const pageFiles = ['index.md', 'structure.md', 'tags.md', 'configuration.md', 'tooling.md'];
+const tagSection = 'params';
+const sections = [
+  { file: 'index.md', id: 'getting-started' },
+  { file: 'configuration.md', id: 'configuration' },
+  { file: 'structure.md', id: 'guide' },
+  { file: 'tags.md', id: tagSection },
+  { file: 'tooling.md', id: 'tooling' },
+];
+const pageFiles = sections.map(section => section.file);
 
 const escapeHtml = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -27,11 +35,20 @@ const escapeHtml = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
  */
 const slugify = text => text.toLowerCase().replace(/[^\w\- ]+/g, '').replace(/ /g, '-');
 
+const isTagHeading = text => /^@api\w*$/.test(text);
+
 /**
- * @param {String} markdown
- * @returns {{html: String, title: String, headings: {level: Number, text: String, id: String}[]}}
+ * Anchor of a tag section, like apidocjs.com: @apiSampleRequest -> param-api-sample-request.
+ *
+ * @param {String} tag
+ * @returns {String}
  */
-function renderMarkdown (markdown) {
+const tagAnchor = tag => 'param-' + tag.replace(/^@/, '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+
+/**
+ * @returns {MarkdownIt}
+ */
+function createMarkdown () {
   const markdownIt = new MarkdownIt({
     highlight: (code, language) => {
       const grammar = Prism.languages[language === 'js' ? 'javascript' : language];
@@ -41,61 +58,101 @@ function renderMarkdown (markdown) {
     },
   });
 
-  const headings = [];
-  const usedIds = new Set();
-  markdownIt.core.ruler.push('collect_headings', state => {
-    state.tokens.forEach((token, index) => {
-      if (token.type !== 'heading_open') { return; }
-      const text = state.tokens[index + 1].children.map(child => child.content).join('');
-      let id = slugify(text);
-      while (usedIds.has(id)) { id += '-1'; }
-      usedIds.add(id);
-      token.attrSet('id', id);
-      headings.push({ level: Number(token.tag.slice(1)), text, id });
-    });
-  });
+  markdownIt.renderer.rules.table_open = () => '<div class="table-responsive"><table>';
+  markdownIt.renderer.rules.table_close = () => '</table></div>';
+
+  markdownIt.renderer.rules.heading_close = (tokens, index, options, env, self) => {
+    const id = tokens[index - 2].attrGet('id');
+    return `<a class="anchor" href="#${id}" aria-label="Link to this section">#</a>${self.renderToken(tokens, index, options)}`;
+  };
 
   const defaultLinkOpen = markdownIt.renderer.rules.link_open || ((tokens, index, options, env, self) => self.renderToken(tokens, index, options));
   markdownIt.renderer.rules.link_open = (tokens, index, options, env, self) => {
-    const href = tokens[index].attrGet('href');
-    const markdownLink = href && href.match(/^([\w-]+)\.md(#.*)?$/);
-    if (markdownLink) { tokens[index].attrSet('href', `${markdownLink[1]}.html${markdownLink[2] || ''}`); }
+    const href = tokens[index].attrGet('href') || '';
+    const local = href.match(/^#(.+)$/);
+    const other = href.match(/^([\w-]+\.md)(?:#(.+))?$/);
+    if (local) {
+      tokens[index].attrSet('href', `#${env.anchors.get(`${env.file}#${local[1]}`) || local[1]}`);
+    } else if (other) {
+      const target = other[2] ? env.anchors.get(`${other[1]}#${other[2]}`) : env.sectionIds.get(other[1]);
+      tokens[index].attrSet('href', `#${target || other[2] || ''}`);
+    }
     return defaultLinkOpen(tokens, index, options, env, self);
   };
 
-  const html = markdownIt.render(markdown);
-  const title = headings.find(heading => heading.level === 1);
-  return { html, title: title ? title.text : '', headings };
+  return markdownIt;
 }
 
 /**
- * @param {Object[]} pages rendered pages in navigation order
- * @param {Object} current page being written
- * @returns {String}
+ * Parse every section, give each heading its final id and remember where each source anchor went.
+ *
+ * @param {MarkdownIt} markdownIt
+ * @returns {{parsed: Object[], anchors: Map, sectionIds: Map}}
  */
-function renderSidebar (pages, current) {
-  const items = pages.map(page => {
-    const isCurrent = page === current;
-    const sections = isCurrent
-      ? `<ul class="docs-sections">${page.headings.filter(heading => heading.level >= 2 && heading.level <= 3).map(heading => `<li class="level-${heading.level}"><a href="#${heading.id}">${escapeHtml(heading.text)}</a></li>`).join('')}</ul>`
-      : '';
-    return `<li><a class="docs-page${isCurrent ? ' active' : ''}" href="${page.output}">${escapeHtml(page.title)}</a>${sections}</li>`;
+function parseSections (markdownIt) {
+  const usedIds = new Set();
+  const anchors = new Map();
+  const sectionIds = new Map(sections.map(section => [section.file, section.id]));
+
+  const parsed = sections.map(section => {
+    const tokens = markdownIt.parse(fs.readFileSync(path.join(docsSourceDir, section.file), 'utf8'), {});
+    const headings = [];
+    tokens.forEach((token, index) => {
+      if (token.type !== 'heading_open') { return; }
+      const text = tokens[index + 1].children.map(child => child.content).join('');
+      const level = Number(token.tag.slice(1));
+      const slug = slugify(text);
+      let id = slug;
+      if (level === 1) { id = section.id; } else if (isTagHeading(text)) { id = tagAnchor(text); }
+      if (usedIds.has(id)) { id = `${section.id}-${id}`; }
+      while (usedIds.has(id)) { id += '-1'; }
+      usedIds.add(id);
+      anchors.set(`${section.file}#${slug}`, id);
+      token.attrSet('id', id);
+      headings.push({ level, text, id });
+    });
+    return { section, tokens, headings };
   });
-  return `<ul class="list-unstyled">${items.join('')}</ul>`;
+
+  return { parsed, anchors, sectionIds };
 }
 
 /**
- * @param {Object[]} pages
- * @param {Object} current
+ * @param {Object} section
+ * @param {Object} heading
+ * @returns {Boolean} whether the heading gets a sidebar entry: every h2, plus the tag sections of the tag reference
+ */
+function isSidebarEntry (section, heading) {
+  if (heading.level === 2) { return true; }
+  return section.id === tagSection && heading.level === 3 && isTagHeading(heading.text);
+}
+
+/**
+ * @param {Object[]} parsed
  * @returns {String}
  */
-function renderPage (pages, current) {
+function renderSidebar (parsed) {
+  const groups = parsed.map(({ section, headings }) => {
+    const [title] = headings;
+    const children = headings.filter(heading => isSidebarEntry(section, heading));
+    const items = children.map(heading => `<li class="level-${heading.level}${isTagHeading(heading.text) ? ' tag' : ''}"><a href="#${heading.id}">${escapeHtml(heading.text)}</a></li>`).join('');
+    return `<li class="docs-group${section.id === tagSection ? ' docs-group-tags' : ''}"><a class="docs-page" href="#${title.id}">${escapeHtml(title.text)}</a><ul class="docs-sections">${items}</ul></li>`;
+  });
+  return `<ul class="list-unstyled">${groups.join('')}</ul>`;
+}
+
+/**
+ * @param {Object[]} parsed
+ * @param {String} content
+ * @returns {String}
+ */
+function renderPage (parsed, content) {
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(current.title)} · apidoc</title>
+  <title>Documentation · apidoc</title>
   <link rel="stylesheet" href="assets/bootstrap.min.css">
   <link rel="stylesheet" href="assets/prism.css">
   <link rel="stylesheet" href="assets/docs.css">
@@ -114,28 +171,31 @@ function renderPage (pages, current) {
   <div class="container-fluid">
     <div class="row">
       <nav id="docs-nav" class="col-lg-3 col-xl-2 docs-sidebar collapse d-lg-block" aria-label="Documentation">
-        ${renderSidebar(pages, current)}
+        ${renderSidebar(parsed)}
       </nav>
       <main class="col-lg-9 col-xl-8 docs-content">
-        ${current.html}
+        ${content}
       </main>
     </div>
   </div>
   <script src="assets/bootstrap.bundle.min.js"></script>
+  <script src="assets/docs.js"></script>
 </body>
 </html>
 `;
 }
 
 /**
- * @param {String} outputDir directory that receives the docs pages and their assets
+ * @param {String} outputDir directory that receives the docs page and its assets
  * @returns {String[]} names of the written pages
  */
 function buildDocs (outputDir) {
-  const pages = pageFiles.map(file => {
-    const rendered = renderMarkdown(fs.readFileSync(path.join(docsSourceDir, file), 'utf8'));
-    return Object.assign(rendered, { output: file.replace(/\.md$/, '.html') });
-  });
+  const markdownIt = createMarkdown();
+  const { parsed, anchors, sectionIds } = parseSections(markdownIt);
+  const content = parsed.map(({ section, tokens }) => {
+    const env = { file: section.file, anchors, sectionIds };
+    return `<section class="docs-section">${markdownIt.renderer.render(tokens, markdownIt.options, env)}</section>`;
+  }).join('\n');
 
   const assetsDir = path.join(outputDir, 'assets');
   fs.ensureDirSync(assetsDir);
@@ -143,9 +203,10 @@ function buildDocs (outputDir) {
   fs.copySync(require.resolve('bootstrap/dist/js/bootstrap.bundle.min.js'), path.join(assetsDir, 'bootstrap.bundle.min.js'));
   fs.copySync(path.join(path.dirname(require.resolve('prismjs')), 'themes', 'prism-tomorrow.css'), path.join(assetsDir, 'prism.css'));
   fs.copySync(path.join(__dirname, 'pages.css'), path.join(assetsDir, 'docs.css'));
+  fs.copySync(path.join(__dirname, 'pages.js'), path.join(assetsDir, 'docs.js'));
 
-  pages.forEach(page => fs.writeFileSync(path.join(outputDir, page.output), renderPage(pages, page)));
-  return pages.map(page => page.output);
+  fs.writeFileSync(path.join(outputDir, 'index.html'), renderPage(parsed, content));
+  return ['index.html'];
 }
 
 /**
@@ -208,7 +269,7 @@ function buildSite (outputDir) {
   buildExample(path.join(outputDir, 'example'));
 }
 
-module.exports = { buildDocs, buildSite, renderMarkdown, pageFiles };
+module.exports = { buildDocs, buildSite, pageFiles, tagAnchor };
 
 if (require.main === module) {
   const outputDir = path.resolve(process.argv[2] || path.join(repoRoot, 'tmp', 'site'));
