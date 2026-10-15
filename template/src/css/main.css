@@ -1081,3 +1081,16 @@ pre code {
   border-color: #ced4da;
   text-decoration: none;
 }
+
+.body-example-hint {
+  cursor: help;
+  border-radius: 3px;
+}
+
+.body-example-hint:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.token.property.body-example-invalid {
+  color: #ff6b6b;
+}

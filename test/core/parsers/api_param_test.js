@@ -124,6 +124,22 @@ describe('Parser: apiParam', function () {
         description: 'Some description.',
       },
     },
+    {
+      title: 'Quoted fieldname is a literal key that may contain a dot',
+      content: '{String} "custom.property" A literal key.',
+      expected: {
+        group: 'Parameter',
+        isArray: false,
+        type: 'String',
+        size: undefined,
+        allowedValues: undefined,
+        optional: false,
+        parentNode: undefined,
+        field: '"custom.property"',
+        defaultValue: undefined,
+        description: 'A literal key.',
+      },
+    },
   ];
 
   // create
@@ -135,5 +151,20 @@ describe('Parser: apiParam', function () {
       assert.deepEqual(parsed, testCase.expected);
     });
     done();
+  });
+
+  it('case 2: should split parents only on dots outside quotes', function () {
+    // ARRANGE
+    parser.parse('{Object} extraInfo Parent.');
+    parser.parse('{Object} "a.b" Literal parent.');
+
+    // ACT
+    const literalChild = parser.parse('{String} extraInfo."name.particle" Literal child.');
+    const childOfLiteral = parser.parse('{String} "a.b".c Child of a literal key.');
+
+    // ASSERT
+    assert.strictEqual(literalChild.field, 'extraInfo."name.particle"');
+    assert.strictEqual(literalChild.parentNode.path, 'extraInfo');
+    assert.strictEqual(childOfLiteral.parentNode.path, '"a.b"');
   });
 });

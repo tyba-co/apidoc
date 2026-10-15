@@ -4,7 +4,7 @@ Source of truth: `lib/core/parsers/*.js`, registered in `lib/core/index.js`. Tag
 
 | Tag | Syntax | Notes |
 |---|---|---|
-| `@api` | `@api {method} path [title]` | One per endpoint block. Write `{method}` always: without it and without `@apiName` the build crashes. |
+| `@api` | `@api {method} path [title]` | One per endpoint block. Write `{method}` always: apidoc accepts the tag without it, but the endpoint then has no HTTP method. |
 | `@apiName` | `@apiName name` | Unique per group and version. Whitespace becomes `_`. If missing, a name is generated from method and URL. |
 | `@apiGroup` | `@apiGroup name` | Whitespace becomes `_`. If missing, the file path is used. Pair with `@apiDefine <group> <title>` to give the group a title and description. |
 | `@apiVersion` | `@apiVersion major.minor.patch` | Strict semver. Also versions an `@apiDefine` block. Falls back to `defaultVersion` from the config (default `0.0.0`). |
@@ -41,9 +41,12 @@ Source of truth: `lib/core/parsers/*.js`, registered in `lib/core/index.js`. Tag
 | `@apiBody {String="ACTIVE","BLOCKED"} status Account status.` | allowed values |
 | `@apiSuccess {Object[]} items Page of results.` | array of objects |
 | `@apiSuccess {String} items.id Item id.` | nested field, dot notation |
+| `@apiBody {String} meta."trace.id" Trace id.` | quoted segment: a literal key that contains a dot |
 | `@apiError (409 Conflict) EmailTaken The email is already registered.` | error with custom group |
 
 Type characters: letters, digits and `()#:./\[]_|-`, so `String|Number` and `Object[]` are valid. A type containing `Object` makes the field a parent for dotted children.
+
+A dot nests only under a parent declared as `Object` or `Object[]`. If the parent is missing or has another type, the generated body example shows the key in red as "cannot nest"; fix the declaration, or quote the segment (`"a.b"`) when the key really contains a dot.
 
 ## Example grammar
 

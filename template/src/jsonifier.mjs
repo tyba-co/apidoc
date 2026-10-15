@@ -9,11 +9,13 @@
  * Licensed under the MIT license.
  */
 
+import { relativeFieldName, splitFieldPath } from './field_path.mjs';
+
 const fieldsToJson = items => {
   let obj = {};
 
   const _get = (obj, path) => {
-    return path.split('.').reduce((o, key) => {
+    return splitFieldPath(path).reduce((o, key) => {
       if (o) {
         if (o[key]) {
           return o[key];
@@ -44,7 +46,7 @@ const fieldsToJson = items => {
   items.forEach(item => {
     const { parentNode, field, type } = item[0];
     const parentPtr = parentNode ? _get(obj, parentNode.path) : undefined;
-    const key = parentPtr ? field.substring(parentNode.path.length + 1) : field;
+    const key = relativeFieldName(field, parentPtr ? parentNode : undefined);
     const isArray = type.indexOf('[]') !== -1;
     // Object / array of Object
     if (type.indexOf('Object') !== -1) {
