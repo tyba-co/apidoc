@@ -2,7 +2,9 @@
 :root {
   --primary: #2e71e5;
   --primary-rgb: 46, 113, 229;
-  --dark: #141b1f;
+  --dark: #253138;
+  --code-bg: #141b1f;
+  --surface: #f0f2f4;
   --text: #202020;
   --muted: #646464;
   --bs-primary-rgb: var(--primary-rgb);
@@ -96,7 +98,7 @@ body {
 }
 
 .docs-content th {
-  background: #f1f3f5;
+  background: var(--surface);
 }
 
 .docs-content pre {
@@ -108,7 +110,7 @@ body {
 .docs-content :not(pre) > code {
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
-  background: #f2f2f2;
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -123,19 +125,21 @@ body {
 }
 
 pre[class*='language-'] {
-  background-color: var(--dark);
+  background-color: var(--code-bg);
 }
 
 .landing code {
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
-  background: #f2f2f2;
+  background: var(--surface);
   color: var(--text);
 }
 
 .landing .card {
   color: var(--text);
-  border-color: #e3e3e3;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  background: var(--surface);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 

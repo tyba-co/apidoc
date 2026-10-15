@@ -13,8 +13,14 @@
   --white: #fff;
   --light-gray: #ccc;
   --main-gray: #646464;
-  --dark-gray: #141b1f;
-  --hover-gray: #26323a;
+  --dark-gray: #253138;
+  --hover-gray: #32424b;
+  --code-bg: #141b1f;
+  --surface: #f0f2f4;
+  --surface-blue: #f5f8ff;
+  --line: #e3e7ea;
+  --radius: 0.875rem;
+  --radius-sm: 0.5rem;
   --text: #202020;
   --meth-get: green;
   --meth-put: #e5c500;
@@ -92,7 +98,7 @@ input[type="date"] {
 
 .sample-request-response pre {
   padding: 0.5rem 0.75rem !important;
-  background-color: var(--dark-gray);
+  background-color: var(--code-bg);
   color: #e6e6e6;
   border-radius: 0.25rem;
 }
@@ -1332,5 +1338,60 @@ body {
 }
 
 pre[class*='language-'] {
-  background-color: var(--dark-gray);
+  background-color: var(--code-bg);
+  border-radius: var(--radius-sm);
+}
+
+/* Tyba look: light surfaces, soft rounded cards, blue chips */
+th {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-weight: 600;
+}
+
+td {
+  border: 1px solid var(--line);
+}
+
+.card {
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: 0 0.25rem 1rem rgba(20, 27, 31, 0.08);
+}
+
+.card-header {
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background-color: var(--surface-blue);
+}
+
+.sample-request .card-header {
+  background-color: var(--surface-blue);
+}
+
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.method {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.label.required {
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
+  background-color: #eaf3ff;
+  color: var(--primary);
+}
+
+.label.optional {
+  border: 1px solid var(--line);
+  background-color: var(--surface);
+  color: var(--main-gray);
+}
+
+.sample-request .input-group-text {
+  background-color: var(--surface);
 }
