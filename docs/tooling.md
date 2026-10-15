@@ -8,7 +8,23 @@ The `vscode/` folder of the repository holds an extension called "apiDoc (Tyba)"
 
 ### What it provides
 
-- **Tag snippets.** Type `@api` inside a doc comment and pick a snippet. There is one for every tag, plus variants that save typing:
+- **Context-aware completion.** Active only inside doc comments (`/** ... */`, Python docstrings and whole-line `//` or `#` comments). It asks for suggestions when you type `@`, `{`, `(` or a space after a tag, and it replaces what you already typed, so accepting `@apiParam` after typing `@apiP` does not leave a second `@`.
+
+  | Where the cursor is | What is suggested |
+  | --- | --- |
+  | `@` at the start of a comment line | Every tag, as a snippet with tab stops |
+  | `@api {` | HTTP methods |
+  | `@apiParam {`, `@apiQuery {`, `@apiBody {`, `@apiHeader {`, `@apiSuccess {`, `@apiError {` (also after a `(group)`) | Field types |
+  | `@apiSuccess (`, `@apiError (` | Common status groups, such as `201 Created` or `404 Not Found` |
+  | `@apiSuccessExample {` and the other example tags | Highlight languages |
+  | `@apiUse `, `@apiPermission ` | The `@apiDefine` names found in the workspace, with their title |
+  | `@apiGroup `, `@apiVersion ` | The groups and versions already used in the workspace |
+
+  The workspace is scanned once, on the first completion: source files outside `node_modules`, `.git`, `dist`, `build`, `out`, `doc` and `docs`, up to 3000 files. The index follows file changes, and the unsaved text of the open file is included.
+
+- **Syntax highlighting.** Inside comments, `@api...` tags, `(group)` and `{type}` get their own colors in every supported language. Ordinary JSDoc such as `@param {string} name` is left alone.
+
+- **Tag snippets.** The same snippets are also available as classic snippets. There is one for every tag, plus variants that save typing:
 
   | Snippet prefix | Inserts |
   | --- | --- |
@@ -22,7 +38,7 @@ The `vscode/` folder of the repository holds an extension called "apiDoc (Tyba)"
 - **Block snippets** for C-style languages: `apidoc` inserts a complete endpoint block, `apidocdefine` an `@apiDefine` block.
 - **`apidoc.json` support.** Files named `apidoc.json` are validated against a JSON schema that lists the keys (`name`, `version`, `description`, `title`, `url`, `sampleUrl`, `defaultVersion`, `order`, `header`, `footer`, `input`, `output`, `template`), the `template` options and the allowed values of `forceLanguage`, and offers completion for them. See [Configuration keys](configuration.md#configuration-keys).
 
-Tag snippets are active in JavaScript, TypeScript (and their React variants), Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin, Scala, Python, Ruby, Perl, Lua, CoffeeScript, Elixir, Erlang and Clojure. Block snippets are available in the C-style subset: JavaScript, TypeScript, Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin and Scala.
+Completion and highlighting work in JavaScript, TypeScript (and their React variants), Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin, Scala, Python, Ruby, Perl, Lua, CoffeeScript, Elixir, Erlang and Clojure. Block snippets are available in the C-style subset: JavaScript, TypeScript, Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin and Scala.
 
 ### Build and install
 
@@ -31,26 +47,25 @@ From a clone of the repository:
 ```bash
 cd vscode
 npm run package
-code --install-extension apidoc-vscode-0.1.0.vsix
+code --install-extension apidoc-vscode-0.2.0.vsix
 ```
 
 `npm run package` runs `@vscode/vsce` through `npx`, so the first run needs network access. Instead of the `code` command you can install the file from the Extensions view: open the `...` menu and choose "Install from VSIX...".
 
-### Suggestions inside comments
+### If nothing shows up
 
-VS Code does not show suggestions inside comments while you type unless `editor.quickSuggestions` allows it. Press `Ctrl+Space` after `@api`, or enable suggestions in comments for your languages:
-
-```json
-{
-  "[javascript]": { "editor.quickSuggestions": { "comments": "on", "other": "on", "strings": "off" } },
-  "[typescript]": { "editor.quickSuggestions": { "comments": "on", "other": "on", "strings": "off" } }
-}
-```
+The completion provider declares `@`, `{`, `(` and the space as trigger characters, so VS Code should ask for suggestions as you type them, also inside comments. If the list does not appear, press `Ctrl+Space`; that always works.
 
 ### Limits
 
-- Names for `@apiUse` and `@apiPermission` are not completed from the `@apiDefine` blocks of your workspace.
+- A comment that follows code on the same line (`const a = 1; // @apiP`) is not treated as an apidoc comment; apidoc blocks occupy whole lines.
+- Ruby `=begin` / `=end` blocks are not detected as comments; use `#` lines or a docstring-style block.
+- There is no hover text, no live diagnostics and no go-to-definition from `@apiUse` to its `@apiDefine` yet.
 - There is no schema for `apidoc.config.js` or for the `apidoc` key of `package.json`.
+
+### Tests
+
+`npm test` in the repository root runs unit tests of the completion logic and checks that every registered tag has a snippet the parser accepts. `cd vscode && npm install && npm run test:host` loads the extension in a real VS Code and asks it for completions. It downloads a VS Code build the first time; set `VSCODE_EXECUTABLE_PATH` to reuse an installed one. If you start it from VS Code's integrated terminal, clear `ELECTRON_RUN_AS_NODE` first. The host tests are not part of the CI, which has no display.
 
 ## Agent skill
 

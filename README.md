@@ -129,7 +129,7 @@ Use `npx --no-install apidoc` (or a package script): plain `npx apidoc` in a pro
 
 ## VS Code extension
 
-`vscode/` contains a VS Code extension with snippets for every apidoc tag and a schema for `apidoc.json`. See [vscode/README.md](vscode/README.md) to build and install it.
+`vscode/` contains a VS Code extension with context-aware completion inside apidoc comments (tags, types, status groups, `@apiUse` names), syntax highlighting, snippets and a schema for `apidoc.json`. See [vscode/README.md](vscode/README.md) to build and install it.
 
 ## Docker image
 

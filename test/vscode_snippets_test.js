@@ -81,7 +81,9 @@ describe('vscode extension', function () {
   it('lists only existing files in the manifest', function () {
     // ARRANGE
     const manifestPaths = manifest.contributes.snippets.map(entry => entry.path)
-      .concat(manifest.contributes.jsonValidation.map(entry => entry.url));
+      .concat(manifest.contributes.jsonValidation.map(entry => entry.url))
+      .concat(manifest.contributes.grammars.map(entry => entry.path))
+      .concat(manifest.main);
 
     // ACT
     const missingPaths = manifestPaths.filter(file => !fs.existsSync(path.join(extensionRoot, file)));

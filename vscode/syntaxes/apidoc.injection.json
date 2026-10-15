@@ -1,0 +1,15 @@
+{
+  "scopeName": "apidoc.injection",
+  "injectionSelector": "L:comment",
+  "patterns": [{ "include": "#tag" }],
+  "repository": {
+    "tag": {
+      "match": "(?<![\\w@])(@api\\w*)\\b(?:(\\s+)(\\([^)\\n]*\\)))?(?:(\\s+)(\\{[^}\\n]*\\}))?",
+      "captures": {
+        "1": { "name": "keyword.control.apidoc" },
+        "3": { "name": "constant.other.apidoc" },
+        "5": { "name": "entity.name.type.apidoc" }
+      }
+    }
+  }
+}

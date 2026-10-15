@@ -1,8 +1,8 @@
 {
   "name": "apidoc-vscode",
   "displayName": "apiDoc (Tyba)",
-  "description": "Snippets for apidoc comments (@api, @apiParam, ...) and a JSON schema for apidoc.json",
-  "version": "0.1.0",
+  "description": "Completion, syntax highlighting and snippets for apidoc comments (@api, @apiParam, ...), and a JSON schema for apidoc.json",
+  "version": "0.2.0",
   "publisher": "tyba-co",
   "license": "MIT",
   "repository": {
@@ -14,6 +14,7 @@
     "vscode": "^1.80.0"
   },
   "categories": [
+    "Programming Languages",
     "Snippets"
   ],
   "keywords": [
@@ -23,7 +24,8 @@
     "snippets"
   ],
   "scripts": {
-    "package": "npx --yes @vscode/vsce@3.9.2 package --no-dependencies"
+    "package": "npx --yes @vscode/vsce@3.9.2 package --no-dependencies",
+    "test:host": "node test/run.js"
   },
   "contributes": {
     "snippets": [
@@ -187,6 +189,67 @@
         ],
         "url": "./schemas/apidoc.schema.json"
       }
+    ],
+    "grammars": [
+      {
+        "scopeName": "apidoc.injection",
+        "path": "./syntaxes/apidoc.injection.json",
+        "injectTo": [
+          "source.js",
+          "source.js.jsx",
+          "source.ts",
+          "source.tsx",
+          "source.vue",
+          "source.php",
+          "source.java",
+          "source.go",
+          "source.c",
+          "source.cpp",
+          "source.cs",
+          "source.dart",
+          "source.groovy",
+          "source.kotlin",
+          "source.scala",
+          "source.python",
+          "source.ruby",
+          "source.perl",
+          "source.lua",
+          "source.coffee",
+          "source.elixir",
+          "source.erlang",
+          "source.clojure"
+        ]
+      }
     ]
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:vue",
+    "onLanguage:php",
+    "onLanguage:java",
+    "onLanguage:go",
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:csharp",
+    "onLanguage:dart",
+    "onLanguage:groovy",
+    "onLanguage:kotlin",
+    "onLanguage:scala",
+    "onLanguage:python",
+    "onLanguage:ruby",
+    "onLanguage:perl",
+    "onLanguage:lua",
+    "onLanguage:coffeescript",
+    "onLanguage:elixir",
+    "onLanguage:erlang",
+    "onLanguage:clojure"
+  ],
+  "devDependencies": {
+    "@vscode/test-electron": "^2.5.2",
+    "mocha": "^11.7.2"
   }
 }
