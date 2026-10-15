@@ -1,0 +1,13 @@
+{
+  "name": "tyba-apidoc",
+  "description": "Agent skill that teaches how to write apidoc comments",
+  "owner": { "name": "Tyba", "url": "https://github.com/tyba-co" },
+  "plugins": [
+    {
+      "name": "apidoc",
+      "source": "./",
+      "description": "Write and validate apidoc @api comment blocks",
+      "skills": ["./skills/apidoc"]
+    }
+  ]
+}

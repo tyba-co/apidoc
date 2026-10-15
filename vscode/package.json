@@ -1,0 +1,192 @@
+{
+  "name": "apidoc-vscode",
+  "displayName": "apiDoc (Tyba)",
+  "description": "Snippets for apidoc comments (@api, @apiParam, ...) and a JSON schema for apidoc.json",
+  "version": "0.1.0",
+  "publisher": "tyba-co",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tyba-co/apidoc",
+    "directory": "vscode"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Snippets"
+  ],
+  "keywords": [
+    "apidoc",
+    "api",
+    "documentation",
+    "snippets"
+  ],
+  "scripts": {
+    "package": "npx --yes @vscode/vsce@3.9.2 package --no-dependencies"
+  },
+  "contributes": {
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "javascriptreact",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "vue",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "php",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "java",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "go",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "c",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "cpp",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "csharp",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "dart",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "groovy",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "kotlin",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "scala",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "python",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "ruby",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "perl",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "lua",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "coffeescript",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "elixir",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "erlang",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "clojure",
+        "path": "./snippets/tags.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "javascriptreact",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "vue",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "php",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "java",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "go",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "c",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "cpp",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "csharp",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "dart",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "groovy",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "kotlin",
+        "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "scala",
+        "path": "./snippets/blocks.json"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "apidoc.json"
+        ],
+        "url": "./schemas/apidoc.schema.json"
+      }
+    ]
+  }
+}

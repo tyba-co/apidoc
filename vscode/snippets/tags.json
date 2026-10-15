@@ -1,0 +1,225 @@
+{
+  "api": {
+    "prefix": "@api",
+    "body": [
+      "@api {${1|get,post,put,patch,delete|}} ${2:/path/:id} ${3:Title}"
+    ],
+    "description": "apidoc: endpoint method, path and title"
+  },
+  "apiName": {
+    "prefix": "@apiName",
+    "body": [
+      "@apiName ${1:GetThing}"
+    ],
+    "description": "apidoc: unique endpoint name (PascalCase VerbNoun)"
+  },
+  "apiGroup": {
+    "prefix": "@apiGroup",
+    "body": [
+      "@apiGroup ${1:Thing}"
+    ],
+    "description": "apidoc: endpoint group"
+  },
+  "apiVersion": {
+    "prefix": "@apiVersion",
+    "body": [
+      "@apiVersion ${1:1.0.0}"
+    ],
+    "description": "apidoc: semver version of the block"
+  },
+  "apiDescription": {
+    "prefix": "@apiDescription",
+    "body": [
+      "@apiDescription ${1:Description}"
+    ],
+    "description": "apidoc: markdown description"
+  },
+  "apiPermission": {
+    "prefix": "@apiPermission",
+    "body": [
+      "@apiPermission ${1:admin}"
+    ],
+    "description": "apidoc: permission name (optionally an @apiDefine)"
+  },
+  "apiUse": {
+    "prefix": "@apiUse",
+    "body": [
+      "@apiUse ${1:DefineName}"
+    ],
+    "description": "apidoc: include an @apiDefine block"
+  },
+  "apiDefine": {
+    "prefix": "@apiDefine",
+    "body": [
+      "@apiDefine ${1:DefineName} ${2:Title}",
+      "${3:Description}"
+    ],
+    "description": "apidoc: reusable block"
+  },
+  "apiSampleRequest": {
+    "prefix": "@apiSampleRequest",
+    "body": [
+      "@apiSampleRequest ${1:/path}"
+    ],
+    "description": "apidoc: sample request URL"
+  },
+  "apiSampleRequestOff": {
+    "prefix": "@apiSampleRequestOff",
+    "body": [
+      "@apiSampleRequest off"
+    ],
+    "description": "apidoc: disable the sample request form"
+  },
+  "apiDeprecated": {
+    "prefix": "@apiDeprecated",
+    "body": [
+      "@apiDeprecated ${1:use (#Group:Name) instead.}"
+    ],
+    "description": "apidoc: mark the endpoint deprecated"
+  },
+  "apiPrivate": {
+    "prefix": "@apiPrivate",
+    "body": [
+      "@apiPrivate"
+    ],
+    "description": "apidoc: hide unless --private"
+  },
+  "apiIgnore": {
+    "prefix": "@apiIgnore",
+    "body": [
+      "@apiIgnore ${1:Not finished}"
+    ],
+    "description": "apidoc: skip this block"
+  },
+  "apiParam": {
+    "prefix": "@apiParam",
+    "body": [
+      "@apiParam {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${2:field} ${3:Description}"
+    ],
+    "description": "apidoc: param field"
+  },
+  "apiParamOptional": {
+    "prefix": "@apiParamOptional",
+    "body": [
+      "@apiParam {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
+    ],
+    "description": "apidoc: optional param field"
+  },
+  "apiQuery": {
+    "prefix": "@apiQuery",
+    "body": [
+      "@apiQuery {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${2:field} ${3:Description}"
+    ],
+    "description": "apidoc: query field"
+  },
+  "apiQueryOptional": {
+    "prefix": "@apiQueryOptional",
+    "body": [
+      "@apiQuery {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
+    ],
+    "description": "apidoc: optional query field"
+  },
+  "apiBody": {
+    "prefix": "@apiBody",
+    "body": [
+      "@apiBody {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${2:field} ${3:Description}"
+    ],
+    "description": "apidoc: body field"
+  },
+  "apiBodyOptional": {
+    "prefix": "@apiBodyOptional",
+    "body": [
+      "@apiBody {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
+    ],
+    "description": "apidoc: optional body field"
+  },
+  "apiHeader": {
+    "prefix": "@apiHeader",
+    "body": [
+      "@apiHeader {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${2:field} ${3:Description}"
+    ],
+    "description": "apidoc: header field"
+  },
+  "apiHeaderOptional": {
+    "prefix": "@apiHeaderOptional",
+    "body": [
+      "@apiHeader {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
+    ],
+    "description": "apidoc: optional header field"
+  },
+  "apiSuccess": {
+    "prefix": "@apiSuccess",
+    "body": [
+      "@apiSuccess {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${2:field} ${3:Description}"
+    ],
+    "description": "apidoc: success field"
+  },
+  "apiSuccessOptional": {
+    "prefix": "@apiSuccessOptional",
+    "body": [
+      "@apiSuccess {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
+    ],
+    "description": "apidoc: optional success field"
+  },
+  "apiSuccessGroup": {
+    "prefix": "@apiSuccessGroup",
+    "body": [
+      "@apiSuccess (${1:201 Created}) {${2|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} ${3:field} ${4:Description}"
+    ],
+    "description": "apidoc: success field with status group"
+  },
+  "apiError": {
+    "prefix": "@apiError",
+    "body": [
+      "@apiError ${1:ErrorName} ${2:Description}"
+    ],
+    "description": "apidoc: error"
+  },
+  "apiErrorGroup": {
+    "prefix": "@apiErrorGroup",
+    "body": [
+      "@apiError (${1:404 Not Found}) ${2:ErrorName} ${3:Description}"
+    ],
+    "description": "apidoc: error with status group"
+  },
+  "apiExample": {
+    "prefix": "@apiExample",
+    "body": [
+      "@apiExample {${1|bash,js,json,python,http|}} ${2:Example usage}",
+      "${3:curl -i https://api.example.com/path}"
+    ],
+    "description": "apidoc: Example block"
+  },
+  "apiParamExample": {
+    "prefix": "@apiParamExample",
+    "body": [
+      "@apiParamExample {${1|json,xml,js|}} ${2:Request-Example}",
+      "${3:{ \"id\": 1 \\}}"
+    ],
+    "description": "apidoc: ParamExample block"
+  },
+  "apiHeaderExample": {
+    "prefix": "@apiHeaderExample",
+    "body": [
+      "@apiHeaderExample {${1|json,xml,js|}} ${2:Header-Example}",
+      "${3:{ \"Authorization\": \"Bearer token\" \\}}"
+    ],
+    "description": "apidoc: HeaderExample block"
+  },
+  "apiSuccessExample": {
+    "prefix": "@apiSuccessExample",
+    "body": [
+      "@apiSuccessExample {${1|json,xml,js|}} ${2:Success-Response}",
+      "${3:HTTP/1.1 200 OK}"
+    ],
+    "description": "apidoc: SuccessExample block"
+  },
+  "apiErrorExample": {
+    "prefix": "@apiErrorExample",
+    "body": [
+      "@apiErrorExample {${1|json,xml,js|}} ${2:Error-Response}",
+      "${3:HTTP/1.1 404 Not Found}"
+    ],
+    "description": "apidoc: ErrorExample block"
+  }
+}

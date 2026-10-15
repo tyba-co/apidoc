@@ -19,6 +19,10 @@ const nodemon = require('nodemon');
 // library to parse arguments/options
 const { Command } = require('commander');
 
+if (process.argv[2] === 'install-skill') {
+  process.exit(require(path.join(__dirname, '..', 'lib', 'install_skill')).runInstallSkillCommand(process.argv.slice(3)));
+}
+
 const apidoc = require(path.join(__dirname, '..', 'lib', 'index'));
 
 /**
@@ -101,6 +105,8 @@ program
   .option('--warn-error', 'Treat warnings as error and exit with error code.', false)
 
   .option('-w, --watch', 'Watch input files for changes to rebuild the docs.', false)
+
+  .addHelpText('after', '\nCommands:\n  install-skill [--global]  Copy the apidoc agent skill to ./.claude/skills/apidoc (or ~/.claude/skills/apidoc).')
 
   .parse(process.argv);
 

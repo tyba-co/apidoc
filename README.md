@@ -20,6 +20,8 @@ apiDoc creates a documentation from API descriptions in your source code.
 $ npm install -g apidoc
 ```
 
+Requires Node.js 22 or newer.
+
 ## Usage
 
 Add some apidoc comments anywhere in your source code:
@@ -81,6 +83,53 @@ Install type definitions (see [@types/apidoc](https://github.com/DefinitelyTyped
 ```bash
 $ npm install -D @types/apidoc
 ```
+
+## AI agent skill
+
+`@tyba-co/apidoc` ships an agent skill in `skills/apidoc/` that teaches coding agents to write and validate apidoc comments for this fork (tags, house style, validation loop, validated examples).
+
+Install the package from GitHub Packages first. The consumer project needs an `.npmrc` with the scope mapping and a token with `read:packages`:
+
+```ini
+@tyba-co:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+```bash
+npm install -D @tyba-co/apidoc
+```
+
+### Claude Code
+
+Copy the skill into the project (commit `.claude/skills/apidoc/` so the whole team gets it) and re-run after upgrading the package:
+
+```bash
+npx --no-install apidoc install-skill            # ./.claude/skills/apidoc
+npx --no-install apidoc install-skill --global   # ~/.claude/skills/apidoc, for all your projects
+```
+
+Or install it as a plugin straight from this repository, without the npm package:
+
+```bash
+claude plugin marketplace add tyba-co/apidoc
+claude plugin install apidoc@tyba-apidoc
+```
+
+Inside Claude Code the same commands are `/plugin marketplace add tyba-co/apidoc` and `/plugin install apidoc@tyba-apidoc`. The plugin follows `master`, so it can describe tags newer than the package version a project uses; run `/plugin marketplace update tyba-apidoc` to refresh it.
+
+### Other agents
+
+Point the agent at the installed copy, e.g. in `AGENTS.md`:
+
+```markdown
+Before writing or changing apidoc comments, read node_modules/@tyba-co/apidoc/skills/apidoc/SKILL.md and follow it.
+```
+
+Use `npx --no-install apidoc` (or a package script): plain `npx apidoc` in a project without `@tyba-co/apidoc` installed runs the unrelated public `apidoc` package.
+
+## VS Code extension
+
+`vscode/` contains a VS Code extension with snippets for every apidoc tag and a schema for `apidoc.json`. See [vscode/README.md](vscode/README.md) to build and install it.
 
 ## Docker image
 
