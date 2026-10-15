@@ -163,6 +163,42 @@ function uploadAvatar () { }
 function createOrderXml () { }
 
 /**
+ * @api {get} /user/export Download the users
+ * @apiVersion 0.3.0
+ * @apiName ExportUsers
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription Downloads every user as a CSV file.
+ *
+ * @apiQuery {String="ACTIVE","BLOCKED"} [status] Only the users in this status.
+ *
+ * @apiSuccess {File="csv"} users The file, comma delimited, UTF-8.
+ * @apiFileColumn (users) {String} name Full name of the user.
+ * @apiFileColumn (users) {String} email=ana@example.com Email address.
+ * @apiFileColumn (users) {Date} "Hire date" Date when the user was hired.
+ * @apiFileColumn (users) {String="ADMIN","USER"} role=USER Role of the user.
+ * @apiResponseHeader {String} Content-Disposition="attachment; filename=users.csv" Name of the downloaded file.
+ * @apiResponseHeader {Number} X-Total-Count=250 Number of rows in the file.
+ */
+function exportUsers () { }
+
+/**
+ * @api {post} /user/export Start an export
+ * @apiVersion 0.3.0
+ * @apiName StartUserExport
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription Starts the export in the background: the answer is 202, and the result is read from the URL of the Location header.
+ *
+ * @apiSuccess (202 Accepted) {String} id Id of the export job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/user/export/42" URL to poll until the export is ready.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
+ */
+function startUserExport () { }
+
+/**
  * @api {put} /user/:id Change a User
  * @apiVersion 0.3.0
  * @apiName PutUser

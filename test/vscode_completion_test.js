@@ -38,7 +38,7 @@ describe('vscode completion', function () {
     assert.strictEqual(result.start, 3);
     assert.ok(labels(result).includes('@apiParam'));
     assert.ok(labels(result).includes('@apiParamExample'));
-    assert.strictEqual(result.items.length, 33);
+    assert.strictEqual(result.items.length, 34);
   });
 
   it('should continue example tags on the next comment line', function () {

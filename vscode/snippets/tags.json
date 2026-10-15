@@ -161,6 +161,13 @@
     ],
     "description": "apidoc: optional header field"
   },
+  "apiResponseHeader": {
+    "prefix": "@apiResponseHeader",
+    "description": "apidoc: header of the response",
+    "body": [
+      "@apiResponseHeader {${1|String,Number,Boolean,Date|}} ${2:Header-Name} ${3:Description}"
+    ]
+  },
   "apiSuccess": {
     "prefix": "@apiSuccess",
     "body": [

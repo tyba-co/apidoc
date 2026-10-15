@@ -16,6 +16,7 @@ Source of truth: `lib/core/parsers/*.js`, registered in `lib/core/index.js`. Tag
 | `@apiQuery` | same as `@apiParam` | Query string parameters. Default group `Query`. |
 | `@apiBody` | same as `@apiParam` | Request body fields. Default group `Body`. A `{Boolean}` default sets the checkbox in the sample request form. A file is `{File="csv"}`. |
 | `@apiContentType` | `@apiContentType type/subtype` | Content-Type of the request body when it is not JSON: `application/x-www-form-urlencoded`, `multipart/form-data`, `application/xml`, `text/plain` or a binary type such as `image/png`. Drives the example, the cURL and the sample request. Default: JSON, or multipart when the body has a `File`. |
+| `@apiResponseHeader` | `@apiResponseHeader [(group)] {type} name[=example] description` | Header of the response (`Location`, `Content-Disposition`, `X-RateLimit-*`). Default group `Response Headers`; shown as a table after the success fields. |
 | `@apiFileColumn` | `@apiFileColumn [(file)] {type} column[=example] description` | One column of a tabular file declared with `@apiBody {File="csv"}`. `(file)` is the name of the File field; quote names with spaces (`"Hire date"`). The site renders the expected columns and an example file. |
 | `@apiHeader` | same as `@apiParam` | Request headers. Default group `Header`. |
 | `@apiSuccess` | same as `@apiParam` | Response fields. Default group `Success 200`; use `(201 Created)` etc. for others. |

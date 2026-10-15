@@ -1,6 +1,6 @@
 # Tag reference
 
-Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (24 tags) plus `@apiIgnore`, which the block scanner handles itself.
+Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (25 tags) plus `@apiIgnore`, which the block scanner handles itself.
 
 Conventions used on this page:
 
@@ -32,6 +32,7 @@ Conventions used on this page:
 | [`@apiPermission`](#apipermission) | Declare the permission needed |
 | [`@apiPrivate`](#apiprivate) | Hide an endpoint unless `--private` |
 | [`@apiQuery`](#apiquery) | Query string parameter |
+| [`@apiResponseHeader`](#apiresponseheader) | Header of the response |
 | [`@apiSampleRequest`](#apisamplerequest) | Configure the sample request form |
 | [`@apiSuccess`](#apisuccess) | Response field |
 | [`@apiSuccessExample`](#apisuccessexample) | Success response example |
@@ -466,7 +467,7 @@ Documents one column of a tabular file sent in the request body, so the site can
 
 | Part | Required | Meaning |
 | --- | --- | --- |
-| `(file)` | No | Name of the `File` field of an [`@apiBody`](#param-api-body) the column belongs to. Without it the column belongs to the first `File` field. A name that matches no `File` field gets its own card, titled with that name. |
+| `(file)` | No | Name of the `File` field the column belongs to: an [`@apiBody`](#param-api-body) field, or an [`@apiSuccess`](#param-api-success) field for a file the endpoint returns. Without it the column belongs to the first `File` field of the body, or of the response when the body has none. A name that matches no `File` field gets its own card, titled with that name. |
 | `{type}` | Yes, in practice | `String`, `Number`, `Boolean`, `Date`... Shown in the Type column and used to build the example value. |
 | `column` | Yes | Header of the column. Put it in brackets for an optional column (`[age]`) and between double quotes when it has spaces or dots (`"Hire date"`). |
 | `=example` | No | Value shown in the Example column and in the example file. Without it the first allowed value is used, and without that a placeholder by type: `text`, `0`, `true` or `2026-01-31`. |
@@ -834,6 +835,43 @@ Documents a query string parameter.
  * @apiQuery {Number{1..100}} [limit=20] Page size.
  * @apiQuery {String="asc","desc"} [order="desc"] Sort direction by date.
  * @apiSuccess {Object[]} items Movements.
+ */
+```
+
+### @apiResponseHeader
+
+Documents a header of the response, such as `Location`, `Content-Disposition` or `X-RateLimit-Remaining`. [`@apiHeader`](#param-api-header) is for the request.
+
+**Syntax**
+
+```text
+@apiResponseHeader [(group)] {type[{size}][=allowed]} name[=example] [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `(group)` | No | Heading of the table. Default `Response Headers`. Use another name, such as `(Response Headers 202)`, to keep the headers of a status apart. |
+| `{type}` | Yes, in practice | `String`, `Number`... shown in the Type column. |
+| `name` | Yes | Header name. `[name]` marks it optional. |
+| `=example` | No | Typical value, shown as "Default value". Quote it when it has spaces: `Content-Disposition="attachment; filename=users.csv"`. |
+| `description` | No | Markdown. |
+
+**Notes**
+
+- The headers are listed in a table after the success fields. They are documentation only: the sample request does not check the response headers.
+- It uses the field grammar of the other field tags, so allowed values and sizes work the same way.
+
+**Example**
+
+```js
+/**
+ * @api {post} /exports Start an export
+ * @apiVersion 1.0.0
+ * @apiName StartExport
+ * @apiGroup Export
+ * @apiSuccess (202 Accepted) {String} id Id of the export job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/exports/42" URL to poll.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
  */
 ```
 

@@ -17,7 +17,7 @@ import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
 import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
-import { describeFiles, hasFiles, isFileType } from './file_columns';
+import { describeAllFiles, hasFiles, isFileType } from './file_columns';
 import { bodyKind, bodyMime, hasNotableMime } from './body_kind';
 import { requestExample } from './request_examples';
 import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from './field_path';
@@ -286,8 +286,8 @@ export function register () {
     return body2json(context);
   });
 
-  Handlebars.registerHelper('fileSpecs', function (bodyFields, columns) {
-    return describeFiles(bodyFields, columns);
+  Handlebars.registerHelper('fileSpecs', function (article, side) {
+    return describeAllFiles(article)[side];
   });
 
   Handlebars.registerHelper('hasFiles', function (bodyFields) {

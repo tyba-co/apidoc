@@ -320,6 +320,45 @@ For `@apiError` the field is an error code, normally without a type. The Type co
 
 Nested response fields use the same dot notation and the same `Object` / `Object[]` parent rule as request bodies. See [Field names and nested bodies](#field-names-and-nested-bodies).
 
+
+## File responses, response headers and asynchronous endpoints
+
+An endpoint can return a file, for example a CSV export. Declare it as a `File` field of `@apiSuccess`, with the format in the allowed values, and describe the columns with `@apiFileColumn`, exactly as for a file in the body. Document the headers the server sends with `@apiResponseHeader`.
+
+```js
+/**
+ * @api {get} /sales/export Download the sales
+ * @apiVersion 1.0.0
+ * @apiName DownloadSales
+ * @apiGroup Sales
+ * @apiQuery {String} [month] Month, as YYYY-MM.
+ * @apiSuccess {File="csv"} sales The file, comma delimited, UTF-8.
+ * @apiFileColumn (sales) {Date} date Sale date.
+ * @apiFileColumn (sales) {Number} amount=1500 Amount in COP.
+ * @apiResponseHeader {String} Content-Disposition="attachment; filename=sales.csv" Name of the downloaded file.
+ * @apiResponseHeader {Number} X-Total-Count=250 Number of rows in the file.
+ */
+```
+
+Under the success table the site shows a card for the file: the format, the expected columns, and an example file as a spreadsheet preview, as the raw CSV and as the raw HTTP response (`200 OK` with `Content-Type` and `Content-Disposition`). The headers get a "Response Headers" table of their own, after the success fields.
+
+For an endpoint that works in the background, answer `202 Accepted` and point to the result with a header. There is no special tag: a success group, a `Location` header and a second endpoint for polling say it all.
+
+```js
+/**
+ * @api {post} /reports Start a report
+ * @apiVersion 1.0.0
+ * @apiName StartReport
+ * @apiGroup Report
+ * @apiBody {String} month Month, as YYYY-MM.
+ * @apiSuccess (202 Accepted) {String} id Id of the report job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/reports/42" URL to poll until the report is ready.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
+ */
+```
+
+Document the polling endpoint as an ordinary `GET` that answers `200` with the result and `202` while it is not ready; the `Location` header of the first answer is its URL.
+
 ## Examples
 
 | Tag | Shown | Typical content |
