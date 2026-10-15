@@ -5,6 +5,7 @@
   --dark: #253138;
   --code-bg: #141b1f;
   --surface: #f0f2f4;
+  --line: #e3e7ea;
   --text: #202020;
   --muted: #646464;
   --bs-primary-rgb: var(--primary-rgb);
@@ -150,4 +151,67 @@ pre[class*='language-'] {
 
 .landing .card h2 {
   color: var(--primary);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.docs-content [id] {
+  scroll-margin-top: 1rem;
+}
+
+.docs-section + .docs-section {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+
+.docs-content h1 {
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.docs-content h3[id^='param-'] {
+  margin-top: 3rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line);
+  font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.docs-content .anchor {
+  margin-left: 0.5rem;
+  color: #b8c0c6;
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.docs-content h1:hover .anchor,
+.docs-content h2:hover .anchor,
+.docs-content h3:hover .anchor,
+.docs-content h4:hover .anchor,
+.docs-content .anchor:focus {
+  opacity: 1;
+}
+
+.docs-content .anchor:hover {
+  color: var(--primary);
+}
+
+.docs-js .docs-group:not(.active) > .docs-sections {
+  display: none;
+}
+
+.docs-sections li.tag a {
+  font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.docs-sections a.active {
+  color: var(--primary);
+  font-weight: 600;
 }
