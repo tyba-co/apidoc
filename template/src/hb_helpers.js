@@ -17,6 +17,7 @@ import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
 import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
+import { describeFiles, hasJsonFields, isFileType } from './file_columns';
 import { relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
 
@@ -301,6 +302,18 @@ export function register () {
 
   Handlebars.registerHelper('body2json', function (context, options) {
     return body2json(context);
+  });
+
+  Handlebars.registerHelper('fileSpecs', function (bodyFields, columns) {
+    return describeFiles(bodyFields, columns);
+  });
+
+  Handlebars.registerHelper('hasJsonFields', function (bodyFields) {
+    return hasJsonFields(bodyFields);
+  });
+
+  Handlebars.registerHelper('isFileType', function (type) {
+    return isFileType(type);
   });
 
   Handlebars.registerHelper('bodyAutocompleteFields', function (fields) {

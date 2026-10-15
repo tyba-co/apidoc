@@ -313,12 +313,12 @@
                 <p class="default-value">{{__ "Default value:"}} <code>{{{defaultValue}}}</code></p>
               {{/if}}
               {{#if size}}
-                <p class="type-size">{{__ "Size range:"}} <code>{{{size}}}</code></p>
+                <p class="type-size">{{#if (isFileType type)}}Size limit:{{else}}{{__ "Size range:"}}{{/if}} <code>{{{size}}}</code></p>
               {{/if}}
               {{#if allowedValues}}
-                <p class="type-size">{{__ "Allowed values:"}}
+                <p class="type-size">{{#if (isFileType type)}}Accepted formats:{{else}}{{__ "Allowed values:"}}{{/if}}
                   {{#each allowedValues}}
-                    <code>{{{this}}}</code>{{#unless @last}}, {{/unless}}
+                    <code>{{#if (isFileType ../type)}}{{removeDblQuotes this}}{{else}}{{{this}}}{{/if}}</code>{{#unless @last}}, {{/unless}}
                   {{/each}}
                 </p>
               {{/if}}
@@ -327,7 +327,87 @@
         {{/each}}
       </tbody>
     </table>
-    {{#unless (hasJsonExample article.parameter.examples)}}
+    {{#each (fileSpecs article.body article.fileColumns)}}
+      <div class="card file-spec mb-4">
+        <div class="card-header file-spec-header">
+          <strong class="code">{{name}}</strong>
+          <span class="chip">{{#if formatLabel}}{{formatLabel}}{{else}}File{{/if}}{{#if multiple}} · several{{/if}}</span>
+          {{#if size}}<span class="chip chip-muted">max {{size}}</span>{{/if}}
+          {{#if formats.length}}{{#if optional}}<span class="chip chip-muted">{{__ "optional"}}</span>{{else}}<span class="chip">{{__ "required"}}</span>{{/if}}{{/if}}
+        </div>
+        <div class="card-body">
+          <h4 class="file-spec-title">Expected columns</h4>
+          <div class="table-responsive">
+            <table class="file-columns">
+              <thead>
+                <tr>
+                  <th class="file-column-position">#</th>
+                  <th>Column</th>
+                  <th>{{__ "Type"}}</th>
+                  <th>Example</th>
+                  <th>{{__ "Description"}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each columns}}
+                  <tr>
+                    <td class="file-column-position">{{position}}</td>
+                    <td class="code">{{name}} {{#if optional}}<span class="chip chip-muted">{{__ "optional"}}</span>{{/if}}</td>
+                    <td class="code">{{type}}</td>
+                    <td class="code">{{example}}</td>
+                    <td>
+                      {{{description}}}
+                      {{#if size}}<p class="type-size">{{__ "Size range:"}} <code>{{{size}}}</code></p>{{/if}}
+                      {{#if allowedValues.length}}
+                        <p class="type-size">{{__ "Allowed values:"}}
+                          {{#each allowedValues}}<code>{{{this}}}</code>{{#unless @last}}, {{/unless}}{{/each}}
+                        </p>
+                      {{/if}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          <h4 class="file-spec-title">Example file</h4>
+          {{#if text}}
+            <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
+              <li class="nav-item" role="presentation"><a class="nav-link active" href="#file-{{../id}}-{{@index}}-sheet" role="tab" data-bs-toggle="tab">Preview</a></li>
+              <li class="nav-item" role="presentation"><a class="nav-link" href="#file-{{../id}}-{{@index}}-text" role="tab" data-bs-toggle="tab">{{formatLabel}}</a></li>
+            </ul>
+          {{/if}}
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="file-{{../id}}-{{@index}}-sheet">
+              <div class="file-sheet table-responsive">
+                <table>
+                  <thead>
+                    <tr class="file-sheet-letters"><th></th>{{#each letters}}<th>{{this}}</th>{{/each}}</tr>
+                  </thead>
+                  <tbody>
+                    <tr class="file-sheet-header"><th class="file-sheet-row">1</th>{{#each header}}<td>{{this}}</td>{{/each}}</tr>
+                    {{#each rows}}
+                      <tr><th class="file-sheet-row">{{add @index 2}}</th>{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{#if text}}
+              <div class="tab-pane fade" id="file-{{../id}}-{{@index}}-text">
+                <pre
+                  class="mb-0"
+                  data-type="text"
+                  data-prismjs-copy="{{__ "Copy"}}"
+                  data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+                  data-prismjs-copy-success="{{__ "copied!"}}"
+                ><code class="language-none">{{text}}</code></pre>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    {{/each}}
+    {{#if (hasJsonFields article.body)}}{{#unless (hasJsonExample article.parameter.examples)}}
       <div class="card mb-4">
         <div class="card-header">
           <strong>Example</strong>
@@ -344,7 +424,7 @@
           ><code class="language-json">{{body2json article.body}}</code></pre>
         </div>
       </div>
-    {{/unless}}
+    {{/unless}}{{/if}}
   {{/if}}
 </script>
 
