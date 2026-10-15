@@ -15,6 +15,7 @@
 import Handlebars from 'handlebars';
 import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
+import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
 import { relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
@@ -300,6 +301,10 @@ export function register () {
 
   Handlebars.registerHelper('body2json', function (context, options) {
     return body2json(context);
+  });
+
+  Handlebars.registerHelper('bodyAutocompleteFields', function (fields) {
+    return JSON.stringify(autocompleteFields(fields));
   });
 
   Handlebars.registerHelper('unquoteField', function (field) {

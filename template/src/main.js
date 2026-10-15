@@ -28,6 +28,7 @@ import { __, setLanguage } from './locales/locale.mjs';
 
 // helpers for HandleBars
 import { register } from './hb_helpers';
+import { initBodyAutocomplete } from './body_autocomplete_ui';
 import { jsonKeyPaths } from './body_example_hover';
 import { unquoteField } from './field_path';
 
@@ -71,6 +72,7 @@ function highlightAll () {
 document.addEventListener('DOMContentLoaded', () => {
   init();
   highlightAll();
+  initBodyAutocomplete();
 
   // Handle sidebar navigation active state
   $(document).on('click', '.sidenav a', function () {

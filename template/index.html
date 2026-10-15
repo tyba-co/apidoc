@@ -577,11 +577,14 @@
 
         <div id="sample-request-body-json-input-{{this.id}}">
           <textarea class="form-control sample-request-input sample-request-code" rows="8" wrap="off"
+            spellcheck="false" autocomplete="off"
+            data-autocomplete="{{bodyAutocompleteFields article.body}}"
             aria-label="json"
             data-family="body-json"
             data-name="body"
             data-content-type="json"
             {{#if optional}}data-optional="true"{{/if}}>{{body2json article.body}}</textarea>
+          <div class="form-text">Type <code>"</code> or press Ctrl+Space for field suggestions.</div>
         </div>
 
         <div style="display: none" id="sample-request-body-form-input-{{this.id}}">
