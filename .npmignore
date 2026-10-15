@@ -16,3 +16,8 @@ Dockerfile
 example/
 jsconfig.json
 SECURITY.md
+.claude/
+.claude-plugin/
+CLAUDE.md
+.nvmrc
+vscode/
