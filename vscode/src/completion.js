@@ -7,6 +7,7 @@ const blockSnippets = require('../snippets/blocks.json');
 const METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
 const TYPES = ['String', 'Number', 'Boolean', 'Object', 'String[]', 'Number[]', 'Object[]', 'Date', 'File'];
 const EXAMPLE_TYPES = ['json', 'xml', 'js', 'bash', 'http', 'text'];
+const CONTENT_TYPES = ['application/json', 'multipart/form-data', 'application/x-www-form-urlencoded', 'application/xml', 'text/plain', 'text/csv', 'application/octet-stream'];
 const STATUSES = {
   Success: ['200 OK', '201 Created', '202 Accepted', '204 No Content'],
   Error: ['400 Bad Request', '401 Unauthorized', '403 Forbidden', '404 Not Found', '409 Conflict', '422 Unprocessable Entity', '500 Internal Server Error'],
@@ -43,6 +44,7 @@ function completionContext (lineBefore) {
     ['exampleType', /^@api\w*Example\s+\{(\w*)$/, 1],
     ['status', /^@api(Success|Error)\s+\(([^)]*)$/, 1],
     ['define', /^@api(?:Use|Permission)\s+(\w*)$/, 1],
+    ['contentType', /^@apiContentType\s+(\S*)$/, 1],
     ['group', /^@apiGroup\s+(.*)$/, 1],
     ['version', /^@apiVersion\s+(\S*)$/, 1],
   ];
@@ -107,6 +109,8 @@ function itemsFor (context, names) {
       return TYPES.map(type => plain(type, 'field type'));
     case 'exampleType':
       return EXAMPLE_TYPES.map(type => plain(type, 'highlight language'));
+    case 'contentType':
+      return CONTENT_TYPES.map(type => plain(type, 'Content-Type'));
     case 'status':
       return STATUSES[context.which].map(status => plain(status, 'status group', { insert: `${status})` }));
     case 'define':

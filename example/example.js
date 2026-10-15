@@ -108,6 +108,61 @@ function postUser () { }
 function importUsers () { }
 
 /**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 0.3.0
+ * @apiName RequestToken
+ * @apiGroup Auth
+ * @apiPermission none
+ *
+ * @apiDescription Exchange credentials for an access token. The body is form encoded, not JSON.
+ *
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username=ana@example.com User name.
+ * @apiBody {String} [password] Password, with the password grant.
+ * @apiBody {String} [refresh_token] Refresh token, with the refresh_token grant.
+ *
+ * @apiSuccess {String} access_token Bearer token.
+ * @apiSuccess {Number} expires_in Seconds until it expires.
+ */
+function requestToken () { }
+
+/**
+ * @api {put} /user/:id/avatar Upload an avatar
+ * @apiVersion 0.3.0
+ * @apiName UploadAvatar
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription The image is the whole body of the request, not a multipart part.
+ *
+ * @apiContentType image/png
+ * @apiParam {Number} id Id of the user.
+ * @apiBody {File{2MB}="png"} avatar The image.
+ */
+function uploadAvatar () { }
+
+/**
+ * @api {post} /order/xml Create an order from XML
+ * @apiVersion 0.3.0
+ * @apiName CreateOrderXml
+ * @apiGroup Order
+ * @apiPermission none
+ *
+ * @apiContentType application/xml
+ * @apiBody {Number} id Order id (element <code>id</code>).
+ * @apiBody {String} customer Customer name (element <code>customer</code>).
+ * @apiParamExample {xml} Request:
+ *     <order>
+ *       <id>1</id>
+ *       <customer>Ana</customer>
+ *     </order>
+ *
+ * @apiSuccess {Number} id Id of the created order.
+ */
+function createOrderXml () { }
+
+/**
  * @api {put} /user/:id Change a User
  * @apiVersion 0.3.0
  * @apiName PutUser

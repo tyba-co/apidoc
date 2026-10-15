@@ -38,7 +38,7 @@ describe('vscode completion', function () {
     assert.strictEqual(result.start, 3);
     assert.ok(labels(result).includes('@apiParam'));
     assert.ok(labels(result).includes('@apiParamExample'));
-    assert.strictEqual(result.items.length, 32);
+    assert.strictEqual(result.items.length, 33);
   });
 
   it('should continue example tags on the next comment line', function () {
@@ -66,6 +66,15 @@ describe('vscode completion', function () {
     assert.ok(optionalGroupTypes.includes('Object'));
     assert.ok(labels(statuses).includes('404 Not Found'));
     assert.strictEqual(statuses.items[0].insert.slice(-1), ')');
+  });
+
+  it('should offer content types after @apiContentType', function () {
+    // ACT
+    const result = completeAt('/**\n * @apiContentType appl|\n */');
+
+    // ASSERT
+    assert.ok(labels(result).includes('application/x-www-form-urlencoded'));
+    assert.strictEqual(result.start, 19);
   });
 
   it('should complete @apiUse and @apiPermission with the defines of the project, and groups and versions', function () {

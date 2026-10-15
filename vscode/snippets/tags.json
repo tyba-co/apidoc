@@ -140,6 +140,13 @@
       "@apiFileColumn (${1:file}) {${2|String,Number,Boolean,Date|}} ${3:column} ${4:Description}"
     ]
   },
+  "apiContentType": {
+    "prefix": "@apiContentType",
+    "description": "apidoc: Content-Type of the request body",
+    "body": [
+      "@apiContentType ${1|application/x-www-form-urlencoded,multipart/form-data,application/json,application/xml,text/plain,application/octet-stream|}"
+    ]
+  },
   "apiHeader": {
     "prefix": "@apiHeader",
     "body": [

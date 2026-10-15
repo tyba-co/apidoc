@@ -18,7 +18,8 @@ import { body2json } from './jsonifier';
 import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
 import { describeFiles, hasFiles, isFileType } from './file_columns';
-import { multipartExample } from './multipart_example';
+import { bodyKind, bodyMime, hasNotableMime } from './body_kind';
+import { requestExample } from './request_examples';
 import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
 
@@ -293,8 +294,32 @@ export function register () {
     return hasFiles(bodyFields);
   });
 
-  Handlebars.registerHelper('multipartExample', function (article) {
-    return multipartExample(article);
+  Handlebars.registerHelper('requestExample', function (article) {
+    return requestExample(article);
+  });
+
+  Handlebars.registerHelper('bodyKind', function (article) {
+    return bodyKind(article);
+  });
+
+  Handlebars.registerHelper('bodyMime', function (article) {
+    return bodyMime(article);
+  });
+
+  Handlebars.registerHelper('hasNotableMime', function (article) {
+    return hasNotableMime(article);
+  });
+
+  Handlebars.registerHelper('isJsonKind', function (article) {
+    return bodyKind(article) === 'json';
+  });
+
+  Handlebars.registerHelper('isTextBody', function (article) {
+    return ['json', 'xml', 'text'].includes(bodyKind(article));
+  });
+
+  Handlebars.registerHelper('isFormBody', function (article) {
+    return ['multipart', 'urlencoded'].includes(bodyKind(article));
   });
 
   Handlebars.registerHelper('hasChoices', function (field) {

@@ -53,7 +53,7 @@ export function buildParts (bodyFields, specs) {
  * @param {String} url
  * @returns {{path: String, host: String}}
  */
-function splitUrl (url) {
+export function splitUrl (url) {
   try {
     const parsed = new URL(url);
     return { path: parsed.pathname + parsed.search, host: parsed.host };

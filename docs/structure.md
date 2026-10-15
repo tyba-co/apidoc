@@ -438,6 +438,66 @@ An endpoint gets a "Send a Sample Request" form when it has a sample request URL
 
 The form is built from the endpoint's `@apiHeader`, `@apiParam`, `@apiQuery` and `@apiBody` fields. `:id` in the URL is replaced with the value typed for the `id` field.
 
+## Body formats
+
+A body is JSON unless you say otherwise. `@apiContentType` declares the format, and the site adapts the example, the cURL command and the sample request to it. The `@apiBody` fields keep describing the content in every case.
+
+Form-encoded bodies, such as OAuth token endpoints:
+
+```js
+/**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 1.0.0
+ * @apiName RequestTokenForm
+ * @apiGroup Auth
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username=ana@example.com User name.
+ * @apiBody {String} [password] Password, with the password grant.
+ * @apiSuccess {String} access_token Bearer token.
+ */
+```
+
+The example is the raw request with the encoded body (`grant_type=password&username=ana%40example.com`) and a cURL command with `--data-urlencode`. The sample request has one input per field and sends the values form encoded. Nested fields use brackets (`address[city]`) and an array repeats its name.
+
+A binary body, where the whole body is one file and not a multipart part:
+
+```js
+/**
+ * @api {put} /users/:id/avatar Upload an avatar
+ * @apiVersion 1.0.0
+ * @apiName UploadAvatarBinary
+ * @apiGroup User
+ * @apiContentType image/png
+ * @apiParam {Number} id Id of the user.
+ * @apiBody {File{2MB}="png"} avatar The image.
+ */
+```
+
+The example shows `[binary content]` and `curl --data-binary @avatar.png`; the sample request has one file input and sends the chosen file with its Content-Type.
+
+XML and text bodies. There is no generated example, because the structure is yours: write it with `@apiParamExample`, and the sample request starts with it.
+
+```js
+/**
+ * @api {post} /orders/xml Create an order from XML
+ * @apiVersion 1.0.0
+ * @apiName CreateOrderXmlBody
+ * @apiGroup Order
+ * @apiContentType application/xml
+ * @apiBody {Number} id Order id.
+ * @apiBody {String} customer Customer name.
+ * @apiParamExample {xml} Request:
+ *     <order>
+ *       <id>1</id>
+ *       <customer>Ana</customer>
+ *     </order>
+ * @apiSuccess {Number} id Id of the created order.
+ */
+```
+
+A top-level JSON array is declared with a single optional `Object[]` field; see [The body example](#the-body-example). Files in a `multipart/form-data` body have their own section below.
+
 ## Files in the body
 
 A file is sent as `multipart/form-data`, so a body with a `File` field is a multipart request: every `@apiBody` field is one part of it, and the field name is the name of the part. The file is the part with that name and a `filename`; the other fields are plain parts. Declare the file as an `@apiBody` field of type `File`. Its format goes in the allowed values, so the same `="..."` that restricts a string describes the accepted extensions. For a tabular file (`csv`, `tsv`, `xlsx`), `@apiFileColumn` lists the columns the file must have.

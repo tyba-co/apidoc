@@ -1,6 +1,6 @@
 # Tag reference
 
-Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (23 tags) plus `@apiIgnore`, which the block scanner handles itself.
+Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (24 tags) plus `@apiIgnore`, which the block scanner handles itself.
 
 Conventions used on this page:
 
@@ -14,6 +14,7 @@ Conventions used on this page:
 | --- | --- |
 | [`@api`](#api) | Declare an endpoint: method, URL and title |
 | [`@apiBody`](#apibody) | Request body field |
+| [`@apiContentType`](#apicontenttype) | Content-Type of the request body |
 | [`@apiDefine`](#apidefine) | Declare a reusable block, group title or permission |
 | [`@apiDeprecated`](#apideprecated) | Mark an endpoint deprecated |
 | [`@apiDescription`](#apidescription) | Markdown description |
@@ -191,6 +192,55 @@ Documents a field of the request body and feeds the generated body example.
  * @apiBody {Boolean} [newsletter=true] Subscribe to the newsletter.
  * @apiBody {String[]} [roles] Role names.
  * @apiSuccess (201 Created) {String} id User id.
+ */
+```
+
+### @apiContentType
+
+Declares how the request body is encoded, when it is not plain JSON.
+
+**Syntax**
+
+```text
+@apiContentType type/subtype
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `type/subtype` | Yes | A media type such as `application/x-www-form-urlencoded`. Lower-cased; anything that is not `type/subtype` stops the run with `Content type not valid.` |
+
+What the site does with each Content-Type:
+
+| Content-Type | Request Body | Sample request |
+| --- | --- | --- |
+| `application/json` (default) | Generated JSON example and the hover tooltips | JSON editor with key completion |
+| `multipart/form-data` (default when the body has a `File` field) | Raw multipart request and `curl -F` | One input per field; files are sent as real parts |
+| `application/x-www-form-urlencoded` | Raw request with the encoded body and `curl --data-urlencode` | One input per field, sent form encoded |
+| `application/xml`, `text/xml`, `+xml` types | No generated example; write it with [`@apiParamExample`](#param-api-param-example) | Text area that starts with the first `@apiParamExample` of the endpoint, sent with that Content-Type |
+| `text/plain` and any other `text/*` | The same as XML | The same as XML |
+| Anything else, such as `application/octet-stream` or `image/png` | Raw request with `[binary content]` and `curl --data-binary` | A single file input; the file is the whole body |
+
+**Notes**
+
+- Without the tag the type is inferred: multipart when the body has a `File` field, JSON otherwise. A declared type always wins, even over a `File` field.
+- The type appears as a chip next to the "Request Body" heading, except for plain JSON.
+- The `@apiBody` fields are still documented in the table of the body, whatever the format. For a binary body the single `File` field describes the whole body (`@apiBody {File{2MB}="png"} avatar`).
+- Only one `@apiContentType` per endpoint; a second one replaces the first.
+- This describes the request; the content type of the response is described by the response examples.
+
+**Example**
+
+```js
+/**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 1.0.0
+ * @apiName RequestToken
+ * @apiGroup Auth
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username User name.
+ * @apiBody {String} [password] Password.
+ * @apiSuccess {String} access_token Bearer token.
  */
 ```
 

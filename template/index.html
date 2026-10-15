@@ -280,7 +280,7 @@
 
 <script id="template-article-body-block" type="text/x-handlebars-template">
   {{#if article.body}}
-    <h2>{{__ "Request Body"}}{{#if (hasFiles article.body)}} <span class="chip">multipart/form-data</span>{{/if}}</h2>
+    <h2>{{__ "Request Body"}}{{#if (hasNotableMime article)}} <span class="chip">{{bodyMime article}}</span>{{/if}}</h2>
     <table>
       <thead>
         <tr>
@@ -407,44 +407,31 @@
         </div>
       </div>
     {{/each}}
-    {{#if (hasFiles article.body)}}
-      {{#with (multipartExample article)}}
-        <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
-          <li class="nav-item" role="presentation"><a class="nav-link active" href="#multipart-{{../id}}-raw" role="tab" data-bs-toggle="tab">Multipart</a></li>
-          <li class="nav-item" role="presentation"><a class="nav-link" href="#multipart-{{../id}}-curl" role="tab" data-bs-toggle="tab">cURL</a></li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="multipart-{{../id}}-raw">
+    {{#if (requestExample article)}}
+      <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
+        {{#each (requestExample article)}}
+          <li class="nav-item" role="presentation"><a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#request-{{../id}}-{{key}}" role="tab" data-bs-toggle="tab">{{title}}</a></li>
+        {{/each}}
+      </ul>
+      <div class="tab-content">
+        {{#each (requestExample article)}}
+          <div class="tab-pane fade{{#ifCond @index '==' 0}} show active{{/ifCond}}" id="request-{{../id}}-{{key}}">
             <div class="card mb-4">
               <div class="card-header"><strong>Example request</strong></div>
               <div class="card-body p-0">
                 <pre
                   class="mb-0"
-                  data-type="http"
+                  data-type="{{language}}"
                   data-prismjs-copy="{{__ "Copy"}}"
                   data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
                   data-prismjs-copy-success="{{__ "copied!"}}"
-                ><code class="language-http">{{raw}}</code></pre>
+                ><code class="language-{{language}}">{{code}}</code></pre>
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="multipart-{{../id}}-curl">
-            <div class="card mb-4">
-              <div class="card-header"><strong>Example request</strong></div>
-              <div class="card-body p-0">
-                <pre
-                  class="mb-0"
-                  data-type="bash"
-                  data-prismjs-copy="{{__ "Copy"}}"
-                  data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
-                  data-prismjs-copy-success="{{__ "copied!"}}"
-                ><code class="language-bash">{{curl}}</code></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      {{/with}}
-    {{else}}{{#unless (hasJsonExample article.parameter.examples)}}
+        {{/each}}
+      </div>
+    {{else}}{{#if (isJsonKind article)}}{{#unless (hasJsonExample article.parameter.examples)}}
       <div class="card mb-4">
         <div class="card-header">
           <strong>Example</strong>
@@ -461,7 +448,7 @@
           ><code class="language-json">{{body2json article.body}}</code></pre>
         </div>
       </div>
-    {{/unless}}{{/if}}
+    {{/unless}}{{/if}}{{/if}}
   {{/if}}
 </script>
 
@@ -687,28 +674,35 @@
         <div class="sample-request-section-head">
           <h4 class="sample-request-section">{{__ "Body"}}</h4>
           <select id="body-content-type-{{this.id}}" data-id="{{this.id}}" aria-label="{{__ "Content-Type"}}" class="sample-request-content-type-switch form-select form-select-sm">
-            {{#if (hasFiles article.body)}}
-              <option value="body-form-data" selected>multipart/form-data</option>
-            {{else}}
+            {{#ifCond (bodyKind article) '===' 'json'}}
               <option value="body-json" selected>json</option>
               <option value="body-form-data">form-data</option>
-            {{/if}}
+            {{else}}
+              <option value="{{#ifCond (bodyKind article) '===' 'multipart'}}body-form-data{{else}}body-{{bodyKind article}}{{/ifCond}}" selected>{{bodyMime article}}</option>
+            {{/ifCond}}
           </select>
         </div>
 
-        <div id="sample-request-body-json-input-{{this.id}}"{{#if (hasFiles article.body)}} style="display: none"{{/if}}>
+        <div id="sample-request-body-json-input-{{this.id}}"{{#unless (isTextBody article)}} style="display: none"{{/unless}}>
           <textarea class="form-control sample-request-input sample-request-code" rows="8" wrap="off"
             spellcheck="false" autocomplete="off"
-            data-autocomplete="{{bodyAutocompleteFields article.body}}"
-            aria-label="json"
+            {{#ifCond (bodyKind article) '===' 'json'}}data-autocomplete="{{bodyAutocompleteFields article.body}}"{{/ifCond}}
+            aria-label="{{bodyMime article}}"
             data-family="body-json"
             data-name="body"
+            data-mime="{{bodyMime article}}"
             data-content-type="json"
-            {{#if optional}}data-optional="true"{{/if}}>{{body2json article.body}}</textarea>
-          <div class="form-text">Type <code>"</code> or press Ctrl+Space for field suggestions.</div>
+            {{#if optional}}data-optional="true"{{/if}}>{{#ifCond (bodyKind article) '===' 'json'}}{{body2json article.body}}{{else}}{{article.parameter.examples.0.content}}{{/ifCond}}</textarea>
+          {{#ifCond (bodyKind article) '===' 'json'}}<div class="form-text">Type <code>"</code> or press Ctrl+Space for field suggestions.</div>{{/ifCond}}
         </div>
 
-        <div{{#unless (hasFiles article.body)}} style="display: none"{{/unless}} id="sample-request-body-form-input-{{this.id}}">
+        {{#ifCond (bodyKind article) '===' 'binary'}}
+          <div id="sample-request-body-binary-input-{{this.id}}" data-body-encoding="binary">
+            <input type="file" class="form-control sample-request-input" aria-label="{{bodyMime article}}" data-family="body-binary" data-name="body" data-mime="{{bodyMime article}}">
+          </div>
+        {{/ifCond}}
+
+        <div{{#unless (isFormBody article)}} style="display: none"{{/unless}} data-body-encoding="{{#ifCond (bodyKind article) '===' 'urlencoded'}}urlencoded{{else}}multipart{{/ifCond}}" id="sample-request-body-form-input-{{this.id}}">
           {{#each article.body}}
               {{#ifNotObject type}}
               <div class="sample-field">
