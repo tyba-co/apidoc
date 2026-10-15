@@ -76,9 +76,9 @@ function getUser () { }
  * @apiBody {Object[]} extraInfo.secrets.deepSecrets Deep user secrets crush (array of objects)
  * @apiBody {String} extraInfo.secrets.deepSecrets.key A deep user secret key
  * @apiBody {Number} extraInfo.secrets.deepSecrets.number A deep user secret key
- * @apiBody {String} extraInfo.secrets.deepSecrets.name.particle A deep user secret name particle with dot
+ * @apiBody {String} extraInfo.secrets.deepSecrets.name.particle Written wrong: "name" is not declared as an Object, so it cannot nest and shows in red
  * @apiBody {Boolean} extraInfo.isAlive Is the user alive? (boolean with no default)
- * @apiBody {String} custom.property Custom property with dot
+ * @apiBody {String} "custom.property" Written right: quoted, so it is a literal key that contains a dot
  *
  * @apiSuccess {Number} id         The new Users-ID.
  *
@@ -200,7 +200,7 @@ function deleteCity () { }
  * @apiGroup Category (official)
  * @apiDescription Get a category. Sample request on example.com here.
  * @apiQuery {Number} id Category ID.
- * @apiBody {String} custom.id Custom ID with dot.
+ * @apiBody {String} "custom.id" Custom ID with dot.
  */
 function getCategory () { }
 

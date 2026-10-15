@@ -3,23 +3,14 @@
  */
 const assert = require('assert');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { readRegisteredParserTags } = require('./support/registered_parser_tags');
+const { validateWithApidoc } = require('./support/validate_with_apidoc');
 
 const repoRoot = path.join(__dirname, '..');
 const skillRoot = path.join(repoRoot, 'skills', 'apidoc');
-const apidocBin = path.join(repoRoot, 'bin', 'apidoc');
 const tagsWithoutParser = ['apiignore'];
 const documentedNonTags = ['apistructure', 'apierrorstructure', 'apisuccessstructure', 'apiheaderstructure'];
-
-/**
- * @returns {String[]} lowercase tag names registered in lib/core/index.js app.parsers
- */
-function readRegisteredParserTags () {
-  const indexSource = fs.readFileSync(path.join(repoRoot, 'lib', 'core', 'index.js'), 'utf8');
-  return [...indexSource.matchAll(/(\w+): '\.\/parsers\/\w+\.js'/g)].map(match => match[1]);
-}
 
 /**
  * @returns {String[]} absolute paths of every markdown file of the skill
@@ -44,22 +35,6 @@ function readApiTagTokens (markdown) {
  */
 function readJsFences (markdown) {
   return [...markdown.matchAll(/^```js\n([\s\S]*?)^```$/gm)].map(match => match[1]);
-}
-
-/**
- * @param {String} source
- * @returns {Number} exit code of apidoc --dry-run --warn-error over a project holding only this source
- */
-function validateWithApidoc (source) {
-  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'apidoc-skill-example-'));
-  try {
-    fs.writeFileSync(path.join(projectDir, 'apidoc.json'), JSON.stringify({ name: 'skill', version: '1.0.0', description: 'skill' }));
-    fs.writeFileSync(path.join(projectDir, 'example.js'), source);
-    const result = spawnSync(process.execPath, [apidocBin, '-i', projectDir, '-o', path.join(projectDir, 'out'), '-n', '--warn-error'], { encoding: 'utf8' });
-    return result.status;
-  } finally {
-    fs.rmSync(projectDir, { recursive: true, force: true });
-  }
 }
 
 describe('apidoc agent skill', function () {
