@@ -136,7 +136,7 @@ function renderSidebar (parsed) {
     const [title] = headings;
     const children = headings.filter(heading => isSidebarEntry(section, heading));
     const items = children.map(heading => `<li class="level-${heading.level}${isTagHeading(heading.text) ? ' tag' : ''}"><a href="#${heading.id}">${escapeHtml(heading.text)}</a></li>`).join('');
-    return `<li class="docs-group"><a class="docs-page" href="#${title.id}">${escapeHtml(title.text)}</a><ul class="docs-sections">${items}</ul></li>`;
+    return `<li class="docs-group${section.id === tagSection ? ' docs-group-tags' : ''}"><a class="docs-page" href="#${title.id}">${escapeHtml(title.text)}</a><ul class="docs-sections">${items}</ul></li>`;
   });
   return `<ul class="list-unstyled">${groups.join('')}</ul>`;
 }

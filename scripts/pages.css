@@ -202,7 +202,7 @@ html {
   color: var(--primary);
 }
 
-.docs-js .docs-group:not(.active) > .docs-sections {
+.docs-js .docs-group:not(.active):not(.docs-group-tags) > .docs-sections {
   display: none;
 }
 
