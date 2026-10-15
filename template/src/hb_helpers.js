@@ -302,6 +302,10 @@ export function register () {
     return body2json(context);
   });
 
+  Handlebars.registerHelper('unquoteField', function (field) {
+    return unquoteField(field);
+  });
+
   Handlebars.registerHelper('bodyFieldLabels', function (fields) {
     return JSON.stringify(bodyFieldLabels(fields, __('required'), __('optional')));
   });

@@ -429,28 +429,26 @@
 
 <script id="template-article-sample-request" type="text/x-handlebars-template">
   {{#if article.sampleRequest}}
-    <div class="card">
+    <div class="card sample-request">
       <div class="card-header">
         <h3 class="mb-0">{{__ "Send a Sample Request"}}</h3>
       </div>
       <div class="card-body">
         <form class="form-horizontal">
           <fieldset>
-            <div class="mb-3">
-              <label class="form-label" for="{{@root.id}}-sample-request-url">URL</label>
-              <div class="input-group">
-                <span class="input-group-text">{{__ "url"}}</span>
-                <input id="{{@root.id}}-sample-request-url" type="url" class="form-control sample-request-url" value="{{article.sampleRequest.0.url}}" />
-              </div>
+            <label class="visually-hidden" for="{{@root.id}}-sample-request-url">URL</label>
+            <div class="input-group">
+              <span class="input-group-text sample-request-method">{{article.type}}</span>
+              <input id="{{@root.id}}-sample-request-url" type="url" class="form-control sample-request-url" value="{{article.sampleRequest.0.url}}" />
             </div>
 
       {{#if article.header}}
         {{#if article.header.fields}}
-          <h4 class="mt-4">{{__ "Headers"}}</h4>
+          <h4 class="sample-request-section">{{__ "Headers"}}</h4>
           {{#each article.header.fields}}
             <div class="{{@root.id}}-sample-request-header-fields">
               {{#each this}}
-              <div class="mb-3">
+              <div class="sample-field">
                 <label class="form-label" for="{{@root.id}}-sample-request-header-field-{{field}}">{{field}}</label>
                 <div class="input-group">
                   <span class="input-group-text">{{{type}}}</span>
@@ -471,37 +469,30 @@
 
       {{#if article.parameter}}
         {{#if article.parameter.fields}}
-          <h4 class="mt-4">{{__ "Parameters"}}</h4>
-          <div class="row mb-3">
-            <div class="col-md-3">
-              <label class="form-label">Format</label>
-              <select name="{{@root.id}}-sample-header-content-type" class="form-select {{@root.id}}-sample-request-param-select sample-header-content-type sample-header-content-type-switch">
-                <option value="auto" selected>ajax-auto</option>
-                <option value="json">json</option>
-                <option value="form-data">form-data</option>
-              </select>
-            </div>
+          <div class="sample-request-section-head">
+            <h4 class="sample-request-section">{{__ "Parameters"}}</h4>
+            <select name="{{@root.id}}-sample-header-content-type" aria-label="Format" class="form-select form-select-sm {{@root.id}}-sample-request-param-select sample-header-content-type sample-header-content-type-switch">
+              <option value="auto" selected>ajax-auto</option>
+              <option value="json">json</option>
+              <option value="form-data">form-data</option>
+            </select>
           </div>
 
           {{#each article.parameter.fields}}
-            <div class="{{@root.id}}-sample-request-param-body {{@root.id}}-sample-header-content-type-body hide">
-              <div class="mb-3">
-                <div class="input-group">
-                  <div class="input-group-text">json</div>
-                  <textarea class="form-control sample-request-body" 
-                    data-family="body-json"
-                    data-name="body"
-                    data-sample-request-body-group="sample-request-param-{{@./index}}" 
-                    rows="6" 
-                    {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
-                </div>
-              </div>
+            <div class="{{@root.id}}-sample-request-param-body {{@root.id}}-sample-header-content-type-body sample-request-format-body" style="display: none">
+              <textarea class="form-control sample-request-body sample-request-code" wrap="off"
+                aria-label="json"
+                data-family="body-json"
+                data-name="body"
+                data-sample-request-body-group="sample-request-param-{{@./index}}"
+                rows="10"
+                {{#if optional}}data-sample-request-param-optional="true"{{/if}}></textarea>
             </div>
-            <div class="{{@root.id}}-sample-request-param-fields {{@root.id}}-sample-header-content-type-fields">
+            <div class="{{@root.id}}-sample-request-param-fields {{@root.id}}-sample-header-content-type-fields sample-request-format-fields">
               {{#each this}}
-              <div class="mb-3">
                 {{#ifNotObject type}}
-                <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
+                <div class="sample-field">
+                <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{unquoteField field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
                 <div class="input-group">
                   <div class="input-group-text">{{{type}}}</div>
                   {{#if allowedValues}}
@@ -528,8 +519,8 @@
                   </div></div>
                   {{/if}}
                 </div>
+                </div>
                 {{/ifNotObject}}
-              </div>
               {{/each}}
             </div>
           {{/each}}
@@ -537,12 +528,12 @@
       {{/if}}
 
       {{#if article.query}}
-        <h4 class="mt-4">{{__ "Query Parameters"}}</h4>
+        <h4 class="sample-request-section">{{__ "Query Parameters"}}</h4>
         <div class="{{@root.id}}-sample-request-param-fields {{@root.id}}-sample-header-content-type-fields">
           {{#each article.query}}
-            <div class="mb-3">
               {{#ifNotObject type}}
-              <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
+              <div class="sample-field">
+              <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{unquoteField field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
               <div class="input-group">
                 <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
@@ -569,42 +560,35 @@
                 </div></div>
                 {{/if}}
               </div>
+              </div>
               {{/ifNotObject}}
-            </div>
           {{/each}}
         </div>
       {{/if}}
 
       {{#if article.body}}
-        <h3>{{__ "Body"}}</h3>
-
-        <div class="col-md-3">
-          <label for="body-content-type-{{this.id}}">{{__ "Content-Type"}}</label>
-          <select id="body-content-type-{{this.id}}" data-id="{{this.id}}" class="sample-request-content-type-switch form-control">
+        <div class="sample-request-section-head">
+          <h4 class="sample-request-section">{{__ "Body"}}</h4>
+          <select id="body-content-type-{{this.id}}" data-id="{{this.id}}" aria-label="{{__ "Content-Type"}}" class="sample-request-content-type-switch form-select form-select-sm">
             <option value="body-json" selected>json</option>
             <option value="body-form-data">form-data</option>
           </select>
         </div>
 
-        <div class="col-md-9" id="sample-request-body-json-input-{{this.id}}">
-          <div class="mb-3">
-            <div class="input-group">
-              <div class="input-group-text">json</div>
-              <textarea class="form-control sample-request-input" rows="6"
-                data-family="body-json"
-                data-name="body"
-                data-content-type="json"
-                {{#if optional}}data-optional="true"{{/if}}>{{body2json article.body}}</textarea>
-            </div>
-          </div>
+        <div id="sample-request-body-json-input-{{this.id}}">
+          <textarea class="form-control sample-request-input sample-request-code" rows="10" wrap="off"
+            aria-label="json"
+            data-family="body-json"
+            data-name="body"
+            data-content-type="json"
+            {{#if optional}}data-optional="true"{{/if}}>{{body2json article.body}}</textarea>
         </div>
 
-        <div hidden class="col-md-12" id="sample-request-body-form-input-{{this.id}}">
-          <h4 class="mt-4">{{__ "Body Parameters"}}</h4>
+        <div style="display: none" id="sample-request-body-form-input-{{this.id}}">
           {{#each article.body}}
-            <div class="mb-3">
               {{#ifNotObject type}}
-              <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
+              <div class="sample-field">
+              <label class="form-label" for="{{@root.id}}-sample-request-param-field-{{field}}">{{unquoteField field}}{{#if optional}} <small class="text-muted">(optional)</small>{{/if}}</label>
               <div class="input-group">
                 <div class="input-group-text">{{{type}}}</div>
                 {{#if allowedValues}}
@@ -632,23 +616,21 @@
                   </div></div>
                 {{/if}}
               </div>
+              </div>
               {{/ifNotObject}}
-            </div>
           {{/each}}
         </div>
       {{/if}}
 
-          <div class="mb-4 mt-4">
-            <div class="controls">
-              <button class="btn btn-primary sample-request-send" data-type="{{article.type}}">{{__ "Send"}}</button>
-              <button class="btn btn-outline-secondary ms-2 sample-request-clear" data-type="{{article.type}}">{{__ "Reset"}}</button>
-            </div>
+          <div class="sample-request-actions controls">
+            <button class="btn btn-primary sample-request-send" data-type="{{article.type}}">{{__ "Send"}}</button>
+            <button class="btn btn-outline-secondary sample-request-clear" data-type="{{article.type}}">{{__ "Reset"}}</button>
           </div>
           <div class="sample-request-response" hidden>
-            <h4 class="mb-3">
-              {{__ "Response"}}
-              <button class="btn btn-outline-secondary btn-sm float-end sample-request-clear">X</button>
-            </h4>
+            <div class="sample-request-section-head">
+              <h4 class="sample-request-section">{{__ "Response"}}</h4>
+              <button class="btn btn-outline-secondary btn-sm sample-request-clear">X</button>
+            </div>
             <div class="card">
               <div class="card-body p-0">
                 <pre 

@@ -92,6 +92,116 @@ input[type="date"] {
   border-radius: 0.25rem;
 }
 
+/* Send a sample request */
+.sample-request {
+  margin: 2rem 0;
+}
+
+.sample-request .card-header {
+  padding: 0.75rem 1.25rem;
+  background-color: #f8f9fa;
+}
+
+.sample-request .card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sample-request .card-body {
+  padding: 1.25rem;
+}
+
+.sample-request .sample-request-method {
+  min-width: 4.75rem;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sample-request .sample-request-section {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.sample-request .sample-request-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.sample-request .sample-request-section-head .sample-request-section {
+  margin: 0;
+}
+
+.sample-request .sample-request-section-head .form-select {
+  width: auto;
+  min-width: 8rem;
+}
+
+.sample-request .sample-request-code {
+  min-height: 12rem;
+  border-radius: 0.375rem;
+  font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.sample-request .sample-field {
+  display: grid;
+  grid-template-columns: minmax(8rem, 30%) 1fr;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sample-request .sample-field .form-label {
+  margin: 0;
+  font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.sample-request .input-group-text {
+  font-size: 0.8rem;
+}
+
+.sample-request .sample-field .input-group > [class^='sample-request-input-']:not(.sample-request-input-Boolean-container) {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
+.sample-request .sample-field .input-group > [class^='sample-request-input-'] > div > .form-control {
+  width: 100%;
+}
+
+.sample-request-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.sample-request .sample-request-response {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .sample-request .sample-field {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Utility classes */
 .hide {
   display: none !important;

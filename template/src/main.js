@@ -83,49 +83,18 @@ document.addEventListener('DOMContentLoaded', () => {
     $(this).parent('li').addClass('active');
   });
 
-  // switch content-type for parameter inputs (json or form-data)
-  console.log('Setting up sample-header-content-type-switch handler');
+  // the Format select of the parameters: json shows the raw body, anything else the field inputs
+  const showParameterFormat = $select => {
+    const $form = $select.closest('form');
+    const isJson = $select.val() === 'json';
+    $form.find('.sample-request-format-body').toggle(isJson);
+    $form.find('.sample-request-format-fields').toggle(!isJson);
+  };
   $(document).on('change', '.sample-header-content-type-switch', function () {
-    console.log('Content type switch changed');
-    const $select = $(this);
-    const selectedValue = $select.val();
-    const id = $select.data('id');
-
-    if (!id) {
-      console.warn('No ID found for content-type switch');
-      return;
-    }
-
-    try {
-      // Hide all content type specific elements
-      $(`#sample-request-body-json-input-${id}, #sample-request-body-form-input-${id}`).hide();
-
-      // Show selected content type element
-      if (selectedValue === 'body-json') {
-        $(`#sample-request-body-json-input-${id}`).show();
-      } else if (selectedValue === 'body-form-data') {
-        $(`#sample-request-body-form-input-${id}`).show();
-      }
-
-      console.log(`Switched to ${selectedValue} for API ${id}`);
-    } catch (error) {
-      console.error('Error switching content type:', error);
-    }
+    showParameterFormat($(this));
   });
-
-  // Initialize the correct state on page load
   $('.sample-header-content-type-switch').each(function () {
-    const selectedValue = $(this).val();
-    const $form = $(this).closest('form');
-    const formId = $form.find('input.sample-request-url').attr('id').split('-').slice(0, -3).join('-');
-
-    if (selectedValue === 'json') {
-      $form.find('.' + formId + '-sample-header-content-type-fields').hide();
-      $form.find('.' + formId + '-sample-header-content-type-body').show();
-    } else {
-      $form.find('.' + formId + '-sample-header-content-type-body').hide();
-      $form.find('.' + formId + '-sample-header-content-type-fields').show();
-    }
+    showParameterFormat($(this));
   });
 });
 
