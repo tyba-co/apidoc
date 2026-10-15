@@ -15,6 +15,8 @@
 import Handlebars from 'handlebars';
 import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
+import { bodyFieldLabels } from './body_example_hover';
+import { relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
 
 // this will register all helpers
@@ -205,15 +207,15 @@ export function register () {
           ret = `[]${ret}`;
         }
         if (p.parentNode) {
-          ret = `[${p.field.substring(p.parentNode.path.length + 1)}]${ret}`;
+          ret = `[${relativeFieldName(p.field, p.parentNode)}]${ret}`;
         } else {
-          ret = p.field + ret;
+          ret = unquoteField(p.field) + ret;
         }
         current = current.parentNode;
       } while (current.parentNode);
-      ret += `[${field.substring(parentNode.path.length + 1)}]`;
+      ret += `[${relativeFieldName(field, parentNode)}]`;
     } else {
-      ret = field;
+      ret = unquoteField(field);
       if (isArray) { ret += '[]'; }
     }
     return ret;
@@ -227,7 +229,8 @@ export function register () {
    */
   Handlebars.registerHelper('nestObject', function (entry) {
     const { parentNode, field } = entry;
-    return parentNode ? '&nbsp;&nbsp;'.repeat(parentNode.path.split('.').length) + field.substring(parentNode.path.length + 1) : field;
+    const indentation = parentNode ? '&nbsp;&nbsp;'.repeat(splitFieldPath(parentNode.path).length) : '';
+    return indentation + relativeFieldName(field, parentNode);
   });
 
   /**
@@ -297,6 +300,14 @@ export function register () {
 
   Handlebars.registerHelper('body2json', function (context, options) {
     return body2json(context);
+  });
+
+  Handlebars.registerHelper('bodyFieldLabels', function (fields) {
+    return JSON.stringify(bodyFieldLabels(fields, __('required'), __('optional')));
+  });
+
+  Handlebars.registerHelper('hasJsonExample', function (examples) {
+    return Array.isArray(examples) && examples.some(example => example.type === 'json');
   });
 
   Handlebars.registerHelper('each_compare_field', function (source, compare, options) {

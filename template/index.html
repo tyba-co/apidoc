@@ -327,6 +327,24 @@
         {{/each}}
       </tbody>
     </table>
+    {{#unless (hasJsonExample article.parameter.examples)}}
+      <div class="card mb-4">
+        <div class="card-header">
+          <strong>Example</strong>
+        </div>
+        <div class="card-body p-0">
+          <pre
+            class="mb-0"
+            data-type="json"
+            data-body-fields="{{bodyFieldLabels article.body}}"
+            data-body-generated
+            data-prismjs-copy="{{__ "Copy"}}"
+            data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+            data-prismjs-copy-success="{{__ "copied!"}}"
+          ><code class="language-json">{{body2json article.body}}</code></pre>
+        </div>
+      </div>
+    {{/unless}}
   {{/if}}
 </script>
 
@@ -395,6 +413,7 @@
               <pre 
                 class="mb-0"
                 data-type="{{type}}"
+                {{#ifCond ../section '==' 'parameter'}}{{#if ../article.body}}data-body-fields="{{bodyFieldLabels ../article.body}}"{{/if}}{{/ifCond}}
                 data-prismjs-copy="{{__ "Copy"}}"
                 data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
                 data-prismjs-copy-success="{{__ "copied!"}}"

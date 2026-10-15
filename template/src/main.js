@@ -28,10 +28,49 @@ import { __, setLanguage } from './locales/locale.mjs';
 
 // helpers for HandleBars
 import { register } from './hb_helpers';
+import { jsonKeyPaths } from './body_example_hover';
+import { unquoteField } from './field_path';
+
+const SCALAR_TOKEN = /\b(string|number|boolean|null)\b/;
+
+/**
+ * Highlight code, then attach type tooltips to the keys and scalar values of JSON body examples.
+ */
+function highlightAll () {
+  Prism.highlightAll();
+
+  document.querySelectorAll('pre[data-body-fields] code.language-json').forEach(code => {
+    const pre = code.closest('pre');
+    const labels = JSON.parse(pre.dataset.bodyFields);
+    const paths = jsonKeyPaths(code.textContent);
+    const tokens = [...code.querySelectorAll('.token')];
+    const properties = tokens.filter(token => token.classList.contains('property'));
+    if (properties.length !== paths.length) { return; }
+
+    properties.forEach((property, index) => {
+      const quotedLabel = labels[paths[index]];
+      const label = quotedLabel ?? labels[unquoteField(paths[index])];
+      if (!label) { return; }
+      // body2json nests only under parents declared as Object, so a dotted key only matches
+      // an unquoted field when it has no such parent; a quoted field is a deliberate literal key
+      const isUnnestable = pre.hasAttribute('data-body-generated') && quotedLabel === undefined;
+      const title = isUnnestable ? `${label} · cannot nest: its parent is not declared as an Object` : label;
+      if (isUnnestable) { property.classList.add('body-example-invalid'); }
+      const value = tokens[tokens.indexOf(property) + 2];
+      const hinted = value && SCALAR_TOKEN.test(value.className) ? [property, value] : [property];
+      hinted.forEach(token => {
+        token.classList.add('body-example-hint');
+        token.dataset.bsToggle = 'tooltip';
+        token.dataset.bsTitle = title;
+        bootstrap.Tooltip.getOrCreateInstance(token, { container: 'body' });
+      });
+    });
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
-  Prism.highlightAll();
+  highlightAll();
 
   // Handle sidebar navigation active state
   $(document).on('click', '.sidenav a', function () {
@@ -777,7 +816,7 @@ function init () {
     }
 
     initDynamic();
-    Prism.highlightAll();
+    highlightAll();
   }
 
   /**
