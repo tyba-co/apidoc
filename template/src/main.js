@@ -459,19 +459,14 @@ function init () {
     $(this).removeClass('border-danger');
   });
 
-  // Content-Scroll on Navigation click.
+  // aloneDisplay shows one article at a time; otherwise the anchor scrolls natively (CSS scroll-margin-top)
   $('.sidenav').find('a').on('click', function (e) {
+    if (!apiProject.template.aloneDisplay) { return; }
     e.preventDefault();
-    const id = this.getAttribute('href');
-    if (apiProject.template.aloneDisplay) {
-      const active = document.querySelector('.sidenav > li.active');
-      if (active) { active.classList.remove('active'); }
-      this.parentNode.classList.add('active');
-    } else {
-      const el = document.querySelector(id);
-      if (el) { $('html,body').animate({ scrollTop: el.offsetTop }, 400); }
-    }
-    window.location.hash = id;
+    const active = document.querySelector('.sidenav > li.active');
+    if (active) { active.classList.remove('active'); }
+    this.parentNode.classList.add('active');
+    window.location.hash = this.getAttribute('href');
   });
 
   /**
@@ -511,19 +506,6 @@ function init () {
         const index = $('#sidenav li[data-group=\'' + group + '\'][data-name=\'' + name + '\']').index($(this));
         if (length === 1 || index === length - 1) { $(this).addClass('is-new'); }
       });
-    }
-
-    // tabs - Bootstrap 5 style
-    $('.nav-tabs-examples a').click(function (e) {
-      e.preventDefault();
-      const tabTrigger = new bootstrap.Tab(this);
-      tabTrigger.show();
-    });
-    // Initialize first tab
-    const firstTab = $('.nav-tabs-examples a').first().get(0);
-    if (firstTab) {
-      const tab = new bootstrap.Tab(firstTab);
-      tab.show();
     }
 
     // switch content-type for body inputs (json or form-data)
@@ -574,7 +556,7 @@ function init () {
 
     // call scrollspy refresh method
     if (!apiProject.template.aloneDisplay) {
-      $('body').scrollspy('refresh');
+      bootstrap.ScrollSpy.getInstance(document.body)?.refresh();
     }
 
     if (apiProject.template.aloneDisplay) {
@@ -672,24 +654,9 @@ function init () {
   }
 
   /**
-   * Off-Canvas side toggle navigation
-   */
-  document.querySelector('[data-bs-toggle="offcanvas"]').addEventListener('click', function () {
-    const row = document.querySelector('.row-offcanvas');
-    if (row) {
-      row.classList.toggle('active');
-    }
-  });
-
-  /**
-   * Set initial focus to search input
-   */
-  $('#scrollingNav .sidenav-search input.search').focus();
-
-  /**
    * Filter search with a delay to prevent issues with very large projects hogging the browser event loop during the search
    */
-  $('[data-action="filter-search"]').on('keyup', resetableTimeout(event => {
+  $('[data-action="filter-search"]').on('input', resetableTimeout(event => {
     const query = event.currentTarget.value.toLowerCase();
 
     $('.sidenav a.nav-list-item').filter((index, el) => {
@@ -700,7 +667,7 @@ function init () {
   /**
    * Search reset
    */
-  $('span.search-reset').on('click', function () {
+  $('.search-reset').on('click', function () {
     $('#scrollingNav .sidenav-search input.search')
       .val('')
       .focus()
