@@ -1,10 +1,19 @@
 {
   "name": "apidoc-vscode",
   "displayName": "apiDoc (Tyba)",
-  "description": "Completion, syntax highlighting and snippets for apidoc comments (@api, @apiParam, ...), and a JSON schema for apidoc.json",
-  "version": "0.2.1",
+  "description": "Completion, syntax highlighting and snippets for @tyba-co/apidoc comments (@api, @apiParam, ...), and a JSON schema for apidoc.json",
+  "version": "0.2.2",
   "publisher": "tyba-co",
   "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#253138",
+    "theme": "dark"
+  },
+  "homepage": "https://tyba-co.github.io/apidoc/",
+  "bugs": {
+    "url": "https://github.com/tyba-co/apidoc/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tyba-co/apidoc",
@@ -21,11 +30,44 @@
     "apidoc",
     "api",
     "documentation",
-    "snippets"
+    "rest",
+    "snippets",
+    "autocomplete",
+    "completion"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:vue",
+    "onLanguage:php",
+    "onLanguage:java",
+    "onLanguage:go",
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:csharp",
+    "onLanguage:dart",
+    "onLanguage:groovy",
+    "onLanguage:kotlin",
+    "onLanguage:scala",
+    "onLanguage:python",
+    "onLanguage:ruby",
+    "onLanguage:perl",
+    "onLanguage:lua",
+    "onLanguage:coffeescript",
+    "onLanguage:elixir",
+    "onLanguage:erlang",
+    "onLanguage:clojure"
   ],
   "scripts": {
     "package": "npx --yes @vscode/vsce@3.9.2 package --no-dependencies",
     "test:host": "node test/run.js"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "^2.5.2",
+    "mocha": "^11.7.2"
   },
   "contributes": {
     "snippets": [
@@ -189,35 +231,5 @@
         ]
       }
     ]
-  },
-  "main": "./extension.js",
-  "activationEvents": [
-    "onLanguage:javascript",
-    "onLanguage:javascriptreact",
-    "onLanguage:typescript",
-    "onLanguage:typescriptreact",
-    "onLanguage:vue",
-    "onLanguage:php",
-    "onLanguage:java",
-    "onLanguage:go",
-    "onLanguage:c",
-    "onLanguage:cpp",
-    "onLanguage:csharp",
-    "onLanguage:dart",
-    "onLanguage:groovy",
-    "onLanguage:kotlin",
-    "onLanguage:scala",
-    "onLanguage:python",
-    "onLanguage:ruby",
-    "onLanguage:perl",
-    "onLanguage:lua",
-    "onLanguage:coffeescript",
-    "onLanguage:elixir",
-    "onLanguage:erlang",
-    "onLanguage:clojure"
-  ],
-  "devDependencies": {
-    "@vscode/test-electron": "^2.5.2",
-    "mocha": "^11.7.2"
   }
 }
