@@ -30,6 +30,18 @@ describe('apidoc completion in a real VS Code', function () {
     await vscode.extensions.getExtension('tyba-co.apidoc-vscode').activate();
   });
 
+  it('contributes snippets only to languages this VS Code knows (no Unknown language errors)', async function () {
+    // ARRANGE
+    const known = new Set(await vscode.languages.getLanguages());
+    const manifest = vscode.extensions.getExtension('tyba-co.apidoc-vscode').packageJSON;
+
+    // ACT
+    const unknownLanguages = [...new Set(manifest.contributes.snippets.map(entry => entry.language))].filter(language => !known.has(language));
+
+    // ASSERT
+    assert.deepStrictEqual(unknownLanguages, []);
+  });
+
   it('activates and offers every tag after @ inside a doc comment', async function () {
     // ACT
     const items = await completionsAt(document, endOfLine(document, ' * @apiP'));

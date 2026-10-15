@@ -38,7 +38,7 @@ The `vscode/` folder of the repository holds an extension called "apiDoc (Tyba)"
 - **Block snippets** for C-style languages: `apidoc` inserts a complete endpoint block, `apidocdefine` an `@apiDefine` block.
 - **`apidoc.json` support.** Files named `apidoc.json` are validated against a JSON schema that lists the keys (`name`, `version`, `description`, `title`, `url`, `sampleUrl`, `defaultVersion`, `order`, `header`, `footer`, `input`, `output`, `template`), the `template` options and the allowed values of `forceLanguage`, and offers completion for them. See [Configuration keys](configuration.md#configuration-keys).
 
-Completion and highlighting work in JavaScript, TypeScript (and their React variants), Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin, Scala, Python, Ruby, Perl, Lua, CoffeeScript, Elixir, Erlang and Clojure. Block snippets are available in the C-style subset: JavaScript, TypeScript, Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin and Scala.
+Completion and highlighting work in JavaScript, TypeScript (and their React variants), Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin, Scala, Python, Ruby, Perl, Lua, CoffeeScript, Elixir, Erlang and Clojure. Block snippets are available in the C-style subset: JavaScript, TypeScript, Vue, PHP, Java, Go, C, C++, C#, Dart, Groovy, Kotlin and Scala. Classic snippets are contributed only to the languages VS Code ships; Vue, Kotlin, Scala, Elixir and Erlang get the same tags from the completion provider, and Vue, Kotlin and Scala get the blocks (type `apidoc`) from it too.
 
 ### Build and install
 
@@ -47,7 +47,7 @@ From a clone of the repository:
 ```bash
 cd vscode
 npm run package
-code --install-extension apidoc-vscode-0.2.0.vsix
+code --install-extension apidoc-vscode-0.2.1.vsix
 ```
 
 `npm run package` runs `@vscode/vsce` through `npx`, so the first run needs network access. Instead of the `code` command you can install the file from the Extensions view: open the `...` menu and choose "Install from VSIX...".

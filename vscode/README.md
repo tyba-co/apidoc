@@ -14,7 +14,7 @@ The extension is not on the Marketplace. Build it from a clone of the repository
 ```bash
 cd vscode
 npm run package
-code --install-extension apidoc-vscode-0.2.0.vsix
+code --install-extension apidoc-vscode-0.2.1.vsix
 ```
 
 `npm run package` needs network access the first time (it runs `@vscode/vsce` through `npx`).

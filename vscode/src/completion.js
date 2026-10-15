@@ -2,6 +2,7 @@
  * Context-aware completion for apidoc comments. Pure functions: the VS Code adapter lives in extension.js.
  */
 const tagSnippets = require('../snippets/tags.json');
+const blockSnippets = require('../snippets/blocks.json');
 
 const METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
 const TYPES = ['String', 'Number', 'Boolean', 'Object', 'String[]', 'Number[]', 'Object[]', 'Date', 'File'];
@@ -120,15 +121,34 @@ function itemsFor (context, names) {
 }
 
 /**
+ * The apidoc / apidocdefine block snippets, for languages VS Code cannot hold snippets for without their language extension.
+ *
+ * @param {String} lineBefore
+ * @returns {{start: Number, items: Object[]}|undefined}
+ */
+function blockCompletions (lineBefore) {
+  const typed = lineBefore.match(/(?:^|\s)(apid\w*)$/);
+  if (!typed) { return undefined; }
+  const items = Object.values(blockSnippets).map(snippet => ({
+    label: snippet.prefix,
+    detail: snippet.description,
+    insert: snippet.body.join('\n'),
+    isSnippet: true,
+  }));
+  return { start: lineBefore.length - typed[1].length, items };
+}
+
+/**
  * @param {Object} input
  * @param {String} input.text whole document
  * @param {Number} input.offset cursor offset in the document
  * @param {String} input.lineBefore text of the cursor line before the cursor
  * @param {Object} input.names result of mergeNames
+ * @param {Boolean} [input.withBlocks] also offer the block snippets outside comments
  * @returns {{start: Number, items: Object[]}|undefined} start is the column where the replaced text begins
  */
-function getCompletions ({ text, offset, lineBefore, names }) {
-  if (!isInsideComment(text, offset)) { return undefined; }
+function getCompletions ({ text, offset, lineBefore, names, withBlocks }) {
+  if (!isInsideComment(text, offset)) { return withBlocks ? blockCompletions(lineBefore) : undefined; }
   const context = completionContext(lineBefore);
   if (!context) { return undefined; }
   return { start: context.start, items: itemsFor(context, names) };

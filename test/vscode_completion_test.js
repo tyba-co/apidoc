@@ -95,6 +95,22 @@ describe('vscode completion', function () {
     assert.strictEqual(prose, undefined);
   });
 
+  it('should offer the block snippets outside comments only when asked to', function () {
+    // ARRANGE
+    const text = 'class User {\n  apid';
+    const request = { text, offset: text.length, lineBefore: '  apid', names };
+
+    // ACT
+    const without = getCompletions(request);
+    const withBlocks = getCompletions(Object.assign({ withBlocks: true }, request));
+
+    // ASSERT
+    assert.strictEqual(without, undefined);
+    assert.deepStrictEqual(labels(withBlocks), ['apidoc', 'apidocdefine']);
+    assert.strictEqual(withBlocks.start, 2);
+    assert.ok(withBlocks.items[0].insert.startsWith('/**\n * @api {'));
+  });
+
   it('should treat docstrings and hash comments as comments too', function () {
     // ASSERT
     assert.ok(isInsideComment('def f():\n    """\n    @api', 25));

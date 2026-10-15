@@ -5,6 +5,8 @@ const LANGUAGES = [
   'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'php', 'java', 'go', 'c', 'cpp', 'csharp',
   'dart', 'groovy', 'kotlin', 'scala', 'python', 'ruby', 'perl', 'lua', 'coffeescript', 'elixir', 'erlang', 'clojure',
 ];
+// no snippet contributions for these: VS Code reports an unknown language when their extension is not installed
+const BLOCK_LANGUAGES = ['vue', 'kotlin', 'scala'];
 const SOURCE_GLOB = '**/*.{js,jsx,ts,tsx,vue,php,java,go,c,cpp,cs,dart,groovy,kt,scala,py,rb,pl,lua,coffee,ex,exs,erl,clj}';
 const EXCLUDE_GLOB = '**/{node_modules,.git,dist,build,out,doc,docs}/**';
 const MAX_FILES = 3000;
@@ -48,14 +50,14 @@ function currentNames (document) {
   return mergeNames([...perFile.values()]);
 }
 
-const provider = {
+const createProvider = withBlocks => ({
   async provideCompletionItems (document, position) {
     const lineBefore = document.lineAt(position.line).text.slice(0, position.character);
-    const quick = getCompletions({ text: document.getText(), offset: document.offsetAt(position), lineBefore, names: mergeNames([]) });
-    if (!quick) { return undefined; }
+    const request = { text: document.getText(), offset: document.offsetAt(position), lineBefore, withBlocks };
+    if (!getCompletions(Object.assign({ names: mergeNames([]) }, request))) { return undefined; }
 
     await ensureIndex();
-    const { start, items } = getCompletions({ text: document.getText(), offset: document.offsetAt(position), lineBefore, names: currentNames(document) });
+    const { start, items } = getCompletions(Object.assign({ names: currentNames(document) }, request));
     const range = new vscode.Range(position.line, start, position.line, position.character);
     return items.map((item, index) => {
       const completion = new vscode.CompletionItem(item.label, item.isSnippet ? vscode.CompletionItemKind.Snippet : vscode.CompletionItemKind.EnumMember);
@@ -67,14 +69,15 @@ const provider = {
       return completion;
     });
   },
-};
+});
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate (context) {
   context.subscriptions.push(
-    vscode.languages.registerCompletionItemProvider(LANGUAGES.map(language => ({ language })), provider, ...TRIGGER_CHARACTERS),
+    vscode.languages.registerCompletionItemProvider(LANGUAGES.filter(language => !BLOCK_LANGUAGES.includes(language)).map(language => ({ language })), createProvider(false), ...TRIGGER_CHARACTERS),
+    vscode.languages.registerCompletionItemProvider(BLOCK_LANGUAGES.map(language => ({ language })), createProvider(true), ...TRIGGER_CHARACTERS),
   );
 
   const watcher = vscode.workspace.createFileSystemWatcher(SOURCE_GLOB);
