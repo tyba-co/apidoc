@@ -1,10 +1,11 @@
 # apiDoc (Tyba) for VS Code
 
-Autocompletion for [@tyba-co/apidoc](https://github.com/tyba-co/apidoc) comments.
+Completion, highlighting and snippets for [@tyba-co/apidoc](https://github.com/tyba-co/apidoc) comments.
 
-- Snippets for every apidoc tag: type `@api` inside a doc comment and pick `@apiParam`, `@apiBody`, `@apiSuccess`, ... Field types are offered as a choice list.
-- Block snippets for C-style languages (JS, TS, PHP, Java, Go, C#, ...): `apidoc` inserts a complete endpoint block, `apidocdefine` an `@apiDefine` block.
-- Validation and completion for `apidoc.json` (keys, `template` options, `forceLanguage` values).
+- **Completion inside doc comments**: type `@` for every tag; after `@api {` the HTTP methods; after `@apiParam {` (and the other field tags) the types; after `@apiSuccess (` / `@apiError (` the status groups; after `@apiUse ` / `@apiPermission ` the `@apiDefine` names of your workspace; after `@apiGroup ` / `@apiVersion ` the values already in use. Accepting a tag replaces what you typed, so there is no double `@`.
+- **Highlighting** of `@api...` tags, `(group)` and `{type}` inside comments.
+- **Snippets**: one per tag (with `Optional` and status-group variants), and `apidoc` / `apidocdefine` blocks for C-style languages.
+- **`apidoc.json`**: validation and completion of keys, `template` options and `forceLanguage` values.
 
 ## Install
 
@@ -13,25 +14,26 @@ The extension is not on the Marketplace. Build it from a clone of the repository
 ```bash
 cd vscode
 npm run package
-code --install-extension apidoc-vscode-0.1.0.vsix
+code --install-extension apidoc-vscode-0.2.1.vsix
 ```
 
 `npm run package` needs network access the first time (it runs `@vscode/vsce` through `npx`).
 
-## Suggestions inside comments
+## If nothing shows up
 
-VS Code does not show suggestions inside comments while you type unless `editor.quickSuggestions` allows it. Press `Ctrl+Space` after `@api`, or enable it for your languages:
+The provider triggers on `@`, `{`, `(` and the space after a tag. If the list does not appear, press `Ctrl+Space`.
 
-```json
-"[javascript]": { "editor.quickSuggestions": { "comments": "on", "other": "on", "strings": "off" } },
-"[typescript]": { "editor.quickSuggestions": { "comments": "on", "other": "on", "strings": "off" } }
-```
+## Tests
+
+- `npm test` in the repository root: unit tests of the completion logic, and every registered tag must have a snippet the parser accepts.
+- `npm install && npm run test:host` here: loads the extension in a real VS Code and asks it for completions. It downloads a VS Code build, or set `VSCODE_EXECUTABLE_PATH` to an installed one. From VS Code's integrated terminal, unset `ELECTRON_RUN_AS_NODE` first. Not run in CI (no display).
 
 ## Adding a tag
 
-When a parser is added to `lib/core/index.js`, add its snippet to `snippets/tags.json`. `npm test` in the repository root fails until every registered tag has a snippet that the parser accepts.
+When a parser is added to `lib/core/index.js`, add its snippet to `snippets/tags.json`; the tag completion uses the same snippets. `npm test` fails until every registered tag has one.
 
 ## Not included
 
-- Completion of `@apiUse` / `@apiPermission` names from the workspace's `@apiDefine` blocks.
+- Hover text, live diagnostics and go-to-definition from `@apiUse` to `@apiDefine`.
+- Comments that follow code on the same line, and Ruby `=begin` blocks.
 - Schema for `apidoc.config.js` and for the `apidoc` key of `package.json`.

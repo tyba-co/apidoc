@@ -8,3 +8,5 @@ tmp/
 test/*/fixtures*/vendor/
 test/apidoc/fixtures*/css/
 vscode/*.vsix
+vscode/node_modules/
+vscode/.vscode-test/
