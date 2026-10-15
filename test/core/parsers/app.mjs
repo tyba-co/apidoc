@@ -71,7 +71,8 @@ const app = {
     apisuccesstitle: './workers/api_success_title.js',
     apiuse: './workers/api_use.js',
   },
-  hooks: {}
+  hooks: {},
+  hook: () => {},
 };
 
 export {

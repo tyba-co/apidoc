@@ -23,7 +23,8 @@
     "eslint": "eslint --ext js,mjs lib bin/apidoc template/src",
     "pre-commit": "npm run eslint && npm run test",
     "serve": "npm run build-example && (docker rm -f apidoc || true) && docker run --rm --name apidoc -p 8080:80 -v /tmp/apidoc-output:/usr/share/nginx/html:ro -d nginx",
-    "test": "mocha --colors --no-package --no-config 'test/**/*_test.*js'"
+    "test": "node --import ./test/support/node_test_globals.mjs --test \"test/**/*_test.*js\"",
+    "test:mocha": "mocha --colors --no-package --no-config \"test/**/*_test.*js\""
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
@@ -38,7 +39,7 @@
     "restful"
   ],
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.0.0"
   },
   "os": [
     "darwin",
@@ -48,7 +49,7 @@
     "win32"
   ],
   "dependencies": {
-    "bootstrap": "^5.3.0",
+    "bootstrap": "^5.3.8",
     "commander": "^10.0.0",
     "diff-match-patch": "^1.0.5",
     "esbuild-loader": "^4.3.0",
@@ -72,7 +73,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.177",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^16.11.9",
+    "@types/node": "^24.0.0",
     "eslint": "^8.38.0",
     "@eslint/js": "^8.38.0",
     "eslint-config-standard": "^17.0.0",
