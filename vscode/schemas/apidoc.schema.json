@@ -38,9 +38,9 @@
     "input": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Source directories, used when the CLI -i option is not given."
+      "description": "Source directories. Applied only when apidoc runs with -c and no -i."
     },
-    "output": { "type": "string", "description": "Output directory, used when the CLI -o option is not given." },
+    "output": { "type": "string", "description": "Output directory. Not honoured by the apidoc CLI, which always passes its own -o; use -o." },
     "template": {
       "type": "object",
       "additionalProperties": false,

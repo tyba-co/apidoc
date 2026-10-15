@@ -14,8 +14,6 @@ Run `npx --no-install apidoc -i <input-dir> -o /tmp/apidoc-check -n --warn-error
 | `parser plugin 'x' not found` | Unknown tag such as `@apiErrorStructure` or a typo. | Use a tag from `tags.md`. |
 | `Empty parser result.` | A tag without its required value, e.g. an example tag with no body or an empty `@apiName`. | Add the missing value or delete the tag. |
 | `Name must contain only alphanumeric and colon characters.` | `@apiDefine` name contains other characters. | Use letters, digits, `_` or `:`. |
-| `Only one definition is allowed in the same block.` | Two `@apiDefine` in one comment block. | One `@apiDefine` per comment block. |
-| `Only one definition or usage is allowed in the same block.` | `@apiUse` or `@apiPermission` inside an `@apiDefine` block. | Put `@apiUse`/`@apiPermission` in the endpoint blocks only. |
 
 ## Common mistakes that do not fail validation
 
