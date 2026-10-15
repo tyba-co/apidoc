@@ -7,15 +7,18 @@
  */
 :root {
   /* Custom theme colors */
-  --primary: #0088cc;
+  --primary: #2e71e5;
+  --primary-hover: #1b56db;
+  --primary-rgb: 46, 113, 229;
   --white: #fff;
   --light-gray: #ccc;
-  --main-gray: #777;
-  --dark-gray: #2d2d2d;
-  --hover-gray: #666;
+  --main-gray: #646464;
+  --dark-gray: #141b1f;
+  --hover-gray: #26323a;
+  --text: #202020;
   --meth-get: green;
   --meth-put: #e5c500;
-  --meth-post: #4070ec;
+  --meth-post: var(--primary);
   --meth-delete: #ed0039;
   --red: #dc3545;
   
@@ -89,7 +92,7 @@ input[type="date"] {
 
 .sample-request-response pre {
   padding: 0.5rem 0.75rem !important;
-  background-color: #2d2d2d;
+  background-color: var(--dark-gray);
   color: #e6e6e6;
   border-radius: 0.25rem;
 }
@@ -935,7 +938,7 @@ tr.del td {
 .container1 > div, .container2 > div, .container3 > div {
   width: 14px;
   height: 14px;
-  background-color: #0088cc;
+  background-color: var(--primary);
 
   border-radius: 100%;
   position: absolute;
@@ -1272,7 +1275,7 @@ pre code {
 
 .body-autocomplete-item.active,
 .body-autocomplete-item:hover {
-  background: #0d6efd;
+  background: var(--primary);
   color: #fff;
 }
 
@@ -1284,4 +1287,50 @@ pre code {
   font-size: 0.75rem;
   opacity: 0.75;
   white-space: nowrap;
+}
+
+/* Tyba brand theme: Bootstrap tokens follow the palette in :root */
+:root {
+  --bs-primary-rgb: var(--primary-rgb);
+  --bs-link-color-rgb: var(--primary-rgb);
+  --bs-link-hover-color-rgb: 27, 86, 219;
+  --bs-body-color: var(--text);
+  --bs-secondary-color: var(--main-gray);
+  --bs-body-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+  color: var(--text);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--primary);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-hover-bg: var(--primary-hover);
+  --bs-btn-hover-border-color: var(--primary-hover);
+  --bs-btn-active-bg: var(--primary-hover);
+  --bs-btn-active-border-color: var(--primary-hover);
+  --bs-btn-disabled-bg: var(--primary);
+  --bs-btn-disabled-border-color: var(--primary);
+  --bs-btn-focus-shadow-rgb: var(--primary-rgb);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.2);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.sidenav > li.nav-header > a {
+  background-color: var(--hover-gray);
+}
+
+pre[class*='language-'] {
+  background-color: var(--dark-gray);
 }
