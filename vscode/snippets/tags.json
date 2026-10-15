@@ -84,6 +84,20 @@
     ],
     "description": "apidoc: hide unless --private"
   },
+  "apiWebhook": {
+    "prefix": "@apiWebhook",
+    "description": "apidoc: the API sends this request to the client",
+    "body": [
+      "@apiWebhook ${1:Sent to the URL registered by the client when ...}"
+    ]
+  },
+  "apiStreaming": {
+    "prefix": "@apiStreaming",
+    "description": "apidoc: the response is a stream (sse, ndjson, websocket)",
+    "body": [
+      "@apiStreaming {${1|sse,ndjson,websocket|}} ${2:Description}"
+    ]
+  },
   "apiIgnore": {
     "prefix": "@apiIgnore",
     "body": [

@@ -1479,3 +1479,21 @@ td {
 .file-sheet td {
   font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
 }
+
+.method + .method {
+  margin-left: 0.4rem;
+}
+
+.meth-webhook {
+  background-color: #6f42c1;
+}
+
+.meth-stream {
+  background-color: #0e8a8a;
+}
+
+.request-note {
+  margin: 0.5rem 0 0;
+  color: var(--main-gray);
+  font-size: 0.9rem;
+}

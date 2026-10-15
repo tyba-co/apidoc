@@ -1,6 +1,6 @@
 # Tag reference
 
-Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (25 tags) plus `@apiIgnore`, which the block scanner handles itself.
+Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (27 tags) plus `@apiIgnore`, which the block scanner handles itself.
 
 Conventions used on this page:
 
@@ -34,10 +34,12 @@ Conventions used on this page:
 | [`@apiQuery`](#apiquery) | Query string parameter |
 | [`@apiResponseHeader`](#apiresponseheader) | Header of the response |
 | [`@apiSampleRequest`](#apisamplerequest) | Configure the sample request form |
+| [`@apiStreaming`](#apistreaming) | The response is a stream |
 | [`@apiSuccess`](#apisuccess) | Response field |
 | [`@apiSuccessExample`](#apisuccessexample) | Success response example |
 | [`@apiUse`](#apiuse) | Inline a defined block |
 | [`@apiVersion`](#apiversion) | Version of the block |
+| [`@apiWebhook`](#apiwebhook) | The API sends this request to a client |
 
 ## Field grammar
 
@@ -920,6 +922,42 @@ Sets the URL used by the "Send a Sample Request" form, or turns the form off for
  */
 ```
 
+### @apiStreaming
+
+Marks an endpoint whose response is a stream, such as server-sent events, instead of a single answer.
+
+**Syntax**
+
+```text
+@apiStreaming [{type}] [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `{type}` | No | Kind of stream: `sse`, `ndjson`, `websocket`... any word. Default `stream`. |
+| `description` | No | Markdown line shown under the URL. Without it the site says that the connection stays open and the server sends events. |
+
+**Notes**
+
+- The endpoint gets a `Stream · type` mark next to its method, and the sample request is hidden: a form cannot hold a connection open.
+- Document what each event looks like with `@apiSuccess` for its fields and an `@apiSuccessExample {http}` for the raw event.
+- apidoc only labels a stream. A WebSocket or gRPC service has no HTTP method and path to document; label its HTTP upgrade endpoint, or describe the protocol in a Markdown include.
+
+**Example**
+
+```js
+/**
+ * @api {get} /events Stream of events
+ * @apiVersion 1.0.0
+ * @apiName EventStream
+ * @apiGroup Events
+ * @apiStreaming {sse} One event per change; send the last event id in since to resume.
+ * @apiQuery {String} [since] Id of the last event received.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the changed object.
+ */
+```
+
 ### @apiSuccess
 
 Documents a field of a successful response.
@@ -1066,6 +1104,41 @@ Sets the version of the block, which drives version comparison and the choice of
  * @apiGroup User
  * @apiParam {String} id User id.
  * @apiSuccess {String} firstName First name.
+ */
+```
+
+### @apiWebhook
+
+Marks a block as a webhook: a request your API sends to a URL that the client registered, and not one the client sends to you.
+
+**Syntax**
+
+```text
+@apiWebhook [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `description` | No | Markdown line shown under the URL, for example when it is sent and what the client must answer. Without it the site says that the API sends this request to the URL the client registers. |
+
+**Notes**
+
+- The endpoint gets a `Webhook` mark next to its method, the request body is called "Payload", and the sample request is hidden, because there is nothing to send to your own API.
+- Describe what the client receives with the usual tags: `@apiBody` for the payload and `@apiHeader` for the headers the API adds, such as a signature. Use `@apiContentType` when the payload is not JSON.
+- The method is the one the API uses, and the path is the one the client chooses; put an example path in the `@api` line.
+
+**Example**
+
+```js
+/**
+ * @api {post} /webhooks/user-created User created
+ * @apiVersion 1.0.0
+ * @apiName UserCreatedWebhook
+ * @apiGroup Webhooks
+ * @apiWebhook Sent when a user is created. Answer with any 2xx within 5 seconds or it is retried.
+ * @apiHeader {String} X-Signature HMAC of the payload with your secret.
+ * @apiBody {String} id Id of the user.
+ * @apiBody {String} email Email address of the user.
  */
 ```
 

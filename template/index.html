@@ -168,12 +168,20 @@
       <p>{{{nl2br article.description}}}</p>
     {{/if}}
     <span class="method meth-{{toLowerCase article.type}}">{{article.type}}</span>
+    {{#if article.webhook}}<span class="method meth-webhook">Webhook</span>{{/if}}
+    {{#if article.streaming}}<span class="method meth-stream">Stream · {{article.streaming.type}}</span>{{/if}}
     <pre 
       data-type="{{toLowerCase article.type}}"
       data-prismjs-copy="{{__ "Copy"}}"
       data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
       data-prismjs-copy-success="{{__ "copied!"}}"
     ><code class="language-http">{{article.url}}</code></pre>
+    {{#if article.webhook}}
+      <p class="request-note">{{#ifCond article.webhook '===' true}}The API sends this request to the URL you register with it.{{else}}{{article.webhook}}{{/ifCond}}</p>
+    {{/if}}
+    {{#if article.streaming}}
+      <p class="request-note">{{#if article.streaming.description}}{{article.streaming.description}}{{else}}The response is a stream ({{article.streaming.type}}): the connection stays open and the server sends events.{{/if}}</p>
+    {{/if}}
 
     {{#if article.permission}}
       <p>
@@ -229,7 +237,7 @@
     {{subTemplate "article-param-block" params=article.responseHeader _hasType=true section="responseHeader"}}
     {{subTemplate "article-param-block" params=article.error _col1="Name" _hasType=_hasTypeInErrorFields section="error"}}
 
-    {{subTemplate "article-sample-request" article=article id=id}}
+    {{#if (canTry article)}}{{subTemplate "article-sample-request" article=article id=id}}{{/if}}
   </article>
 </script>
 
@@ -374,7 +382,7 @@
 
 <script id="template-article-body-block" type="text/x-handlebars-template">
   {{#if article.body}}
-    <h2>{{__ "Request Body"}}{{#if (hasNotableMime article)}} <span class="chip">{{bodyMime article}}</span>{{/if}}</h2>
+    <h2>{{#if article.webhook}}Payload{{else}}{{__ "Request Body"}}{{/if}}{{#if (hasNotableMime article)}} <span class="chip">{{bodyMime article}}</span>{{/if}}</h2>
     <table>
       <thead>
         <tr>
@@ -903,7 +911,7 @@
     {{subTemplate "article-compare-param-block" source=article.success compare=compare.success _hasType=_hasTypeInSuccessFields section="success"}}
     {{subTemplate "article-compare-param-block" source=article.error compare=compare.error _col1="Name" _hasType=_hasTypeInErrorFields section="error"}}
 
-    {{subTemplate "article-sample-request" article=article id=id}}
+    {{#if (canTry article)}}{{subTemplate "article-sample-request" article=article id=id}}{{/if}}
 
   </article>
 </script>

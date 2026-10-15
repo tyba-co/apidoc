@@ -199,6 +199,40 @@ function exportUsers () { }
 function startUserExport () { }
 
 /**
+ * @api {post} /webhooks/user-created User created
+ * @apiVersion 0.3.0
+ * @apiName UserCreatedWebhook
+ * @apiGroup Webhooks
+ * @apiPermission none
+ *
+ * @apiWebhook Sent to the URL registered by the client, every time a user is created. Answer with any 2xx within 5 seconds or it is retried.
+ *
+ * @apiHeader {String} X-Signature=sha256=9f86d0 HMAC of the payload with your secret.
+ * @apiBody {String} id Id of the user.
+ * @apiBody {String} email Email address of the user.
+ * @apiBody {Date} createdAt Creation date.
+ */
+function userCreatedWebhook () { }
+
+/**
+ * @api {get} /events Stream of events
+ * @apiVersion 0.3.0
+ * @apiName EventStream
+ * @apiGroup Webhooks
+ * @apiPermission none
+ *
+ * @apiStreaming {sse} Server-sent events: keep the connection open and read one event per user change.
+ *
+ * @apiQuery {String} [since] Id of the last event received, to resume the stream.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the changed user.
+ * @apiSuccessExample {http} Event:
+ *     event: user.updated
+ *     data: {"id":"42","name":"Ana"}
+ */
+function eventStream () { }
+
+/**
  * @api {put} /user/:id Change a User
  * @apiVersion 0.3.0
  * @apiName PutUser

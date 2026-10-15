@@ -310,6 +310,10 @@ export function register () {
     return hasNotableMime(article);
   });
 
+  Handlebars.registerHelper('canTry', function (article) {
+    return !article.webhook && !article.streaming;
+  });
+
   Handlebars.registerHelper('isJsonKind', function (article) {
     return bodyKind(article) === 'json';
   });

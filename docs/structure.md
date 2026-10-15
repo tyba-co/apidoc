@@ -359,6 +359,44 @@ For an endpoint that works in the background, answer `202 Accepted` and point to
 
 Document the polling endpoint as an ordinary `GET` that answers `200` with the result and `202` while it is not ready; the `Location` header of the first answer is its URL.
 
+
+## Webhooks and streams
+
+Two kinds of endpoint are not a simple request and answer:
+
+- **Webhooks.** Your API calls the client. Declare the block as usual, with the method and an example path, and add `@apiWebhook`. The site marks it as a webhook, calls the body "Payload" and hides the sample request.
+- **Streams.** The response never ends: server-sent events or newline-delimited JSON. Add `@apiStreaming {sse}` and describe one event with `@apiSuccess` and an `@apiSuccessExample {http}`. The sample request is hidden.
+
+```js
+/**
+ * @api {post} /webhooks/payment-confirmed Payment confirmed
+ * @apiVersion 1.0.0
+ * @apiName PaymentConfirmedWebhook
+ * @apiGroup Webhooks
+ * @apiWebhook Sent when a payment is confirmed. Answer 2xx within 5 seconds.
+ * @apiHeader {String} X-Signature HMAC of the payload.
+ * @apiBody {String} paymentId Id of the payment.
+ * @apiBody {Number} amount Amount in cents.
+ */
+```
+
+```js
+/**
+ * @api {get} /payments/stream Payment events
+ * @apiVersion 1.0.0
+ * @apiName PaymentStream
+ * @apiGroup Payments
+ * @apiStreaming {sse} One event per payment change.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the payment.
+ * @apiSuccessExample {http} Event:
+ *     event: payment.confirmed
+ *     data: {"id":"p_1","amount":1500}
+ */
+```
+
+apidoc is for HTTP APIs: GraphQL, WebSocket and gRPC services do not fit a method and path, and are not modeled.
+
 ## Examples
 
 | Tag | Shown | Typical content |
