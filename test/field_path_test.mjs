@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { relativeFieldName, splitFieldPath, unquoteField } from '../template/src/field_path.mjs';
+import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from '../template/src/field_path.mjs';
 import { body2json } from '../template/src/jsonifier.mjs';
 
 describe('field path', function () {
@@ -43,5 +43,19 @@ describe('field path', function () {
 
     // ASSERT
     assert.deepStrictEqual(body, { extraInfo: { 'name.particle': 'x' }, 'custom.property': 'y' });
+  });
+
+  it('should name form parts with brackets for nesting and arrays', function () {
+    // ARRANGE
+    const extraInfo = { field: 'extraInfo', type: 'Object' };
+    const secrets = { field: 'extraInfo.secrets', type: 'Object[]', isArray: true, parentNode: Object.assign({ path: 'extraInfo' }, extraInfo) };
+    const key = { field: 'extraInfo.secrets.key', type: 'String', parentNode: Object.assign({ path: 'extraInfo.secrets' }, secrets) };
+    const hireDate = { field: 'extraInfo.hireDate', type: 'Date', parentNode: Object.assign({ path: 'extraInfo' }, extraInfo) };
+
+    // ACT
+    const names = [{ field: 'age' }, { field: 'tags', isArray: true }, { field: '"custom.property"' }, hireDate, key].map(formFieldName);
+
+    // ASSERT
+    assert.deepStrictEqual(names, ['age', 'tags[]', 'custom.property', 'extraInfo[hireDate]', 'extraInfo[secrets][][key]']);
   });
 });

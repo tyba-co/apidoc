@@ -174,7 +174,7 @@ Documents a field of the request body and feeds the generated body example.
 
 **Notes**
 
-- A file is a `{File}` field; put its format in the allowed values (`{File="csv"}`) and describe its columns with [`@apiFileColumn`](#apifilecolumn). See [Files in the body](structure.md#files-in-the-body).
+- A file is a `{File}` field; put its format in the allowed values (`{File="csv"}`) and describe its columns with [`@apiFileColumn`](#apifilecolumn). A body with a file is a `multipart/form-data` request, and the example shows it as raw multipart and `curl`. See [Files in the body](structure.md#files-in-the-body).
 - A `{Boolean}` field gets a `checked` flag when it has any default value, which pre-ticks the checkbox of the form-data sample request.
 - The Request Body section renders an example JSON generated from these fields unless an `@apiParamExample` of type `json` exists. See [The body example](structure.md#the-body-example).
 - Not checked against the URL.

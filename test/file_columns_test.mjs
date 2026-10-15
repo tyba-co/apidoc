@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { columnLetter, delimitedText, describeFiles, hasJsonFields, isFileType } from '../template/src/file_columns.mjs';
+import { columnLetter, delimitedText, describeFiles, exampleValue, hasFiles, isFileType } from '../template/src/file_columns.mjs';
 
 const body = [
   { field: 'sales', type: 'File', allowedValues: ['"csv"'], size: '5MB', description: '<p>Monthly export.</p>' },
@@ -22,11 +22,19 @@ describe('file columns', function () {
     assert.ok(!isFileType(undefined));
   });
 
-  it('should tell whether a body has fields that can go in JSON', function () {
+  it('should tell whether a body has a file, which makes the request multipart', function () {
     // ASSERT
-    assert.ok(hasJsonFields(body));
-    assert.ok(!hasJsonFields([body[0]]));
-    assert.ok(!hasJsonFields(undefined));
+    assert.ok(hasFiles(body));
+    assert.ok(!hasFiles([body[1]]));
+    assert.ok(!hasFiles(undefined));
+  });
+
+  it('should take the example value from the default, then the first allowed value, then the type', function () {
+    // ASSERT
+    assert.strictEqual(exampleValue({ type: 'Number', defaultValue: '7' }), '7');
+    assert.strictEqual(exampleValue({ type: 'String', allowedValues: ['"A"', '"B"'] }), 'A');
+    assert.strictEqual(exampleValue({ type: 'Date' }), '2026-01-31');
+    assert.strictEqual(exampleValue({ type: 'Mixed' }), '');
   });
 
   it('should name columns like a spreadsheet', function () {

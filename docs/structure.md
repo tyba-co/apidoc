@@ -440,7 +440,7 @@ The form is built from the endpoint's `@apiHeader`, `@apiParam`, `@apiQuery` and
 
 ## Files in the body
 
-A file sent in the body is an `@apiBody` field of type `File`. Its format goes in the allowed values, so the same `="..."` that restricts a string describes the accepted extensions. For a tabular file (`csv`, `tsv`, `xlsx`), `@apiFileColumn` lists the columns the file must have.
+A file is sent as `multipart/form-data`, so a body with a `File` field is a multipart request: every `@apiBody` field is one part of it, and the field name is the name of the part. The file is the part with that name and a `filename`; the other fields are plain parts. Declare the file as an `@apiBody` field of type `File`. Its format goes in the allowed values, so the same `="..."` that restricts a string describes the accepted extensions. For a tabular file (`csv`, `tsv`, `xlsx`), `@apiFileColumn` lists the columns the file must have.
 
 ```js
 /**
@@ -462,17 +462,17 @@ A file sent in the body is an `@apiBody` field of type `File`. Its format goes i
 
 What the site shows under "Request Body":
 
-- In the field table, the `users` row has type `File`, its accepted formats (`csv`) and its size limit (`5MB`).
+- The heading is marked `multipart/form-data`. In the field table, the `users` row has type `File`, its accepted formats (`csv`) and its size limit (`5MB`).
 - A card per file with the format and whether it is required, a table of **expected columns** (position, name, type, an example value, description, allowed values, and an `optional` mark) and an **example file**: a spreadsheet-style preview with the column letters and the header row, plus a tab with the raw CSV ready to copy.
-- The generated JSON example is left out when the body has only files, because a multipart upload has no JSON.
+- The generated example is the multipart request itself, in two tabs: the raw HTTP request (with the file part, its `filename` and `Content-Type`, and the CSV content built from the columns) and the equivalent `curl` command with `-F`. It replaces the JSON example, because a multipart body has no JSON. Nested fields get bracket names, like `extraInfo[hireDate]` and `tags[]`, the same as in the sample request form.
 
 Rules:
 
 - The `(file)` of `@apiFileColumn` is the name of the `File` field; without it, the column belongs to the first file. Columns whose name matches no file field get their own card.
 - The order of the tags is the order of the columns, and the example row uses the `=example` value, then the first allowed value, then a placeholder by type.
 - Quote a column name that has spaces or dots: `"Hire date"`. See [Field names and nested bodies](#field-names-and-nested-bodies) for the same quoting in `@apiBody`.
-- Several files are several `File` fields (or one `{File[]}`); give each its own `(file)` group.
-- In the form-data variant of the sample request, each `File` field is a file input. apidoc documents the upload; it does not validate it.
+- Several files are several `File` fields, or one `{File[]}`, which is shown as two parts with the same name. Give each file its own `(file)` group.
+- The sample request starts as `multipart/form-data` when the body has a file: each `File` field is a file input (`multiple` for `File[]`), and the chosen files are sent as real file parts. apidoc documents the upload; it does not validate it.
 
 ## Field names and nested bodies
 

@@ -16,10 +16,10 @@ const stripQuotes = value => value.replace(/^["']|["']$/g, '');
 export const isFileType = type => typeof type === 'string' && type.replace('[]', '').toLowerCase() === 'file';
 
 /**
- * @param {Object[]} bodyFields
- * @returns {Boolean} whether at least one field can be part of a JSON body
+ * @param {Object[]} [bodyFields]
+ * @returns {Boolean} whether the body has a File field, which makes the request multipart/form-data
  */
-export const hasJsonFields = bodyFields => (bodyFields || []).some(field => !isFileType(field.type));
+export const hasFiles = bodyFields => (bodyFields || []).some(field => isFileType(field.type));
 
 /**
  * @param {Number} index zero based
@@ -49,10 +49,10 @@ export function delimitedText (rows, delimiter) {
 }
 
 /**
- * @param {Object} column
- * @returns {String} the value shown for the column in the example row
+ * @param {Object} column a column or a body field
+ * @returns {String} the default, else the first allowed value, else a placeholder by type
  */
-function exampleValue (column) {
+export function exampleValue (column) {
   if (column.defaultValue !== undefined && column.defaultValue !== '') { return String(column.defaultValue); }
   if (column.allowedValues && column.allowedValues.length > 0) { return stripQuotes(column.allowedValues[0]); }
   return SAMPLES_BY_TYPE[(column.type || '').toLowerCase()] || '';
