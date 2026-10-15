@@ -1,6 +1,6 @@
 {
   "name": "@tyba-co/apidoc",
-  "version": "1.4.5",
+  "version": "1.5.0",
   "description": "RESTful web API Documentation Generator",
   "author": "Forked by Tyba - github.com/tyba-co/tyba.co",
   "license": "MIT",
