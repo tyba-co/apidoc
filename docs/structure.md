@@ -538,3 +538,13 @@ Hovering a key or a scalar value (string, number, boolean or null) in the exampl
 - On the generated example, the tooltip text for a key that cannot nest also says `cannot nest: its parent is not declared as an Object`, and the key is red.
 - In your own `@apiParamExample` the keys are matched to your `@apiBody` fields by their dotted path (arrays add no path segment), so `address` and `address.city` get tooltips in the example above. Keys that match no `@apiBody` field get no tooltip, and the red marker is never used there.
 - Tooltips are attached only when the key paths found in the highlighted JSON line up with the highlighted tokens. An example that is not valid JSON-like text may get none.
+
+### Autocomplete in the sample request
+
+The JSON textarea of "Send a Sample Request" suggests the keys you declared with `@apiBody`, so a body is quick to write by hand.
+
+- **Keys.** Type `"` inside an object, or press Ctrl+Space, to see the keys that object can take, filtered as you type. The list follows the nesting: inside `address` it offers `address.city`, not the root fields, and it goes through arrays of objects. Keys already present in that object are left out.
+- **Accepting.** Enter or Tab inserts `"key": value` with the default of the field (`""`, `0`, `false`, `{}`, `[]` or `[{}]` by type) and puts the cursor where you continue typing. When another key follows, a comma is added. Accepting on a key that is already complete only renames it.
+- **Values.** After `:` it offers `true` and `false` for a `{Boolean}` field and the allowed values of a field declared like `{String="ASC","DESC"}`.
+- **Navigating.** The arrow keys move, Escape closes the list, and hovering an entry shows the field description. The details next to each key are the same `Type · required|optional` as the tooltips.
+- **Not covered.** Free text values are not suggested, and the Parameters textarea of endpoints documented with `@apiParam` has no autocomplete.
