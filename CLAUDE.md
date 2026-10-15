@@ -7,9 +7,10 @@ Fork of [apidoc](https://apidocjs.com) published as `@tyba-co/apidoc` to GitHub 
 ```bash
 npm test                 # node:test, test/**/*_test.*js (mocha-style globals from test/support/node_test_globals.mjs)
 npm run test:mocha       # same suite under mocha
-npm run eslint           # lib, bin/apidoc, template/src
+npm run eslint           # lib, bin/apidoc, template/src, scripts
 npm run pre-commit       # eslint + test
 npm run build-example    # generates ./tmp/apidoc-output from example/
+npm run build-pages      # GitHub Pages site into ./tmp/site: landing, docs/ and example/
 npm run serve            # build-example + nginx on :8080 (docker)
 ```
 
@@ -29,6 +30,8 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - `example/` — sample sources and `apidoc.json`; doubles as the CI smoke test via `build-example`.
 - `skills/apidoc/` — agent skill shipped in the npm package; `apidoc install-skill` (`lib/install_skill.js`, dispatched in `bin/apidoc` before commander) copies it to `.claude/skills/apidoc`. `.claude-plugin/marketplace.json` exposes the same skill as a Claude Code plugin.
 - `vscode/` — VS Code extension (snippets + `apidoc.json` schema), not published to npm; `cd vscode && npm run package` builds the `.vsix`.
+- `docs/` — user documentation in markdown (getting started, structure, tag reference, configuration, tooling). `scripts/build-pages.js` renders it with markdown-it and Prism, and `.github/workflows/pages.yml` publishes it with the example to GitHub Pages on every push to `master`. Neither ships in the npm package.
+- Field names: a quoted segment (`meta."trace.id"`, `"custom.property"`) is a literal key containing a dot. `template/src/field_path.mjs` is the one place that splits and unquotes field paths; the body example in `template/index.html` marks a dotted key in red when its parent is not declared as `Object`.
 
 ## Conventions
 
@@ -39,7 +42,8 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - Keep upstream code diffable: avoid reformatting or renaming upstream files, so merging upstream releases stays cheap. Tyba-specific work is mostly in `template/` (layout, sidebar, tabs, responsiveness).
 - New behavior ships with a test next to the closest existing one in `test/`. Parser tests: `test/core/parsers/`. Template/ESM tests: `*_test.mjs`.
 - Tests must run under both node:test and mocha: use only `describe`, `it`, `before`, `after` (no `beforeEach`/`afterEach`, `.only`, `this.timeout()`; chain `it(...).timeout(ms)` instead).
-- Adding or changing a parser means updating `vscode/snippets/tags.json` and `skills/apidoc/references/tags.md`; `test/vscode_snippets_test.js` and `test/skill_sync_test.js` fail until both match `lib/core/index.js`.
+- Adding or changing a parser means updating `vscode/snippets/tags.json`, `skills/apidoc/references/tags.md` and a `### @apiXxx` heading in `docs/tags.md`; `test/vscode_snippets_test.js`, `test/skill_sync_test.js` and `test/build_pages_test.js` fail until all match `lib/core/index.js`.
+- Every `js` code fence in `docs/` and in the skill must be a valid apidoc block (checked with `--dry-run --warn-error`); use a `text` fence for anything that is not.
 
 ## Git and release
 
