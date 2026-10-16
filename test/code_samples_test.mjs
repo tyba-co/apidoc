@@ -2,8 +2,6 @@ import assert from 'assert';
 
 import { codeSamples, pythonLiteral, requestModel } from '../template/src/code_samples.mjs';
 
-globalThis.window = { navigator: { language: 'en-US' } };
-
 const bearer = { auth: [{ name: 'Token', type: 'bearer' }] };
 const lookup = {
   type: 'get',
@@ -29,6 +27,14 @@ const create = {
 const bySample = (article, project) => Object.fromEntries(codeSamples(article, project).map(sample => [sample.key, sample.code]));
 
 describe('code samples', function () {
+  before(function () {
+    globalThis.window = { navigator: { language: 'en-US' } };
+  });
+
+  after(function () {
+    delete globalThis.window;
+  });
+
   it('should fill the path, the required query and the headers, and add the credentials', function () {
     // ACT
     const model = requestModel(lookup, bearer);
