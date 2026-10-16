@@ -10,6 +10,9 @@
  */
 import $ from 'jquery';
 import UrlProcessor from './sampreq_url_processor.mjs';
+import { buildRequestBody } from './request_body.mjs';
+import { withQuery } from './auth_request.mjs';
+import { currentAuth } from './try_settings.mjs';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-json';
 
@@ -161,6 +164,12 @@ function collectValues ($root) {
           }
         }
 
+        // An optional field left empty is not sent
+        if (!value && isOptional) {
+          $el.removeClass(CSS_CLASSES.BORDER_DANGER);
+          return true;
+        }
+
         // Validate required fields
         if (!value && !isOptional && el.type !== 'checkbox') {
           $el.addClass(CSS_CLASSES.BORDER_DANGER);
@@ -180,20 +189,24 @@ function collectValues ($root) {
     parameters[family] = inputValues;
   });
 
-  // Handle JSON body special case
+  // how the body is encoded depends on which body container is on screen
   const $bodyJson = $root.find('[data-family="body-json"]');
+  const $bodyBinary = $root.find('[data-family="body-binary"]');
+  const $formContainer = $root.find('[data-body-encoding]:visible');
+  if (!parameters.header) parameters.header = {};
 
   if ($bodyJson.length > 0 && $bodyJson.is(':visible')) {
-    const jsonValue = $bodyJson.val();
-    logger.debug('Using JSON body mode', { hasValue: !!jsonValue });
-
-    parameters.body = jsonValue || '';
-    if (!parameters.header) parameters.header = {};
-    parameters.header['Content-Type'] = 'application/json';
-  } else {
-    logger.debug('Using form-data mode');
-    if (!parameters.header) parameters.header = {};
-    parameters.header['Content-Type'] = 'multipart/form-data';
+    const mime = $bodyJson.data('mime') || 'application/json';
+    parameters.encoding = /json/.test(mime) ? 'json' : 'text';
+    parameters.mime = mime;
+    parameters.text = $bodyJson.val() || '';
+  } else if ($bodyBinary.length > 0 && $bodyBinary.is(':visible')) {
+    parameters.encoding = 'binary';
+    parameters.mime = $bodyBinary.data('mime');
+    parameters.file = $bodyBinary[0].files[0];
+    $bodyBinary.toggleClass(CSS_CLASSES.BORDER_DANGER, !parameters.file);
+  } else if ($formContainer.length > 0) {
+    parameters.encoding = $formContainer.data('body-encoding');
   }
 
   logger.debug('Final collected parameters', parameters);
@@ -244,38 +257,26 @@ function sendSampleRequest (group, name, version, method) {
   }
 
   const parameters = collectValues($root);
-  const url = getHydratedUrl($root, parameters.query);
+  const auth = currentAuth($root.find('.sample-request'));
+  const url = withQuery(getHydratedUrl($root, parameters.query), auth.query);
 
-  // Prepare request configuration
+  // Prepare request configuration; a header filled in by hand wins over the credentials
   const requestConfig = {
     url: url,
-    headers: parameters.header || {},
+    headers: Object.assign({}, auth.headers, parameters.header),
     type: method.toUpperCase(),
     success: (data, status, jqXHR) => displaySuccess($root, data, status, jqXHR),
     error: (jqXHR, textStatus, error) => displayError($root, jqXHR, textStatus, error),
   };
 
-  // Handle request body based on content type
-  if (parameters.header && parameters.header['Content-Type'] === 'application/json') {
-    // JSON body
-    requestConfig.data = parameters.body;
+  // The browser sets the Content-Type of multipart, with its boundary
+  delete requestConfig.headers['Content-Type'];
+  const hasBody = parameters.encoding !== undefined && !['GET', 'HEAD'].includes(method.toUpperCase());
+  if (hasBody) {
+    const body = buildRequestBody({ encoding: parameters.encoding, values: parameters.body, text: parameters.text, file: parameters.file, mime: parameters.mime });
+    requestConfig.data = body.data;
     requestConfig.processData = false;
-    requestConfig.contentType = 'application/json';
-  } else {
-    // Form data
-    const formData = new FormData();
-    if (parameters.body && typeof parameters.body === 'object') {
-      for (const [name, value] of Object.entries(parameters.body)) {
-        const values = Array.isArray(value) ? value : [value];
-        values.forEach(item => formData.append(name, item));
-      }
-    }
-    requestConfig.data = formData;
-    requestConfig.processData = false;
-    requestConfig.contentType = false; // Let browser set multipart boundary
-
-    // Remove Content-Type header to let browser handle it
-    delete requestConfig.headers['Content-Type'];
+    requestConfig.contentType = body.contentType;
   }
 
   // Show loading state

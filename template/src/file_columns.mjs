@@ -7,7 +7,29 @@ const UNSPECIFIED_FILE = 'Columns';
 const DELIMITERS = { csv: ',', tsv: '\t' };
 const SAMPLES_BY_TYPE = { string: 'text', number: '0', boolean: 'true', date: '2026-01-31', datetime: '2026-01-31T10:00:00Z', email: 'ana@example.com' };
 
+const CONTENT_TYPES = {
+  csv: 'text/csv',
+  tsv: 'text/tab-separated-values',
+  txt: 'text/plain',
+  json: 'application/json',
+  xml: 'application/xml',
+  pdf: 'application/pdf',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  zip: 'application/zip',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+};
+
 const stripQuotes = value => value.replace(/^["']|["']$/g, '');
+
+/**
+ * @param {String} format file extension, such as csv
+ * @returns {String} its media type
+ */
+export const contentTypeOfFormat = format => CONTENT_TYPES[format] || 'application/octet-stream';
 
 /**
  * @param {String} [type]
@@ -79,19 +101,39 @@ function describeColumn (column, index) {
 
 /**
  * @param {String} name
- * @param {Object} [field] the File field of the body, when there is one
+ * @param {String} format
+ * @param {String} [text] the content of the file, when it is text
+ * @returns {String} the HTTP response that downloads the file
+ */
+function rawFileResponse (name, format, text) {
+  return [
+    'HTTP/1.1 200 OK',
+    `Content-Type: ${contentTypeOfFormat(format)}`,
+    `Content-Disposition: attachment; filename="${name}.${format}"`,
+    '',
+    text === undefined ? '[file content]' : text,
+  ].join('\n');
+}
+
+/**
+ * @param {String} name
+ * @param {Object} [field] the File field, when there is one
  * @param {Object[]} columns
+ * @param {String} side body or response
  * @returns {Object}
  */
-function buildSpec (name, field, columns) {
+function buildSpec (name, field, columns, side) {
   const allowed = field && field.allowedValues ? field.allowedValues : [];
   const formats = allowed.map(value => stripQuotes(value).toLowerCase());
   const described = columns.map(describeColumn);
   const delimiter = DELIMITERS[formats[0]];
   const header = described.map(column => column.name);
   const row = described.map(column => column.example);
+  const text = delimiter === undefined ? undefined : delimitedText([header, row], delimiter);
+  const response = side === 'response' && formats.length > 0 ? rawFileResponse(name, formats[0], text) : undefined;
   return {
     name,
+    side,
     formats,
     formatLabel: formats.map(format => format.toUpperCase()).join(' / '),
     size: field && field.size,
@@ -102,39 +144,60 @@ function buildSpec (name, field, columns) {
     letters: described.map(column => column.letter),
     header,
     rows: [row],
-    text: delimiter === undefined ? undefined : delimitedText([header, row], delimiter),
+    text,
+    response,
+    tabs: [{ key: 'sheet', title: 'Preview' }, ...text === undefined ? [] : [{ key: 'text', title: formats[0].toUpperCase() }], ...response === undefined ? [] : [{ key: 'response', title: 'Response' }]],
+    tabbed: text !== undefined || response !== undefined,
   };
 }
 
 /**
- * One entry per File field that has columns, in body order, plus one for every group of columns
- * that matches no File field. Columns written without a (file) belong to the first File field.
+ * The File fields that have columns, for the request body and for the response, plus one entry for every
+ * group of columns that matches no File field. Columns written without a (file) belong to the first File
+ * field of the body, or of the response when the body has none.
  *
- * @param {Object[]} [bodyFields] @apiBody entries
- * @param {Object[]} [columns] @apiFileColumn entries
- * @returns {Object[]}
+ * @param {Object} endpoint
+ * @param {Object[]} [endpoint.body] @apiBody entries
+ * @param {Object} [endpoint.success] the success fields, by group
+ * @param {Object[]} [endpoint.fileColumns] @apiFileColumn entries
+ * @returns {{body: Object[], response: Object[]}}
  */
-export function describeFiles (bodyFields, columns) {
-  const files = (bodyFields || []).filter(field => isFileType(field.type));
-  const allColumns = columns || [];
+export function describeAllFiles ({ body, success, fileColumns }) {
+  const bodyFiles = (body || []).filter(field => isFileType(field.type));
+  const groups = success && success.fields ? success.fields : {};
+  const responseFields = Object.values(groups).flat();
+  const responseFiles = responseFields.filter(field => isFileType(field.type));
+  const allColumns = fileColumns || [];
+  const owner = bodyFiles[0] || responseFiles[0];
   const assigned = new Set();
 
-  const specs = [];
-  files.forEach((file, index) => {
+  const belongsTo = (file, name) => column => {
+    if (assigned.has(column)) { return false; }
+    if (column.group === name) { return true; }
+    return file === owner && column.group === UNSPECIFIED_FILE;
+  };
+  const specsFor = (files, side) => files.flatMap(file => {
     const name = unquoteField(file.field);
-    const belongs = column => {
-      if (column.group === name) { return true; }
-      return index === 0 && column.group === UNSPECIFIED_FILE;
-    };
-    const mine = allColumns.filter(belongs);
-    if (mine.length === 0) { return; }
+    const mine = allColumns.filter(belongsTo(file, name));
     mine.forEach(column => assigned.add(column));
-    specs.push(buildSpec(name, file, mine));
+    if (mine.length === 0) { return []; }
+    return [buildSpec(name, file, mine, side)];
   });
 
+  const bodySpecs = specsFor(bodyFiles, 'body');
+  const responseSpecs = specsFor(responseFiles, 'response');
   const orphans = allColumns.filter(column => !assigned.has(column));
   [...new Set(orphans.map(column => column.group))].forEach(group => {
-    specs.push(buildSpec(group, undefined, orphans.filter(column => column.group === group)));
+    bodySpecs.push(buildSpec(group, undefined, orphans.filter(column => column.group === group), 'body'));
   });
-  return specs;
+  return { body: bodySpecs, response: responseSpecs };
+}
+
+/**
+ * @param {Object[]} [bodyFields] @apiBody entries
+ * @param {Object[]} [columns] @apiFileColumn entries
+ * @returns {Object[]} the files of the request body that have columns
+ */
+export function describeFiles (bodyFields, columns) {
+  return describeAllFiles({ body: bodyFields, fileColumns: columns }).body;
 }

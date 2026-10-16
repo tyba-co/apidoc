@@ -108,6 +108,131 @@ function postUser () { }
 function importUsers () { }
 
 /**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 0.3.0
+ * @apiName RequestToken
+ * @apiGroup Auth
+ * @apiPermission none
+ *
+ * @apiDescription Exchange credentials for an access token. The body is form encoded, not JSON.
+ *
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username=ana@example.com User name.
+ * @apiBody {String} [password] Password, with the password grant.
+ * @apiBody {String} [refresh_token] Refresh token, with the refresh_token grant.
+ *
+ * @apiSuccess {String} access_token Bearer token.
+ * @apiSuccess {Number} expires_in Seconds until it expires.
+ */
+function requestToken () { }
+
+/**
+ * @api {put} /user/:id/avatar Upload an avatar
+ * @apiVersion 0.3.0
+ * @apiName UploadAvatar
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription The image is the whole body of the request, not a multipart part.
+ *
+ * @apiContentType image/png
+ * @apiParam {Number} id Id of the user.
+ * @apiBody {File{2MB}="png"} avatar The image.
+ */
+function uploadAvatar () { }
+
+/**
+ * @api {post} /order/xml Create an order from XML
+ * @apiVersion 0.3.0
+ * @apiName CreateOrderXml
+ * @apiGroup Order
+ * @apiPermission none
+ *
+ * @apiContentType application/xml
+ * @apiBody {Number} id Order id (element <code>id</code>).
+ * @apiBody {String} customer Customer name (element <code>customer</code>).
+ * @apiParamExample {xml} Request:
+ *     <order>
+ *       <id>1</id>
+ *       <customer>Ana</customer>
+ *     </order>
+ *
+ * @apiSuccess {Number} id Id of the created order.
+ */
+function createOrderXml () { }
+
+/**
+ * @api {get} /user/export Download the users
+ * @apiVersion 0.3.0
+ * @apiName ExportUsers
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription Downloads every user as a CSV file.
+ *
+ * @apiQuery {String="ACTIVE","BLOCKED"} [status] Only the users in this status.
+ *
+ * @apiSuccess {File="csv"} users The file, comma delimited, UTF-8.
+ * @apiFileColumn (users) {String} name Full name of the user.
+ * @apiFileColumn (users) {String} email=ana@example.com Email address.
+ * @apiFileColumn (users) {Date} "Hire date" Date when the user was hired.
+ * @apiFileColumn (users) {String="ADMIN","USER"} role=USER Role of the user.
+ * @apiResponseHeader {String} Content-Disposition="attachment; filename=users.csv" Name of the downloaded file.
+ * @apiResponseHeader {Number} X-Total-Count=250 Number of rows in the file.
+ */
+function exportUsers () { }
+
+/**
+ * @api {post} /user/export Start an export
+ * @apiVersion 0.3.0
+ * @apiName StartUserExport
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription Starts the export in the background: the answer is 202, and the result is read from the URL of the Location header.
+ *
+ * @apiSuccess (202 Accepted) {String} id Id of the export job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/user/export/42" URL to poll until the export is ready.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
+ */
+function startUserExport () { }
+
+/**
+ * @api {post} /webhooks/user-created User created
+ * @apiVersion 0.3.0
+ * @apiName UserCreatedWebhook
+ * @apiGroup Webhooks
+ * @apiPermission none
+ *
+ * @apiWebhook Sent to the URL registered by the client, every time a user is created. Answer with any 2xx within 5 seconds or it is retried.
+ *
+ * @apiHeader {String} X-Signature=sha256=9f86d0 HMAC of the payload with your secret.
+ * @apiBody {String} id Id of the user.
+ * @apiBody {String} email Email address of the user.
+ * @apiBody {Date} createdAt Creation date.
+ */
+function userCreatedWebhook () { }
+
+/**
+ * @api {get} /events Stream of events
+ * @apiVersion 0.3.0
+ * @apiName EventStream
+ * @apiGroup Webhooks
+ * @apiPermission none
+ *
+ * @apiStreaming {sse} Server-sent events: keep the connection open and read one event per user change.
+ *
+ * @apiQuery {String} [since] Id of the last event received, to resume the stream.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the changed user.
+ * @apiSuccessExample {http} Event:
+ *     event: user.updated
+ *     data: {"id":"42","name":"Ana"}
+ */
+function eventStream () { }
+
+/**
  * @api {put} /user/:id Change a User
  * @apiVersion 0.3.0
  * @apiName PutUser

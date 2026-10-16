@@ -17,8 +17,10 @@ import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
 import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
-import { describeFiles, hasFiles, isFileType } from './file_columns';
-import { multipartExample } from './multipart_example';
+import { describeAllFiles, hasFiles, isFileType } from './file_columns';
+import { bodyKind, bodyMime, hasNotableMime } from './body_kind';
+import { codeSamples } from './code_samples';
+import { requestExample } from './request_examples';
 import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
 
@@ -285,16 +287,53 @@ export function register () {
     return body2json(context);
   });
 
-  Handlebars.registerHelper('fileSpecs', function (bodyFields, columns) {
-    return describeFiles(bodyFields, columns);
+  Handlebars.registerHelper('fileSpecs', function (article, side) {
+    return describeAllFiles(article)[side];
   });
 
   Handlebars.registerHelper('hasFiles', function (bodyFields) {
     return hasFiles(bodyFields);
   });
 
-  Handlebars.registerHelper('multipartExample', function (article) {
-    return multipartExample(article);
+  Handlebars.registerHelper('requestExample', function (article) {
+    return requestExample(article);
+  });
+
+  Handlebars.registerHelper('bodyKind', function (article) {
+    return bodyKind(article);
+  });
+
+  Handlebars.registerHelper('bodyMime', function (article) {
+    return bodyMime(article);
+  });
+
+  Handlebars.registerHelper('hasNotableMime', function (article) {
+    return hasNotableMime(article);
+  });
+
+  Handlebars.registerHelper('hasTrySettings', function (project) {
+    return Boolean(project.auth && project.auth.length) || Boolean(project.environments && project.environments.length);
+  });
+
+  Handlebars.registerHelper('codeSamples', function (article) {
+    const project = typeof API_PROJECT === 'undefined' ? undefined : API_PROJECT; // eslint-disable-line no-undef
+    return codeSamples(article, project);
+  });
+
+  Handlebars.registerHelper('canTry', function (article) {
+    return !article.webhook && !article.streaming;
+  });
+
+  Handlebars.registerHelper('isJsonKind', function (article) {
+    return bodyKind(article) === 'json';
+  });
+
+  Handlebars.registerHelper('isTextBody', function (article) {
+    return ['json', 'xml', 'text'].includes(bodyKind(article));
+  });
+
+  Handlebars.registerHelper('isFormBody', function (article) {
+    return ['multipart', 'urlencoded'].includes(bodyKind(article));
   });
 
   Handlebars.registerHelper('hasChoices', function (field) {

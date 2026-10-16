@@ -84,6 +84,20 @@
     ],
     "description": "apidoc: hide unless --private"
   },
+  "apiWebhook": {
+    "prefix": "@apiWebhook",
+    "description": "apidoc: the API sends this request to the client",
+    "body": [
+      "@apiWebhook ${1:Sent to the URL registered by the client when ...}"
+    ]
+  },
+  "apiStreaming": {
+    "prefix": "@apiStreaming",
+    "description": "apidoc: the response is a stream (sse, ndjson, websocket)",
+    "body": [
+      "@apiStreaming {${1|sse,ndjson,websocket|}} ${2:Description}"
+    ]
+  },
   "apiIgnore": {
     "prefix": "@apiIgnore",
     "body": [
@@ -140,6 +154,13 @@
       "@apiFileColumn (${1:file}) {${2|String,Number,Boolean,Date|}} ${3:column} ${4:Description}"
     ]
   },
+  "apiContentType": {
+    "prefix": "@apiContentType",
+    "description": "apidoc: Content-Type of the request body",
+    "body": [
+      "@apiContentType ${1|application/x-www-form-urlencoded,multipart/form-data,application/json,application/xml,text/plain,application/octet-stream|}"
+    ]
+  },
   "apiHeader": {
     "prefix": "@apiHeader",
     "body": [
@@ -153,6 +174,13 @@
       "@apiHeader {${1|String,Number,Boolean,Object,String[],Number[],Object[],Date,File|}} [${2:field}] ${3:Description}"
     ],
     "description": "apidoc: optional header field"
+  },
+  "apiResponseHeader": {
+    "prefix": "@apiResponseHeader",
+    "description": "apidoc: header of the response",
+    "body": [
+      "@apiResponseHeader {${1|String,Number,Boolean,Date|}} ${2:Header-Name} ${3:Description}"
+    ]
   },
   "apiSuccess": {
     "prefix": "@apiSuccess",

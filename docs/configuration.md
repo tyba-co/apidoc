@@ -87,7 +87,42 @@ The same settings inside `package.json`:
 | `footer` | object | none | Markdown page shown after the endpoints. See below. |
 | `input` | string[] | `["./src"]` | Source directories. Read only together with `-c`; see below. |
 | `output` | string | `doc/` | Output directory. Not honoured by the CLI; use `-o`. See below. |
+| `auth` | object[] | none | Credentials the sample requests can send, with an Authorize button. See [auth and environments](#auth-and-environments). |
+| `environments` | object[] | none | Base URLs for the sample requests, with a selector. See [auth and environments](#auth-and-environments). |
 | `template` | object | see below | Options of the generated site. |
+
+### auth and environments
+
+Two keys make the sample requests usable against a real API. Both need `sampleUrl`, which turns the sample requests on.
+
+```json
+{
+  "sampleUrl": "https://api.example.com",
+  "auth": [
+    { "name": "Bearer token", "type": "bearer" },
+    { "name": "API key", "type": "apiKey", "in": "header", "param": "X-API-Key" }
+  ],
+  "environments": [
+    { "name": "Sandbox", "url": "https://sandbox.api.example.com" },
+    { "name": "Production", "url": "https://api.example.com" }
+  ]
+}
+```
+
+**`auth`** adds an Authorize button under the project title. Each entry is one way to authenticate:
+
+| Key | Applies to | Meaning |
+| --- | --- | --- |
+| `name` | all | Name shown in the Authorize dialog. |
+| `type` | all | `bearer` sends `Authorization: Bearer <token>`; `apiKey` sends a key in a header or in the query; `basic` sends `Authorization: Basic` with the username and password. |
+| `header`, `prefix` | `bearer` | Header that carries the token (default `Authorization`) and the word before it (default `Bearer`). |
+| `in`, `param` | `apiKey` | `header` (default) or `query`, and the name of the header or parameter (default `X-API-Key`). |
+
+- The credentials are typed in the dialog and kept in the `sessionStorage` of the tab: they are gone when the tab closes, and they are never written to the generated files.
+- Every sample request sends them, except those of endpoints documented with `@apiPermission none`.
+- A header filled in by hand in the sample request form wins over the credentials.
+
+**`environments`** adds a selector with the base URLs. The first one is the default and the choice is remembered in the browser. The URL replaces `sampleUrl`: what comes after it in each sample request URL is kept. A sample URL that does not start with `sampleUrl` (a custom one in `@apiSampleRequest`) keeps its path and only changes its origin.
 
 ### header and footer
 
@@ -120,6 +155,7 @@ Set under the `template` key.
 | `showRequiredLabels` | boolean | `false` | Show a "required" label next to non-optional fields. Optional fields always show an "optional" label. |
 | `withGenerator` | boolean | `true` | Show the "Generated with @tyba-co/apidoc" line, with version and time. |
 | `withCompare` | boolean | `true` | Show the version dropdowns and the compare features. When `false`, the version is shown as plain text. |
+| `codeSamples` | boolean | `true` | Show cURL, JavaScript and Python samples under each endpoint. See [Code samples](structure.md#code-samples). |
 | `forceLanguage` | string | browser language | Language of the interface texts (labels, tooltips, buttons). Without it the site follows the first two letters of the browser language and falls back to English. |
 
 Allowed values for `forceLanguage`:
@@ -158,6 +194,7 @@ npx --no-install apidoc [options]
 | `-n, --dry-run` | off | Parse and validate, write nothing. Prints `Dry run mode enabled: no files created.` |
 | `--warn-error` | off | Treat warnings as errors: the first warning is printed as an error and the process exits with code 1 at once, so later problems are not reported until you fix it. |
 | `--write-json` | off | Also write the parsed data as `assets/api-data.json` in the output directory. |
+| `--openapi` | off | Also write `openapi.json` (OpenAPI 3.0.3) in the output directory. See [OpenAPI export](structure.md#openapi-export). |
 | `-p, --private` | off | Include endpoints marked with `@apiPrivate`. |
 | `-S, --single` | off | Produce one self-contained `index.html` (CSS and JavaScript inlined) in the output directory. |
 | `--filter-by <tag=value>` | none | Keep only blocks whose tag has exactly this value, plus all `@apiDefine` blocks. The tag name must be written in lower case, for example `--filter-by apigroup=User`; `apiGroup=User` matches nothing. |

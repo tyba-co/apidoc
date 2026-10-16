@@ -320,6 +320,83 @@ For `@apiError` the field is an error code, normally without a type. The Type co
 
 Nested response fields use the same dot notation and the same `Object` / `Object[]` parent rule as request bodies. See [Field names and nested bodies](#field-names-and-nested-bodies).
 
+
+## File responses, response headers and asynchronous endpoints
+
+An endpoint can return a file, for example a CSV export. Declare it as a `File` field of `@apiSuccess`, with the format in the allowed values, and describe the columns with `@apiFileColumn`, exactly as for a file in the body. Document the headers the server sends with `@apiResponseHeader`.
+
+```js
+/**
+ * @api {get} /sales/export Download the sales
+ * @apiVersion 1.0.0
+ * @apiName DownloadSales
+ * @apiGroup Sales
+ * @apiQuery {String} [month] Month, as YYYY-MM.
+ * @apiSuccess {File="csv"} sales The file, comma delimited, UTF-8.
+ * @apiFileColumn (sales) {Date} date Sale date.
+ * @apiFileColumn (sales) {Number} amount=1500 Amount in COP.
+ * @apiResponseHeader {String} Content-Disposition="attachment; filename=sales.csv" Name of the downloaded file.
+ * @apiResponseHeader {Number} X-Total-Count=250 Number of rows in the file.
+ */
+```
+
+Under the success table the site shows a card for the file: the format, the expected columns, and an example file as a spreadsheet preview, as the raw CSV and as the raw HTTP response (`200 OK` with `Content-Type` and `Content-Disposition`). The headers get a "Response Headers" table of their own, after the success fields.
+
+For an endpoint that works in the background, answer `202 Accepted` and point to the result with a header. There is no special tag: a success group, a `Location` header and a second endpoint for polling say it all.
+
+```js
+/**
+ * @api {post} /reports Start a report
+ * @apiVersion 1.0.0
+ * @apiName StartReport
+ * @apiGroup Report
+ * @apiBody {String} month Month, as YYYY-MM.
+ * @apiSuccess (202 Accepted) {String} id Id of the report job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/reports/42" URL to poll until the report is ready.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
+ */
+```
+
+Document the polling endpoint as an ordinary `GET` that answers `200` with the result and `202` while it is not ready; the `Location` header of the first answer is its URL.
+
+
+## Webhooks and streams
+
+Two kinds of endpoint are not a simple request and answer:
+
+- **Webhooks.** Your API calls the client. Declare the block as usual, with the method and an example path, and add `@apiWebhook`. The site marks it as a webhook, calls the body "Payload" and hides the sample request.
+- **Streams.** The response never ends: server-sent events or newline-delimited JSON. Add `@apiStreaming {sse}` and describe one event with `@apiSuccess` and an `@apiSuccessExample {http}`. The sample request is hidden.
+
+```js
+/**
+ * @api {post} /webhooks/payment-confirmed Payment confirmed
+ * @apiVersion 1.0.0
+ * @apiName PaymentConfirmedWebhook
+ * @apiGroup Webhooks
+ * @apiWebhook Sent when a payment is confirmed. Answer 2xx within 5 seconds.
+ * @apiHeader {String} X-Signature HMAC of the payload.
+ * @apiBody {String} paymentId Id of the payment.
+ * @apiBody {Number} amount Amount in cents.
+ */
+```
+
+```js
+/**
+ * @api {get} /payments/stream Payment events
+ * @apiVersion 1.0.0
+ * @apiName PaymentStream
+ * @apiGroup Payments
+ * @apiStreaming {sse} One event per payment change.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the payment.
+ * @apiSuccessExample {http} Event:
+ *     event: payment.confirmed
+ *     data: {"id":"p_1","amount":1500}
+ */
+```
+
+apidoc is for HTTP APIs: GraphQL, WebSocket and gRPC services do not fit a method and path, and are not modeled.
+
 ## Examples
 
 | Tag | Shown | Typical content |
@@ -409,6 +486,32 @@ An undefined permission name is not an error: it is shown without a popover.
 - `@apiPrivate` hides the block unless you build with `--private` (`-p`).
 - `@apiIgnore` skips the block completely, for work in progress or code that must never be documented.
 
+## Code samples
+
+Under every endpoint the site shows its request as **cURL**, **JavaScript** (`fetch`) and **Python** (`requests`), built from what you documented:
+
+- the path parameters (`@apiParam`) replaced in the URL with their example value;
+- the required query parameters (`@apiQuery`), and those with a default;
+- the request headers (`@apiHeader`) that are required or have a default; a secret header without an example, such as `Authorization`, gets a placeholder (`<token>`);
+- the credentials of the first `auth` scheme of `apidoc.json` as a placeholder, except for endpoints with `@apiPermission none`;
+- the body, according to its format: the JSON example for JSON, form parts with the file for `multipart/form-data`, `--data-urlencode` and `URLSearchParams` for form-encoded bodies, `--data-binary` for a binary body, and the first `@apiParamExample` for XML and text.
+
+The samples are generated, not written: there is nothing to maintain. Examples are the `=example` / default values of the fields, then the first allowed value, then a placeholder by type. Webhooks and streams have no samples. To turn them off, set `template.codeSamples` to `false`; see [Configuration](configuration.md#configuration-keys).
+
+## OpenAPI export
+
+`apidoc --openapi` writes `openapi.json` (OpenAPI 3.0.3) next to the site, so the same comments feed Postman, code generators and gateways:
+
+```bash
+npx --no-install apidoc -i src -o doc --openapi
+```
+
+- `url` and `environments` become `servers`; `auth` becomes `securitySchemes` and the global `security`. Endpoints with `@apiPermission none` get `security: []`.
+- Path parameters, `@apiQuery` and `@apiHeader` become `parameters`; the body becomes a `requestBody` in its format (JSON schema with nesting, required fields, sizes and allowed values; `multipart/form-data` with binary files and their `@apiFileColumn` columns; form-encoded, binary, XML and text bodies).
+- Success and error groups become responses by status (`Error 4xx` is `4XX`); `@apiResponseHeader` becomes response `headers`, and a `File` field in the success fields becomes a download with its media type.
+- `@apiWebhook` endpoints go under `x-webhooks`, and `@apiStreaming` adds `x-streaming`.
+- Only the newest version of each method and path is exported.
+
 ## Sample request
 
 An endpoint gets a "Send a Sample Request" form when it has a sample request URL, which comes from either place:
@@ -437,6 +540,66 @@ An endpoint gets a "Send a Sample Request" form when it has a sample request URL
 ```
 
 The form is built from the endpoint's `@apiHeader`, `@apiParam`, `@apiQuery` and `@apiBody` fields. `:id` in the URL is replaced with the value typed for the `id` field.
+
+## Body formats
+
+A body is JSON unless you say otherwise. `@apiContentType` declares the format, and the site adapts the example, the cURL command and the sample request to it. The `@apiBody` fields keep describing the content in every case.
+
+Form-encoded bodies, such as OAuth token endpoints:
+
+```js
+/**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 1.0.0
+ * @apiName RequestTokenForm
+ * @apiGroup Auth
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username=ana@example.com User name.
+ * @apiBody {String} [password] Password, with the password grant.
+ * @apiSuccess {String} access_token Bearer token.
+ */
+```
+
+The example is the raw request with the encoded body (`grant_type=password&username=ana%40example.com`) and a cURL command with `--data-urlencode`. The sample request has one input per field and sends the values form encoded. Nested fields use brackets (`address[city]`) and an array repeats its name.
+
+A binary body, where the whole body is one file and not a multipart part:
+
+```js
+/**
+ * @api {put} /users/:id/avatar Upload an avatar
+ * @apiVersion 1.0.0
+ * @apiName UploadAvatarBinary
+ * @apiGroup User
+ * @apiContentType image/png
+ * @apiParam {Number} id Id of the user.
+ * @apiBody {File{2MB}="png"} avatar The image.
+ */
+```
+
+The example shows `[binary content]` and `curl --data-binary @avatar.png`; the sample request has one file input and sends the chosen file with its Content-Type.
+
+XML and text bodies. There is no generated example, because the structure is yours: write it with `@apiParamExample`, and the sample request starts with it.
+
+```js
+/**
+ * @api {post} /orders/xml Create an order from XML
+ * @apiVersion 1.0.0
+ * @apiName CreateOrderXmlBody
+ * @apiGroup Order
+ * @apiContentType application/xml
+ * @apiBody {Number} id Order id.
+ * @apiBody {String} customer Customer name.
+ * @apiParamExample {xml} Request:
+ *     <order>
+ *       <id>1</id>
+ *       <customer>Ana</customer>
+ *     </order>
+ * @apiSuccess {Number} id Id of the created order.
+ */
+```
+
+A top-level JSON array is declared with a single optional `Object[]` field; see [The body example](#the-body-example). Files in a `multipart/form-data` body have their own section below.
 
 ## Files in the body
 

@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "description": "Documentation for the REST api access provided at AcmeCorp",
   "title": "Custom apiDoc browser title",
-  "url" : "https://api.example.com",
+  "url": "https://api.example.com",
   "sampleUrl": "https://apidoc.free.beeceptor.com",
   "output": "/tmp/apidoc-output",
   "input": [
@@ -29,5 +29,27 @@
     "withCompare": true,
     "withGenerator": true,
     "aloneDisplay": false
-  }
+  },
+  "auth": [
+    {
+      "name": "Bearer token",
+      "type": "bearer"
+    },
+    {
+      "name": "API key",
+      "type": "apiKey",
+      "in": "header",
+      "param": "X-API-Key"
+    }
+  ],
+  "environments": [
+    {
+      "name": "Sandbox",
+      "url": "https://apidoc.free.beeceptor.com"
+    },
+    {
+      "name": "Local",
+      "url": "http://localhost:3000"
+    }
+  ]
 }

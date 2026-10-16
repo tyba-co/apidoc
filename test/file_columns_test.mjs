@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { columnLetter, delimitedText, describeFiles, exampleValue, hasFiles, isFileType } from '../template/src/file_columns.mjs';
+import { columnLetter, delimitedText, describeAllFiles, describeFiles, exampleValue, hasFiles, isFileType } from '../template/src/file_columns.mjs';
 
 const body = [
   { field: 'sales', type: 'File', allowedValues: ['"csv"'], size: '5MB', description: '<p>Monthly export.</p>' },
@@ -106,5 +106,36 @@ describe('file columns', function () {
     // ASSERT
     assert.deepStrictEqual(describeFiles(body, []), []);
     assert.deepStrictEqual(describeFiles(undefined, undefined), []);
+  });
+
+  it('should describe a file of the response with the raw download response, apart from the body', function () {
+    // ARRANGE
+    const success = { fields: { 'Success 200': [{ field: 'report', type: 'File', allowedValues: ['"csv"'] }] } };
+    const reportColumns = [{ group: 'report', type: 'String', field: 'name' }, { group: 'report', type: 'Number', field: 'total' }];
+
+    // ACT
+    const { body: inBody, response } = describeAllFiles({ body, success, fileColumns: columns.concat(reportColumns) });
+
+    // ASSERT
+    assert.deepStrictEqual(inBody.map(spec => spec.name), ['sales']);
+    assert.deepStrictEqual(response.map(spec => spec.name), ['report']);
+    assert.strictEqual(response[0].side, 'response');
+    assert.strictEqual(response[0].response, 'HTTP/1.1 200 OK\nContent-Type: text/csv\nContent-Disposition: attachment; filename="report.csv"\n\nname,total\ntext,0');
+    assert.deepStrictEqual(response[0].tabs.map(tab => tab.title), ['Preview', 'CSV', 'Response']);
+    assert.ok(response[0].tabbed);
+    assert.strictEqual(inBody[0].response, undefined);
+  });
+
+  it('should give a column without a file to the response file when the body has none', function () {
+    // ARRANGE
+    const success = { fields: { 'Success 200': [{ field: 'out', type: 'File', allowedValues: ['"xlsx"'] }] } };
+
+    // ACT
+    const { body: inBody, response } = describeAllFiles({ body: [], success, fileColumns: [{ group: 'Columns', type: 'String', field: 'a' }] });
+
+    // ASSERT
+    assert.deepStrictEqual(inBody, []);
+    assert.strictEqual(response[0].name, 'out');
+    assert.deepStrictEqual(response[0].tabs.map(tab => tab.title), ['Preview', 'Response']);
   });
 });

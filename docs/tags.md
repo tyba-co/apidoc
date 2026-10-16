@@ -1,6 +1,6 @@
 # Tag reference
 
-Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (23 tags) plus `@apiIgnore`, which the block scanner handles itself.
+Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (27 tags) plus `@apiIgnore`, which the block scanner handles itself.
 
 Conventions used on this page:
 
@@ -14,6 +14,7 @@ Conventions used on this page:
 | --- | --- |
 | [`@api`](#api) | Declare an endpoint: method, URL and title |
 | [`@apiBody`](#apibody) | Request body field |
+| [`@apiContentType`](#apicontenttype) | Content-Type of the request body |
 | [`@apiDefine`](#apidefine) | Declare a reusable block, group title or permission |
 | [`@apiDeprecated`](#apideprecated) | Mark an endpoint deprecated |
 | [`@apiDescription`](#apidescription) | Markdown description |
@@ -31,11 +32,14 @@ Conventions used on this page:
 | [`@apiPermission`](#apipermission) | Declare the permission needed |
 | [`@apiPrivate`](#apiprivate) | Hide an endpoint unless `--private` |
 | [`@apiQuery`](#apiquery) | Query string parameter |
+| [`@apiResponseHeader`](#apiresponseheader) | Header of the response |
 | [`@apiSampleRequest`](#apisamplerequest) | Configure the sample request form |
+| [`@apiStreaming`](#apistreaming) | The response is a stream |
 | [`@apiSuccess`](#apisuccess) | Response field |
 | [`@apiSuccessExample`](#apisuccessexample) | Success response example |
 | [`@apiUse`](#apiuse) | Inline a defined block |
 | [`@apiVersion`](#apiversion) | Version of the block |
+| [`@apiWebhook`](#apiwebhook) | The API sends this request to a client |
 
 ## Field grammar
 
@@ -191,6 +195,55 @@ Documents a field of the request body and feeds the generated body example.
  * @apiBody {Boolean} [newsletter=true] Subscribe to the newsletter.
  * @apiBody {String[]} [roles] Role names.
  * @apiSuccess (201 Created) {String} id User id.
+ */
+```
+
+### @apiContentType
+
+Declares how the request body is encoded, when it is not plain JSON.
+
+**Syntax**
+
+```text
+@apiContentType type/subtype
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `type/subtype` | Yes | A media type such as `application/x-www-form-urlencoded`. Lower-cased; anything that is not `type/subtype` stops the run with `Content type not valid.` |
+
+What the site does with each Content-Type:
+
+| Content-Type | Request Body | Sample request |
+| --- | --- | --- |
+| `application/json` (default) | Generated JSON example and the hover tooltips | JSON editor with key completion |
+| `multipart/form-data` (default when the body has a `File` field) | Raw multipart request and `curl -F` | One input per field; files are sent as real parts |
+| `application/x-www-form-urlencoded` | Raw request with the encoded body and `curl --data-urlencode` | One input per field, sent form encoded |
+| `application/xml`, `text/xml`, `+xml` types | No generated example; write it with [`@apiParamExample`](#param-api-param-example) | Text area that starts with the first `@apiParamExample` of the endpoint, sent with that Content-Type |
+| `text/plain` and any other `text/*` | The same as XML | The same as XML |
+| Anything else, such as `application/octet-stream` or `image/png` | Raw request with `[binary content]` and `curl --data-binary` | A single file input; the file is the whole body |
+
+**Notes**
+
+- Without the tag the type is inferred: multipart when the body has a `File` field, JSON otherwise. A declared type always wins, even over a `File` field.
+- The type appears as a chip next to the "Request Body" heading, except for plain JSON.
+- The `@apiBody` fields are still documented in the table of the body, whatever the format. For a binary body the single `File` field describes the whole body (`@apiBody {File{2MB}="png"} avatar`).
+- Only one `@apiContentType` per endpoint; a second one replaces the first.
+- This describes the request; the content type of the response is described by the response examples.
+
+**Example**
+
+```js
+/**
+ * @api {post} /oauth/token Request an access token
+ * @apiVersion 1.0.0
+ * @apiName RequestToken
+ * @apiGroup Auth
+ * @apiContentType application/x-www-form-urlencoded
+ * @apiBody {String="password","refresh_token"} grant_type Grant type.
+ * @apiBody {String} username User name.
+ * @apiBody {String} [password] Password.
+ * @apiSuccess {String} access_token Bearer token.
  */
 ```
 
@@ -416,7 +469,7 @@ Documents one column of a tabular file sent in the request body, so the site can
 
 | Part | Required | Meaning |
 | --- | --- | --- |
-| `(file)` | No | Name of the `File` field of an [`@apiBody`](#param-api-body) the column belongs to. Without it the column belongs to the first `File` field. A name that matches no `File` field gets its own card, titled with that name. |
+| `(file)` | No | Name of the `File` field the column belongs to: an [`@apiBody`](#param-api-body) field, or an [`@apiSuccess`](#param-api-success) field for a file the endpoint returns. Without it the column belongs to the first `File` field of the body, or of the response when the body has none. A name that matches no `File` field gets its own card, titled with that name. |
 | `{type}` | Yes, in practice | `String`, `Number`, `Boolean`, `Date`... Shown in the Type column and used to build the example value. |
 | `column` | Yes | Header of the column. Put it in brackets for an optional column (`[age]`) and between double quotes when it has spaces or dots (`"Hire date"`). |
 | `=example` | No | Value shown in the Example column and in the example file. Without it the first allowed value is used, and without that a placeholder by type: `text`, `0`, `true` or `2026-01-31`. |
@@ -787,6 +840,43 @@ Documents a query string parameter.
  */
 ```
 
+### @apiResponseHeader
+
+Documents a header of the response, such as `Location`, `Content-Disposition` or `X-RateLimit-Remaining`. [`@apiHeader`](#param-api-header) is for the request.
+
+**Syntax**
+
+```text
+@apiResponseHeader [(group)] {type[{size}][=allowed]} name[=example] [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `(group)` | No | Heading of the table. Default `Response Headers`. Use another name, such as `(Response Headers 202)`, to keep the headers of a status apart. |
+| `{type}` | Yes, in practice | `String`, `Number`... shown in the Type column. |
+| `name` | Yes | Header name. `[name]` marks it optional. |
+| `=example` | No | Typical value, shown as "Default value". Quote it when it has spaces: `Content-Disposition="attachment; filename=users.csv"`. |
+| `description` | No | Markdown. |
+
+**Notes**
+
+- The headers are listed in a table after the success fields. They are documentation only: the sample request does not check the response headers.
+- It uses the field grammar of the other field tags, so allowed values and sizes work the same way.
+
+**Example**
+
+```js
+/**
+ * @api {post} /exports Start an export
+ * @apiVersion 1.0.0
+ * @apiName StartExport
+ * @apiGroup Export
+ * @apiSuccess (202 Accepted) {String} id Id of the export job.
+ * @apiResponseHeader (Response Headers 202) {String} Location="/exports/42" URL to poll.
+ * @apiResponseHeader (Response Headers 202) {Number} Retry-After=5 Seconds to wait before polling.
+ */
+```
+
 ### @apiSampleRequest
 
 Sets the URL used by the "Send a Sample Request" form, or turns the form off for this endpoint.
@@ -829,6 +919,42 @@ Sets the URL used by the "Send a Sample Request" form, or turns the form off for
  * @apiGroup Webhook
  * @apiBody {String} event Event name.
  * @apiSampleRequest off
+ */
+```
+
+### @apiStreaming
+
+Marks an endpoint whose response is a stream, such as server-sent events, instead of a single answer.
+
+**Syntax**
+
+```text
+@apiStreaming [{type}] [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `{type}` | No | Kind of stream: `sse`, `ndjson`, `websocket`... any word. Default `stream`. |
+| `description` | No | Markdown line shown under the URL. Without it the site says that the connection stays open and the server sends events. |
+
+**Notes**
+
+- The endpoint gets a `Stream · type` mark next to its method, and the sample request is hidden: a form cannot hold a connection open.
+- Document what each event looks like with `@apiSuccess` for its fields and an `@apiSuccessExample {http}` for the raw event.
+- apidoc only labels a stream. A WebSocket or gRPC service has no HTTP method and path to document; label its HTTP upgrade endpoint, or describe the protocol in a Markdown include.
+
+**Example**
+
+```js
+/**
+ * @api {get} /events Stream of events
+ * @apiVersion 1.0.0
+ * @apiName EventStream
+ * @apiGroup Events
+ * @apiStreaming {sse} One event per change; send the last event id in since to resume.
+ * @apiQuery {String} [since] Id of the last event received.
+ * @apiSuccess {String} event Event name.
+ * @apiSuccess {String} data JSON with the changed object.
  */
 ```
 
@@ -978,6 +1104,41 @@ Sets the version of the block, which drives version comparison and the choice of
  * @apiGroup User
  * @apiParam {String} id User id.
  * @apiSuccess {String} firstName First name.
+ */
+```
+
+### @apiWebhook
+
+Marks a block as a webhook: a request your API sends to a URL that the client registered, and not one the client sends to you.
+
+**Syntax**
+
+```text
+@apiWebhook [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `description` | No | Markdown line shown under the URL, for example when it is sent and what the client must answer. Without it the site says that the API sends this request to the URL the client registers. |
+
+**Notes**
+
+- The endpoint gets a `Webhook` mark next to its method, the request body is called "Payload", and the sample request is hidden, because there is nothing to send to your own API.
+- Describe what the client receives with the usual tags: `@apiBody` for the payload and `@apiHeader` for the headers the API adds, such as a signature. Use `@apiContentType` when the payload is not JSON.
+- The method is the one the API uses, and the path is the one the client chooses; put an example path in the `@api` line.
+
+**Example**
+
+```js
+/**
+ * @api {post} /webhooks/user-created User created
+ * @apiVersion 1.0.0
+ * @apiName UserCreatedWebhook
+ * @apiGroup Webhooks
+ * @apiWebhook Sent when a user is created. Answer with any 2xx within 5 seconds or it is retried.
+ * @apiHeader {String} X-Signature HMAC of the payload with your secret.
+ * @apiBody {String} id Id of the user.
+ * @apiBody {String} email Email address of the user.
  */
 ```
 

@@ -1,25 +1,10 @@
 /**
  * Example of the multipart/form-data request of an endpoint whose body has File fields.
  */
-import { describeFiles, exampleValue, isFileType } from './file_columns.mjs';
+import { contentTypeOfFormat, describeFiles, exampleValue, isFileType } from './file_columns.mjs';
 import { formFieldName, unquoteField } from './field_path.mjs';
 
 const BOUNDARY = '----apidoc-boundary';
-const CONTENT_TYPES = {
-  csv: 'text/csv',
-  tsv: 'text/tab-separated-values',
-  txt: 'text/plain',
-  json: 'application/json',
-  xml: 'application/xml',
-  pdf: 'application/pdf',
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  gif: 'image/gif',
-  zip: 'application/zip',
-  xls: 'application/vnd.ms-excel',
-  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-};
 
 /**
  * @param {Object[]} bodyFields
@@ -38,7 +23,7 @@ export function buildParts (bodyFields, specs) {
         parts.push({
           name,
           filename: format ? `${name}${copies > 1 ? copy : ''}.${format}` : `${name}${copies > 1 ? copy : ''}`,
-          contentType: CONTENT_TYPES[format] || 'application/octet-stream',
+          contentType: contentTypeOfFormat(format),
           content: spec && spec.text !== undefined ? spec.text : '[file content]',
         });
       }
@@ -53,7 +38,7 @@ export function buildParts (bodyFields, specs) {
  * @param {String} url
  * @returns {{path: String, host: String}}
  */
-function splitUrl (url) {
+export function splitUrl (url) {
   try {
     const parsed = new URL(url);
     return { path: parsed.pathname + parsed.search, host: parsed.host };
