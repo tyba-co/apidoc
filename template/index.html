@@ -251,6 +251,31 @@
     {{subTemplate "article-param-block" params=article.responseHeader _hasType=true section="responseHeader"}}
     {{subTemplate "article-param-block" params=article.error _col1="Name" _hasType=_hasTypeInErrorFields section="error"}}
 
+    {{#if template.codeSamples}}{{#if (canTry article)}}
+      <h2>Code samples</h2>
+      <ul class="nav nav-tabs nav-tabs-examples" role="tablist">
+        {{#each (codeSamples article)}}
+          <li class="nav-item" role="presentation"><a class="nav-link{{#ifCond @index '==' 0}} active{{/ifCond}}" href="#code-{{../id}}-{{key}}" role="tab" data-bs-toggle="tab">{{title}}</a></li>
+        {{/each}}
+      </ul>
+      <div class="tab-content">
+        {{#each (codeSamples article)}}
+          <div class="tab-pane fade{{#ifCond @index '==' 0}} show active{{/ifCond}}" id="code-{{../id}}-{{key}}">
+            <div class="card mb-4">
+              <div class="card-body p-0">
+                <pre
+                  class="mb-0"
+                  data-type="{{language}}"
+                  data-prismjs-copy="{{__ "Copy"}}"
+                  data-prismjs-copy-error="{{__ "Press Ctrl+C to copy"}}"
+                  data-prismjs-copy-success="{{__ "copied!"}}"
+                ><code class="language-{{language}}">{{code}}</code></pre>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}{{/if}}
     {{#if (canTry article)}}{{subTemplate "article-sample-request" article=article id=id}}{{/if}}
   </article>
 </script>

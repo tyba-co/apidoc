@@ -79,6 +79,7 @@
         "showRequiredLabels": { "type": "boolean", "default": false, "description": "Label required fields." },
         "withGenerator": { "type": "boolean", "default": true, "description": "Show the 'Generated with apidoc' line." },
         "withCompare": { "type": "boolean", "default": true, "description": "Enable the version compare dropdowns." },
+        "codeSamples": { "type": "boolean", "default": true, "description": "Show cURL, JavaScript and Python samples under each endpoint." },
         "forceLanguage": {
           "type": "string",
           "enum": ["ca", "cn", "cs", "de", "es", "en", "fr", "it", "nl", "pl", "pt", "pt_br", "ro", "ru", "tr", "vi", "zh", "zh_cn"],

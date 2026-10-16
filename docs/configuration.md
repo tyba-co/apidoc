@@ -155,6 +155,7 @@ Set under the `template` key.
 | `showRequiredLabels` | boolean | `false` | Show a "required" label next to non-optional fields. Optional fields always show an "optional" label. |
 | `withGenerator` | boolean | `true` | Show the "Generated with @tyba-co/apidoc" line, with version and time. |
 | `withCompare` | boolean | `true` | Show the version dropdowns and the compare features. When `false`, the version is shown as plain text. |
+| `codeSamples` | boolean | `true` | Show cURL, JavaScript and Python samples under each endpoint. See [Code samples](structure.md#code-samples). |
 | `forceLanguage` | string | browser language | Language of the interface texts (labels, tooltips, buttons). Without it the site follows the first two letters of the browser language and falls back to English. |
 
 Allowed values for `forceLanguage`:

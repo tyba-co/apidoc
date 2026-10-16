@@ -128,6 +128,7 @@ function init () {
     showRequiredLabels: false,
     withGenerator: true,
     withCompare: true,
+    codeSamples: true,
   };
 
   apiProject.template = Object.assign(defaultTemplateOptions, apiProject.template ?? {});

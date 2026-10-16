@@ -19,6 +19,7 @@ import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
 import { describeAllFiles, hasFiles, isFileType } from './file_columns';
 import { bodyKind, bodyMime, hasNotableMime } from './body_kind';
+import { codeSamples } from './code_samples';
 import { requestExample } from './request_examples';
 import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
@@ -312,6 +313,11 @@ export function register () {
 
   Handlebars.registerHelper('hasTrySettings', function (project) {
     return Boolean(project.auth && project.auth.length) || Boolean(project.environments && project.environments.length);
+  });
+
+  Handlebars.registerHelper('codeSamples', function (article) {
+    const project = typeof API_PROJECT === 'undefined' ? undefined : API_PROJECT; // eslint-disable-line no-undef
+    return codeSamples(article, project);
   });
 
   Handlebars.registerHelper('canTry', function (article) {

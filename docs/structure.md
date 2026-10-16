@@ -486,6 +486,18 @@ An undefined permission name is not an error: it is shown without a popover.
 - `@apiPrivate` hides the block unless you build with `--private` (`-p`).
 - `@apiIgnore` skips the block completely, for work in progress or code that must never be documented.
 
+## Code samples
+
+Under every endpoint the site shows its request as **cURL**, **JavaScript** (`fetch`) and **Python** (`requests`), built from what you documented:
+
+- the path parameters (`@apiParam`) replaced in the URL with their example value;
+- the required query parameters (`@apiQuery`), and those with a default;
+- the request headers (`@apiHeader`) that are required or have a default; a secret header without an example, such as `Authorization`, gets a placeholder (`<token>`);
+- the credentials of the first `auth` scheme of `apidoc.json` as a placeholder, except for endpoints with `@apiPermission none`;
+- the body, according to its format: the JSON example for JSON, form parts with the file for `multipart/form-data`, `--data-urlencode` and `URLSearchParams` for form-encoded bodies, `--data-binary` for a binary body, and the first `@apiParamExample` for XML and text.
+
+The samples are generated, not written: there is nothing to maintain. Examples are the `=example` / default values of the fields, then the first allowed value, then a placeholder by type. Webhooks and streams have no samples. To turn them off, set `template.codeSamples` to `false`; see [Configuration](configuration.md#configuration-keys).
+
 ## Sample request
 
 An endpoint gets a "Send a Sample Request" form when it has a sample request URL, which comes from either place:
