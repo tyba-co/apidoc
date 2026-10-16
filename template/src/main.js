@@ -29,6 +29,7 @@ import { __, setLanguage } from './locales/locale.mjs';
 // helpers for HandleBars
 import { register } from './hb_helpers';
 import { initBodyAutocomplete } from './body_autocomplete_ui';
+import { applyEnvironment, initTrySettings } from './try_settings';
 import { jsonKeyPaths } from './body_example_hover';
 import { unquoteField } from './field_path';
 
@@ -39,6 +40,7 @@ const SCALAR_TOKEN = /\b(string|number|boolean|null)\b/;
  */
 function highlightAll () {
   Prism.highlightAll();
+  applyEnvironment();
 
   document.querySelectorAll('pre[data-body-fields] code.language-json').forEach(code => {
     const pre = code.closest('pre');
@@ -71,6 +73,7 @@ function highlightAll () {
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
+  initTrySettings(API_PROJECT); // eslint-disable-line no-undef
   highlightAll();
   initBodyAutocomplete();
 

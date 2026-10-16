@@ -41,6 +41,36 @@
       "description": "Source directories. Applied only when apidoc runs with -c and no -i."
     },
     "output": { "type": "string", "description": "Output directory. Not honoured by the apidoc CLI, which always passes its own -o; use -o." },
+    "auth": {
+      "type": "array",
+      "description": "Credentials the sample requests can send. An Authorize button stores them for the tab; endpoints with @apiPermission none do not send them.",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "description": "Name shown in the Authorize dialog." },
+          "type": { "enum": ["bearer", "apiKey", "basic"], "description": "bearer: Authorization: Bearer <token>. apiKey: a header or query parameter. basic: Authorization: Basic." },
+          "header": { "type": "string", "description": "bearer only: header that carries the token. Default Authorization." },
+          "prefix": { "type": "string", "description": "bearer only: word before the token. Default Bearer." },
+          "in": { "enum": ["header", "query"], "description": "apiKey only: where the key goes. Default header." },
+          "param": { "type": "string", "description": "apiKey only: name of the header or query parameter. Default X-API-Key." }
+        }
+      }
+    },
+    "environments": {
+      "type": "array",
+      "description": "Base URLs for the sample requests, shown as a selector. The first one is the default. The URL goes in front of the path, in place of sampleUrl.",
+      "items": {
+        "type": "object",
+        "required": ["name", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "description": "Name shown in the selector, such as Sandbox." },
+          "url": { "type": "string", "description": "Base URL, such as https://sandbox.api.example.com." }
+        }
+      }
+    },
     "template": {
       "type": "object",
       "additionalProperties": false,

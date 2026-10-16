@@ -310,6 +310,10 @@ export function register () {
     return hasNotableMime(article);
   });
 
+  Handlebars.registerHelper('hasTrySettings', function (project) {
+    return Boolean(project.auth && project.auth.length) || Boolean(project.environments && project.environments.length);
+  });
+
   Handlebars.registerHelper('canTry', function (article) {
     return !article.webhook && !article.streaming;
   });

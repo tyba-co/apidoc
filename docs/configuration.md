@@ -87,7 +87,42 @@ The same settings inside `package.json`:
 | `footer` | object | none | Markdown page shown after the endpoints. See below. |
 | `input` | string[] | `["./src"]` | Source directories. Read only together with `-c`; see below. |
 | `output` | string | `doc/` | Output directory. Not honoured by the CLI; use `-o`. See below. |
+| `auth` | object[] | none | Credentials the sample requests can send, with an Authorize button. See [auth and environments](#auth-and-environments). |
+| `environments` | object[] | none | Base URLs for the sample requests, with a selector. See [auth and environments](#auth-and-environments). |
 | `template` | object | see below | Options of the generated site. |
+
+### auth and environments
+
+Two keys make the sample requests usable against a real API. Both need `sampleUrl`, which turns the sample requests on.
+
+```json
+{
+  "sampleUrl": "https://api.example.com",
+  "auth": [
+    { "name": "Bearer token", "type": "bearer" },
+    { "name": "API key", "type": "apiKey", "in": "header", "param": "X-API-Key" }
+  ],
+  "environments": [
+    { "name": "Sandbox", "url": "https://sandbox.api.example.com" },
+    { "name": "Production", "url": "https://api.example.com" }
+  ]
+}
+```
+
+**`auth`** adds an Authorize button under the project title. Each entry is one way to authenticate:
+
+| Key | Applies to | Meaning |
+| --- | --- | --- |
+| `name` | all | Name shown in the Authorize dialog. |
+| `type` | all | `bearer` sends `Authorization: Bearer <token>`; `apiKey` sends a key in a header or in the query; `basic` sends `Authorization: Basic` with the username and password. |
+| `header`, `prefix` | `bearer` | Header that carries the token (default `Authorization`) and the word before it (default `Bearer`). |
+| `in`, `param` | `apiKey` | `header` (default) or `query`, and the name of the header or parameter (default `X-API-Key`). |
+
+- The credentials are typed in the dialog and kept in the `sessionStorage` of the tab: they are gone when the tab closes, and they are never written to the generated files.
+- Every sample request sends them, except those of endpoints documented with `@apiPermission none`.
+- A header filled in by hand in the sample request form wins over the credentials.
+
+**`environments`** adds a selector with the base URLs. The first one is the default and the choice is remembered in the browser. The URL replaces `sampleUrl`: what comes after it in each sample request URL is kept. A sample URL that does not start with `sampleUrl` (a custom one in `@apiSampleRequest`) keeps its path and only changes its origin.
 
 ### header and footer
 

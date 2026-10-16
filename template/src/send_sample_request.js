@@ -11,6 +11,8 @@
 import $ from 'jquery';
 import UrlProcessor from './sampreq_url_processor.mjs';
 import { buildRequestBody } from './request_body.mjs';
+import { withQuery } from './auth_request.mjs';
+import { currentAuth } from './try_settings.mjs';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-json';
 
@@ -255,12 +257,13 @@ function sendSampleRequest (group, name, version, method) {
   }
 
   const parameters = collectValues($root);
-  const url = getHydratedUrl($root, parameters.query);
+  const auth = currentAuth($root.find('.sample-request'));
+  const url = withQuery(getHydratedUrl($root, parameters.query), auth.query);
 
-  // Prepare request configuration
+  // Prepare request configuration; a header filled in by hand wins over the credentials
   const requestConfig = {
     url: url,
-    headers: parameters.header || {},
+    headers: Object.assign({}, auth.headers, parameters.header),
     type: method.toUpperCase(),
     success: (data, status, jqXHR) => displaySuccess($root, data, status, jqXHR),
     error: (jqXHR, textStatus, error) => displayError($root, jqXHR, textStatus, error),

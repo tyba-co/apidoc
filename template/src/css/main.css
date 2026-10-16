@@ -1497,3 +1497,31 @@ td {
   color: var(--main-gray);
   font-size: 0.9rem;
 }
+
+.try-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.try-settings .form-select {
+  width: auto;
+  min-width: 10rem;
+}
+
+.try-settings-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--main-gray);
+}
+
+.try-auth-legend {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}

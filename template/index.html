@@ -88,6 +88,20 @@
     {{/if}}
   </div>
   <div class="clearfix"></div>
+  {{#if (hasTrySettings this)}}
+    <div class="try-settings">
+      {{#if environments.length}}
+        <label for="try-environment" class="try-settings-label">Environment</label>
+        <select id="try-environment" class="form-select form-select-sm">
+          {{#each environments}}<option value="{{url}}">{{name}}</option>{{/each}}
+        </select>
+      {{/if}}
+      {{#if auth.length}}
+        <button id="try-authorize" type="button" class="btn btn-sm btn-outline-primary">Authorize</button>
+        <span id="try-auth-state" class="chip chip-muted">not authorized</span>
+      {{/if}}
+    </div>
+  {{/if}}
 </script>
 
 <script id="template-header" type="text/x-handlebars-template">
@@ -563,7 +577,7 @@
 
 <script id="template-article-sample-request" type="text/x-handlebars-template">
   {{#if article.sampleRequest}}
-    <div class="card sample-request">
+    <div class="card sample-request"{{#each article.permission}}{{#ifCond name '===' 'none'}} data-public="true"{{/ifCond}}{{/each}}>
       <div class="card-header">
         <h3 class="mb-0">{{__ "Send a Sample Request"}}</h3>
       </div>
