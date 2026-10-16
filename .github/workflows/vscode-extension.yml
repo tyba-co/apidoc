@@ -1,0 +1,121 @@
+name: VS Code extension
+
+# Pull requests and pushes that touch vscode/ run the host tests and build the .vsix.
+# Pushing a tag vscode-vX.Y.Z (matching vscode/package.json) also publishes it to the
+# Visual Studio Marketplace (Entra ID via OIDC, vars AZURE_CLIENT_ID / AZURE_TENANT_ID)
+# and, if the OVSX_PAT secret is set, to Open VSX.
+# It does not create a GitHub release: that would trigger publishing.yml (npm).
+
+on:
+  push:
+    branches: [master]
+    paths: ['vscode/**', '.github/workflows/vscode-extension.yml']
+    tags: ['vscode-v*']
+  pull_request:
+    paths: ['vscode/**', '.github/workflows/vscode-extension.yml']
+  workflow_dispatch:
+    inputs:
+      marketplace-identity:
+        description: Only print the Marketplace member ID of the Entra app (to add it to the publisher)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: vscode
+
+jobs:
+  marketplace-identity:
+    if: inputs.marketplace-identity
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace
+    permissions:
+      id-token: write
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Print Marketplace member ID
+        working-directory: .
+        run: |
+          az rest --method get \
+            --url https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1-preview.3 \
+            --resource 499b84ac-1321-427f-aa17-267ca6975798 \
+            --query '{id: id, displayName: displayName}'
+
+  build:
+    if: ${{ !inputs.marketplace-identity }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vscode/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/vscode-v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#vscode-v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match vscode/package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Run host tests
+        run: xvfb-run -a npm run test:host
+
+      - name: Package
+        run: npx --yes @vscode/vsce@3.9.2 package --no-dependencies --out apidoc-vscode.vsix
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apidoc-vscode-vsix
+          path: vscode/apidoc-vscode.vsix
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/vscode-v')
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: apidoc-vscode-vsix
+          path: vscode
+
+      # Entra ID app with a federated credential for this repo's vscode-marketplace environment,
+      # added as a member of the tyba-co publisher. No PAT: global PATs end on 2026-12-01.
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Publish to Visual Studio Marketplace
+        run: npx --yes @vscode/vsce@3.9.2 publish --azure-credential --packagePath apidoc-vscode.vsix
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        if: env.OVSX_PAT != ''
+        run: npx --yes ovsx@0.10.6 publish apidoc-vscode.vsix
