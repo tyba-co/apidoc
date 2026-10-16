@@ -438,6 +438,42 @@ An endpoint gets a "Send a Sample Request" form when it has a sample request URL
 
 The form is built from the endpoint's `@apiHeader`, `@apiParam`, `@apiQuery` and `@apiBody` fields. `:id` in the URL is replaced with the value typed for the `id` field.
 
+## Files in the body
+
+A file is sent as `multipart/form-data`, so a body with a `File` field is a multipart request: every `@apiBody` field is one part of it, and the field name is the name of the part. The file is the part with that name and a `filename`; the other fields are plain parts. Declare the file as an `@apiBody` field of type `File`. Its format goes in the allowed values, so the same `="..."` that restricts a string describes the accepted extensions. For a tabular file (`csv`, `tsv`, `xlsx`), `@apiFileColumn` lists the columns the file must have.
+
+```js
+/**
+ * @api {post} /users/import Import users from a file
+ * @apiVersion 1.0.0
+ * @apiName ImportUsersFile
+ * @apiGroup User
+ * @apiDescription Upload a CSV file with one user per row. The first row holds the column names.
+ * @apiBody {File{5MB}="csv"} users Users to create, comma delimited, UTF-8.
+ * @apiBody {Boolean} [dryRun] Validate the file without creating anything.
+ * @apiFileColumn (users) {String} name Full name of the user.
+ * @apiFileColumn (users) {String} email=ana@example.com Email address, unique per user.
+ * @apiFileColumn (users) {Date} "Hire date" Date when the user was hired, as YYYY-MM-DD.
+ * @apiFileColumn (users) {Number} [age] Age in years.
+ * @apiFileColumn (users) {String="ADMIN","USER"} role=USER Role granted to the user.
+ * @apiSuccess {Number} created Number of users created.
+ */
+```
+
+What the site shows under "Request Body":
+
+- The heading is marked `multipart/form-data`. In the field table, the `users` row has type `File`, its accepted formats (`csv`) and its size limit (`5MB`).
+- A card per file with the format and whether it is required, a table of **expected columns** (position, name, type, an example value, description, allowed values, and an `optional` mark) and an **example file**: a spreadsheet-style preview with the column letters and the header row, plus a tab with the raw CSV ready to copy.
+- The generated example is the multipart request itself, in two tabs: the raw HTTP request (with the file part, its `filename` and `Content-Type`, and the CSV content built from the columns) and the equivalent `curl` command with `-F`. It replaces the JSON example, because a multipart body has no JSON. Nested fields get bracket names, like `extraInfo[hireDate]` and `tags[]`, the same as in the sample request form.
+
+Rules:
+
+- The `(file)` of `@apiFileColumn` is the name of the `File` field; without it, the column belongs to the first file. Columns whose name matches no file field get their own card.
+- The order of the tags is the order of the columns, and the example row uses the `=example` value, then the first allowed value, then a placeholder by type.
+- Quote a column name that has spaces or dots: `"Hire date"`. See [Field names and nested bodies](#field-names-and-nested-bodies) for the same quoting in `@apiBody`.
+- Several files are several `File` fields, or one `{File[]}`, which is shown as two parts with the same name. Give each file its own `(file)` group.
+- The sample request starts as `multipart/form-data` when the body has a file: each `File` field is a file input (`multiple` for `File[]`), and the chosen files are sent as real file parts. apidoc documents the upload; it does not validate it.
+
 ## Field names and nested bodies
 
 Dot notation describes nested objects, in requests and responses:

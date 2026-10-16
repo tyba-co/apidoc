@@ -14,7 +14,8 @@ Source of truth: `lib/core/parsers/*.js`, registered in `lib/core/index.js`. Tag
 | `@apiDefine` | `@apiDefine name [title]` + description lines | Reusable block. Name: letters, digits, `_` and `:` only. May contain `@apiVersion`, field tags and example tags. |
 | `@apiParam` | `@apiParam [(group)] [{type}] field [description]` | URL path parameters. Default group `Parameter`. |
 | `@apiQuery` | same as `@apiParam` | Query string parameters. Default group `Query`. |
-| `@apiBody` | same as `@apiParam` | Request body fields. Default group `Body`. A `{Boolean}` default sets the checkbox in the sample request form. |
+| `@apiBody` | same as `@apiParam` | Request body fields. Default group `Body`. A `{Boolean}` default sets the checkbox in the sample request form. A file is `{File="csv"}`. |
+| `@apiFileColumn` | `@apiFileColumn [(file)] {type} column[=example] description` | One column of a tabular file declared with `@apiBody {File="csv"}`. `(file)` is the name of the File field; quote names with spaces (`"Hire date"`). The site renders the expected columns and an example file. |
 | `@apiHeader` | same as `@apiParam` | Request headers. Default group `Header`. |
 | `@apiSuccess` | same as `@apiParam` | Response fields. Default group `Success 200`; use `(201 Created)` etc. for others. |
 | `@apiError` | same as `@apiParam` | Error identifiers, usually without type: `@apiError (404 Not Found) UserNotFound description`. Default group `Error 4xx`. |

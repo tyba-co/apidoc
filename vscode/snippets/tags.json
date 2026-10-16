@@ -133,6 +133,13 @@
     ],
     "description": "apidoc: optional body field"
   },
+  "apiFileColumn": {
+    "prefix": "@apiFileColumn",
+    "description": "apidoc: column of a tabular file (csv) in the body",
+    "body": [
+      "@apiFileColumn (${1:file}) {${2|String,Number,Boolean,Date|}} ${3:column} ${4:Description}"
+    ]
+  },
   "apiHeader": {
     "prefix": "@apiHeader",
     "body": [

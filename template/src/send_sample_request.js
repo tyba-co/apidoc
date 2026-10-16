@@ -146,6 +146,12 @@ function collectValues ($root) {
 
         let value = el.value || '';
 
+        if (el.type === 'file') {
+          const files = [...el.files];
+          value = el.multiple ? files : files[0];
+          if (!value || value.length === 0) { value = ''; }
+        }
+
         // Handle different input types
         if (el.type === 'checkbox') {
           if (el.checked) {
@@ -260,7 +266,8 @@ function sendSampleRequest (group, name, version, method) {
     const formData = new FormData();
     if (parameters.body && typeof parameters.body === 'object') {
       for (const [name, value] of Object.entries(parameters.body)) {
-        formData.append(name, value);
+        const values = Array.isArray(value) ? value : [value];
+        values.forEach(item => formData.append(name, item));
       }
     }
     requestConfig.data = formData;

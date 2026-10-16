@@ -87,6 +87,27 @@ function getUser () { }
 function postUser () { }
 
 /**
+ * @api {post} /user/import Import users from a file
+ * @apiVersion 0.3.0
+ * @apiName ImportUsers
+ * @apiGroup User
+ * @apiPermission none
+ *
+ * @apiDescription Upload a CSV file with one user per row. The columns must come in this order and the first row holds their names.
+ *
+ * @apiBody {File="csv"} users Users to create. Use a comma as delimiter and UTF-8.
+ * @apiBody {Boolean} [dryRun=false] Validate the file without creating anything.
+ * @apiFileColumn (users) {String} name Full name of the user.
+ * @apiFileColumn (users) {String} email=ana@example.com Email address, unique per user.
+ * @apiFileColumn (users) {Date} "Hire date" Date when the user was hired, as YYYY-MM-DD.
+ * @apiFileColumn (users) {Number} [age] Age in years.
+ * @apiFileColumn (users) {String="ADMIN","USER"} role=USER Role granted to the user.
+ *
+ * @apiSuccess {Number} created Number of users created.
+ */
+function importUsers () { }
+
+/**
  * @api {put} /user/:id Change a User
  * @apiVersion 0.3.0
  * @apiName PutUser

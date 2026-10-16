@@ -17,7 +17,9 @@ import { __ } from './locales/locale';
 import { body2json } from './jsonifier';
 import { autocompleteFields } from './body_autocomplete';
 import { bodyFieldLabels } from './body_example_hover';
-import { relativeFieldName, splitFieldPath, unquoteField } from './field_path';
+import { describeFiles, hasFiles, isFileType } from './file_columns';
+import { multipartExample } from './multipart_example';
+import { formFieldName, relativeFieldName, splitFieldPath, unquoteField } from './field_path';
 import DiffMatchPatch from './diff_match_patch';
 
 // this will register all helpers
@@ -45,6 +47,8 @@ export function register () {
   Handlebars.registerHelper('setInputType', function (text) {
     switch (text) {
       case 'File':
+      case 'File[]':
+        return 'file';
       case 'Email':
       case 'Color':
       case 'Number':
@@ -197,29 +201,7 @@ export function register () {
    * @returns {String}
    */
   Handlebars.registerHelper('dot2bracket', function (entry) {
-    const { parentNode, field, isArray } = entry;
-    let ret = '';
-    if (parentNode) {
-      let current = entry;
-      // loop on parents to build full object path
-      do {
-        const p = current.parentNode;
-        if (p.isArray) {
-          ret = `[]${ret}`;
-        }
-        if (p.parentNode) {
-          ret = `[${relativeFieldName(p.field, p.parentNode)}]${ret}`;
-        } else {
-          ret = unquoteField(p.field) + ret;
-        }
-        current = current.parentNode;
-      } while (current.parentNode);
-      ret += `[${relativeFieldName(field, parentNode)}]`;
-    } else {
-      ret = unquoteField(field);
-      if (isArray) { ret += '[]'; }
-    }
-    return ret;
+    return formFieldName(entry);
   });
 
   /**
@@ -301,6 +283,26 @@ export function register () {
 
   Handlebars.registerHelper('body2json', function (context, options) {
     return body2json(context);
+  });
+
+  Handlebars.registerHelper('fileSpecs', function (bodyFields, columns) {
+    return describeFiles(bodyFields, columns);
+  });
+
+  Handlebars.registerHelper('hasFiles', function (bodyFields) {
+    return hasFiles(bodyFields);
+  });
+
+  Handlebars.registerHelper('multipartExample', function (article) {
+    return multipartExample(article);
+  });
+
+  Handlebars.registerHelper('hasChoices', function (field) {
+    return Boolean(field.allowedValues) && field.allowedValues.length > 0 && !isFileType(field.type);
+  });
+
+  Handlebars.registerHelper('isFileType', function (type) {
+    return isFileType(type);
   });
 
   Handlebars.registerHelper('bodyAutocompleteFields', function (fields) {

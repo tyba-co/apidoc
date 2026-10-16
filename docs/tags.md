@@ -1,6 +1,6 @@
 # Tag reference
 
-Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (22 tags) plus `@apiIgnore`, which the block scanner handles itself.
+Every tag that apidoc understands, with its syntax, parameters, constraints and an example. The list comes from the parsers registered in `lib/core/index.js` (23 tags) plus `@apiIgnore`, which the block scanner handles itself.
 
 Conventions used on this page:
 
@@ -20,6 +20,7 @@ Conventions used on this page:
 | [`@apiError`](#apierror) | Error response identifier |
 | [`@apiErrorExample`](#apierrorexample) | Error response example |
 | [`@apiExample`](#apiexample) | Usage example |
+| [`@apiFileColumn`](#apifilecolumn) | Column of a tabular file in the body |
 | [`@apiGroup`](#apigroup) | Put the endpoint in a sidebar group |
 | [`@apiHeader`](#apiheader) | Request header |
 | [`@apiHeaderExample`](#apiheaderexample) | Header example |
@@ -173,6 +174,7 @@ Documents a field of the request body and feeds the generated body example.
 
 **Notes**
 
+- A file is a `{File}` field; put its format in the allowed values (`{File="csv"}`) and describe its columns with [`@apiFileColumn`](#apifilecolumn). A body with a file is a `multipart/form-data` request, and the example shows it as raw multipart and `curl`. See [Files in the body](structure.md#files-in-the-body).
 - A `{Boolean}` field gets a `checked` flag when it has any default value, which pre-ticks the checkbox of the form-data sample request.
 - The Request Body section renders an example JSON generated from these fields unless an `@apiParamExample` of type `json` exists. See [The body example](structure.md#the-body-example).
 - Not checked against the URL.
@@ -399,6 +401,50 @@ A free-form usage example, shown in tabs above the field tables.
  *     curl -i https://api.example.com/users/u_1
  * @apiExample {js} Fetch:
  *     const user = await fetch('/users/u_1').then(response => response.json());
+ */
+```
+
+### @apiFileColumn
+
+Documents one column of a tabular file sent in the request body, so the site can show the layout the file must have.
+
+**Syntax**
+
+```text
+@apiFileColumn [(file)] {type[{size}][=allowed]} column[=example] [description]
+```
+
+| Part | Required | Meaning |
+| --- | --- | --- |
+| `(file)` | No | Name of the `File` field of an [`@apiBody`](#param-api-body) the column belongs to. Without it the column belongs to the first `File` field. A name that matches no `File` field gets its own card, titled with that name. |
+| `{type}` | Yes, in practice | `String`, `Number`, `Boolean`, `Date`... Shown in the Type column and used to build the example value. |
+| `column` | Yes | Header of the column. Put it in brackets for an optional column (`[age]`) and between double quotes when it has spaces or dots (`"Hire date"`). |
+| `=example` | No | Value shown in the Example column and in the example file. Without it the first allowed value is used, and without that a placeholder by type: `text`, `0`, `true` or `2026-01-31`. |
+| `description` | No | Markdown. |
+
+**Notes**
+
+- The order of the tags is the order of the columns: the first tag is column 1 (`A`).
+- The field of the file is declared with [`@apiBody`](#param-api-body) and its format goes in the allowed values: `{File="csv"}`. With `csv` or `tsv` the example file also has a tab with the raw text (comma or tab delimited, quoted as RFC 4180 requires); other formats, such as `xlsx`, only get the preview.
+- A file field without columns stays a normal row of the body table, with its accepted formats and size (`{File{5MB}="csv"}` shows `Size limit: 5MB`).
+- apidoc does not validate uploads; this is documentation only. Columns declared in an [`@apiDefine`](#param-api-define) are inherited by [`@apiUse`](#param-api-use) like any other field.
+- Works with `{File[]}` for several files.
+
+**Example**
+
+```js
+/**
+ * @api {post} /sales/import Import sales
+ * @apiVersion 1.0.0
+ * @apiName ImportSales
+ * @apiGroup Sales
+ * @apiBody {File="csv"} sales Monthly export, comma delimited, UTF-8.
+ * @apiBody {Boolean} [dryRun] Validate without importing.
+ * @apiFileColumn (sales) {Date} date Sale date, as YYYY-MM-DD.
+ * @apiFileColumn (sales) {Number} amount=1500 Amount in COP.
+ * @apiFileColumn (sales) {String} "Customer name" Full name of the customer.
+ * @apiFileColumn (sales) {String="ACTIVE","BLOCKED"} [status] Account status.
+ * @apiSuccess {Number} imported Rows imported.
  */
 ```
 
