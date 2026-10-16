@@ -30,7 +30,7 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - `template/` — the generated site (handlebars + jquery + bootstrap 5). Source in `template/src/`, locales in `template/src/locales/*.mjs`.
 - `example/` — sample sources and `apidoc.json`; doubles as the CI smoke test via `build-example`.
 - `skills/apidoc/` — agent skill shipped in the npm package; `apidoc install-skill` (`lib/install_skill.js`, dispatched in `bin/apidoc` before commander) copies it to `.claude/skills/apidoc`. `.claude-plugin/marketplace.json` exposes the same skill as a Claude Code plugin.
-- `vscode/` — VS Code extension, not published to npm: context-aware completion (`src/completion.js` is pure and unit-tested, `extension.js` is the thin VS Code adapter), an injection grammar for highlighting, snippets and the `apidoc.json` schema. `cd vscode && npm run package` builds the `.vsix`; `npm run test:host` runs it in a real VS Code (not in CI).
+- `vscode/` — VS Code extension, not published to npm: context-aware completion (`src/completion.js` is pure and unit-tested, `extension.js` is the thin VS Code adapter), an injection grammar for highlighting, snippets and the `apidoc.json` schema. `cd vscode && npm run package` builds the `.vsix`; `npm run test:host` runs it in a real VS Code. `.github/workflows/vscode-extension.yml` runs the host tests on changes to `vscode/` and publishes to the Marketplace (and Open VSX) on a `vscode-vX.Y.Z` tag.
 - `docs/` — user documentation in markdown (getting started, configuration and CLI, structuring, tag reference, tooling). `scripts/build-pages.js` renders all of it as one page (like apidocjs.com): `### @apiXxx` headings get the anchor `#param-api-xxx`, markdown links between files are resolved to in-page anchors, and `scripts/pages.js` follows the scroll in the sidebar. `.github/workflows/pages.yml` publishes it with the example to GitHub Pages on every push to `master`. Neither ships in the npm package.
 - Field names: a quoted segment (`meta."trace.id"`, `"custom.property"`) is a literal key containing a dot. `template/src/field_path.mjs` is the one place that splits and unquotes field paths; the body example in `template/index.html` marks a dotted key in red when its parent is not declared as `Object`.
 
@@ -50,6 +50,7 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 
 - Default branch is `master`; `CONTRIBUTING.md` mentions `dev`, which this fork does not use.
 - Publishing: creating a GitHub release triggers `publishing.yml`, which sets the `package.json` version from the tag, commits it to `master`, and runs `npm publish`. Do not bump the version by hand for a release.
+- VS Code extension releases are separate: bump `vscode/package.json` by hand and push a `vscode-vX.Y.Z` tag. Never create a GitHub release for it (that runs the npm publish).
 - `.npmrc` reads `NODE_AUTH_TOKEN`; never commit a token.
 - `doc/` and `tmp/` are gitignored build output.
 - `.npmignore` (not a `files` field) controls the tarball: `skills/` ships; `vscode/`, `.claude/`, `.claude-plugin/`, `CLAUDE.md` do not. Check with `npm pack --dry-run`.

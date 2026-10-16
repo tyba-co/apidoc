@@ -9,7 +9,9 @@ Completion, highlighting and snippets for [@tyba-co/apidoc](https://github.com/t
 
 ## Install
 
-The extension is not on the Marketplace. Build it from a clone of the repository and install the file:
+Search for **apiDoc (Tyba)** in the Extensions view, or run `code --install-extension tyba-co.apidoc-vscode`.
+
+To build it from a clone of the repository and install the file:
 
 ```bash
 cd vscode
@@ -26,19 +28,22 @@ The provider triggers on `@`, `{`, `(` and the space after a tag. If the list do
 ## Tests
 
 - `npm test` in the repository root: unit tests of the completion logic, and every registered tag must have a snippet the parser accepts.
-- `npm install && npm run test:host` here: loads the extension in a real VS Code and asks it for completions. It downloads a VS Code build, or set `VSCODE_EXECUTABLE_PATH` to an installed one. From VS Code's integrated terminal, unset `ELECTRON_RUN_AS_NODE` first. Not run in CI (no display).
+- `npm install && npm run test:host` here: loads the extension in a real VS Code and asks it for completions. It downloads a VS Code build, or set `VSCODE_EXECUTABLE_PATH` to an installed one. From VS Code's integrated terminal, unset `ELECTRON_RUN_AS_NODE` first. CI runs it under `xvfb-run` (`.github/workflows/vscode-extension.yml`).
 
 ## Publishing
 
-The manifest is ready for the Visual Studio Marketplace (`publisher: tyba-co`, `icon.png` is the Tyba app icon at 256x256). Publishing needs the publisher to exist and a personal access token with the Marketplace "Manage" scope:
+The manifest is ready for the Visual Studio Marketplace (`publisher: tyba-co`, `icon.png` is the Tyba app icon at 256x256). `.github/workflows/vscode-extension.yml` publishes it: bump `version` in `package.json`, add the entry to `CHANGELOG.md`, merge to `master`, then push a tag with the same version:
 
 ```bash
-cd vscode
-npx @vscode/vsce login tyba-co
-npx @vscode/vsce publish --no-dependencies
+git tag vscode-v0.2.3 && git push origin vscode-v0.2.3
 ```
 
-For Cursor, Windsurf and VSCodium, publish the same `.vsix` to Open VSX with `npx ovsx publish apidoc-vscode-<version>.vsix -p <token>`.
+The workflow checks that the tag matches `package.json`, runs the host tests and publishes the `.vsix`. Do not create a GitHub release for these tags: releases trigger the npm publish.
+
+- **Visual Studio Marketplace**: no token. The job signs in to Microsoft Entra ID through OIDC as the app in the repository variables `AZURE_CLIENT_ID` and `AZURE_TENANT_ID` (federated credential for the `vscode-marketplace` environment), and runs `vsce publish --azure-credential`. That app is a Contributor member of the `tyba-co` publisher; to find its member ID, run the workflow by hand with `marketplace-identity` checked. Global personal access tokens stop working on December 1, 2026.
+- **Open VSX** (Cursor, Windsurf, VSCodium): the same `.vsix` with the secret `OVSX_PAT`; the step is skipped when it is unset.
+
+To publish by hand, upload the `.vsix` from `npm run package` at https://marketplace.visualstudio.com/manage/publishers/tyba-co.
 
 ## Adding a tag
 
