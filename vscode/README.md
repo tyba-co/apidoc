@@ -28,6 +28,18 @@ The provider triggers on `@`, `{`, `(` and the space after a tag. If the list do
 - `npm test` in the repository root: unit tests of the completion logic, and every registered tag must have a snippet the parser accepts.
 - `npm install && npm run test:host` here: loads the extension in a real VS Code and asks it for completions. It downloads a VS Code build, or set `VSCODE_EXECUTABLE_PATH` to an installed one. From VS Code's integrated terminal, unset `ELECTRON_RUN_AS_NODE` first. Not run in CI (no display).
 
+## Publishing
+
+The manifest is ready for the Visual Studio Marketplace (`publisher: tyba-co`, `icon.png` is the Tyba app icon at 256x256). Publishing needs the publisher to exist and a personal access token with the Marketplace "Manage" scope:
+
+```bash
+cd vscode
+npx @vscode/vsce login tyba-co
+npx @vscode/vsce publish --no-dependencies
+```
+
+For Cursor, Windsurf and VSCodium, publish the same `.vsix` to Open VSX with `npx ovsx publish apidoc-vscode-<version>.vsix -p <token>`.
+
 ## Adding a tag
 
 When a parser is added to `lib/core/index.js`, add its snippet to `snippets/tags.json`; the tag completion uses the same snippets. `npm test` fails until every registered tag has one.
