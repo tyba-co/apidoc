@@ -498,6 +498,20 @@ Under every endpoint the site shows its request as **cURL**, **JavaScript** (`fe
 
 The samples are generated, not written: there is nothing to maintain. Examples are the `=example` / default values of the fields, then the first allowed value, then a placeholder by type. Webhooks and streams have no samples. To turn them off, set `template.codeSamples` to `false`; see [Configuration](configuration.md#configuration-keys).
 
+## OpenAPI export
+
+`apidoc --openapi` writes `openapi.json` (OpenAPI 3.0.3) next to the site, so the same comments feed Postman, code generators and gateways:
+
+```bash
+npx --no-install apidoc -i src -o doc --openapi
+```
+
+- `url` and `environments` become `servers`; `auth` becomes `securitySchemes` and the global `security`. Endpoints with `@apiPermission none` get `security: []`.
+- Path parameters, `@apiQuery` and `@apiHeader` become `parameters`; the body becomes a `requestBody` in its format (JSON schema with nesting, required fields, sizes and allowed values; `multipart/form-data` with binary files and their `@apiFileColumn` columns; form-encoded, binary, XML and text bodies).
+- Success and error groups become responses by status (`Error 4xx` is `4XX`); `@apiResponseHeader` becomes response `headers`, and a `File` field in the success fields becomes a download with its media type.
+- `@apiWebhook` endpoints go under `x-webhooks`, and `@apiStreaming` adds `x-streaming`.
+- Only the newest version of each method and path is exported.
+
 ## Sample request
 
 An endpoint gets a "Send a Sample Request" form when it has a sample request URL, which comes from either place:

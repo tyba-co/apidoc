@@ -194,6 +194,7 @@ npx --no-install apidoc [options]
 | `-n, --dry-run` | off | Parse and validate, write nothing. Prints `Dry run mode enabled: no files created.` |
 | `--warn-error` | off | Treat warnings as errors: the first warning is printed as an error and the process exits with code 1 at once, so later problems are not reported until you fix it. |
 | `--write-json` | off | Also write the parsed data as `assets/api-data.json` in the output directory. |
+| `--openapi` | off | Also write `openapi.json` (OpenAPI 3.0.3) in the output directory. See [OpenAPI export](structure.md#openapi-export). |
 | `-p, --private` | off | Include endpoints marked with `@apiPrivate`. |
 | `-S, --single` | off | Produce one self-contained `index.html` (CSS and JavaScript inlined) in the output directory. |
 | `--filter-by <tag=value>` | none | Keep only blocks whose tag has exactly this value, plus all `@apiDefine` blocks. The tag name must be written in lower case, for example `--filter-by apigroup=User`; `apiGroup=User` matches nothing. |

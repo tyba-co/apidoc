@@ -256,7 +256,7 @@ function buildLanding (outputDir) {
  * @param {String} outputDir directory that receives the generated example site
  */
 function buildExample (outputDir) {
-  execFileSync(process.execPath, [path.join(repoRoot, 'bin', 'apidoc'), '-i', path.join(repoRoot, 'example'), '-o', outputDir, '-q'], { stdio: 'inherit' });
+  execFileSync(process.execPath, [path.join(repoRoot, 'bin', 'apidoc'), '-i', path.join(repoRoot, 'example'), '-o', outputDir, '--openapi', '-q'], { stdio: 'inherit' });
 }
 
 /**

@@ -26,6 +26,7 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - `lib/core/languages/` — comment-style regexes per file extension; `default.js` covers C-style.
 - `lib/core/index.js` — registers parsers/filters/workers/languages by name. A new tag or worker is not active until registered here.
 - `lib/writer.js` — writes `api_data.js`/`api_project.js`, copies `template/`, runs webpack on `template/src/main.js`.
+- `lib/openapi.js` — pure converter from parsed blocks + project to OpenAPI 3.0.3, written as `openapi.json` by `lib/writer.js` under `--openapi`. Duplicates `bodyKind`/`bodyMime`/`splitFieldPath` from `template/src/` in CommonJS; `test/openapi_test.js` checks parity.
 - `template/` — the generated site (handlebars + jquery + bootstrap 5). Source in `template/src/`, locales in `template/src/locales/*.mjs`.
 - `example/` — sample sources and `apidoc.json`; doubles as the CI smoke test via `build-example`.
 - `skills/apidoc/` — agent skill shipped in the npm package; `apidoc install-skill` (`lib/install_skill.js`, dispatched in `bin/apidoc` before commander) copies it to `.claude/skills/apidoc`. `.claude-plugin/marketplace.json` exposes the same skill as a Claude Code plugin.
@@ -39,7 +40,7 @@ Pipeline: `bin/apidoc` (commander CLI, nodemon watch) → `lib/index.js` `create
 - CommonJS in `lib/` and `bin/`; ESM (`.mjs`) only in `template/src` helpers and their tests.
 - ESLint is `standard` plus: single quotes, semicolons, `comma-dangle: always-multiline`, no extra parens. 2-space indent, LF (`.editorconfig`).
 - Existing JSDoc uses `{String}`/`{Object}` casing; match the file you are editing.
-- Keep upstream code diffable: avoid reformatting or renaming upstream files, so merging upstream releases stays cheap. Tyba-specific work is mostly in `template/` (layout, sidebar, tabs, responsiveness).
+- Keep upstream code diffable: avoid reformatting or renaming upstream files, so merging upstream releases stays cheap. Tyba-specific work is mostly in `template/` (layout, sidebar, tabs, responsiveness, sample requests, `auth`/`environments` in `try_settings.mjs`, generated code samples in `code_samples.mjs`).
 - New behavior ships with a test next to the closest existing one in `test/`. Parser tests: `test/core/parsers/`. Template/ESM tests: `*_test.mjs`.
 - Tests must run under both node:test and mocha: use only `describe`, `it`, `before`, `after` (no `beforeEach`/`afterEach`, `.only`, `this.timeout()`; chain `it(...).timeout(ms)` instead).
 - Adding or changing a parser means updating `vscode/snippets/tags.json`, `skills/apidoc/references/tags.md` and a `### @apiXxx` heading in `docs/tags.md`; `test/vscode_snippets_test.js`, `test/skill_sync_test.js` and `test/build_pages_test.js` fail until all match `lib/core/index.js`.
